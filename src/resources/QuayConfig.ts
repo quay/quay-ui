@@ -1,4 +1,4 @@
-import { getBackendUrl } from '../utils/httputils';
+// import { getBackendUrl } from '../utils/httputils';
 
 const testConfig = {
   AUTHENTICATION_TYPE: 'Database',
