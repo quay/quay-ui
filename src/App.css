@@ -16,3 +16,11 @@ html, body, #root,  .App {
   background-color: black;
   color: black;
 }
+
+.pf-c-toolbar__content-section {
+    row-gap: 16px !important;
+}
+
+.pf-c-page__sidebar-body {
+    padding-top: 0;
+}
