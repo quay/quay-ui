@@ -1,17 +1,16 @@
 import React from 'react';
-import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import '@patternfly/react-core/dist/styles/base.css';
+import 'src/App.css';
 import { RecoilRoot } from 'recoil';
-import { Main } from './routes/Main';
+import { StandaloneMain } from 'src/routes/StandaloneMain';
+
 
 function App() {
-  return (
+    return (
     <div className="App">
       <RecoilRoot>
-        <Routes>
-          <Route path="/" element={<Main />} />
-        </Routes>
-      </RecoilRoot>
+          <StandaloneMain />
+     </RecoilRoot>
     </div>
   );
 }
