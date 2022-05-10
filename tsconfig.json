@@ -9,7 +9,7 @@
     "jsx": "react-jsx",
     "rootDir": ".",
     "outDir": "dist",
-
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src"
