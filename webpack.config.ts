@@ -88,6 +88,7 @@ const config: Configuration = {
   devServer: {
     static: './dist',
     port: 9001,
+    historyApiFallback: true,
     // Allow bridge running in a container to connect to the plugin dev server.
     allowedHosts: 'all',
     headers: {

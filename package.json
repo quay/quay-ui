@@ -2,6 +2,7 @@
   "name": "quay-ui",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@material-ui/styles": "^4.11.5",
     "@openshift-console/dynamic-plugin-sdk": "0.0.7",

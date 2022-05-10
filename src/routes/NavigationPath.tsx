@@ -14,6 +14,8 @@ export enum NavigationPath {
     teamMembershipTab = '/namespaces/:reponame/team',
     robotAccountTab = '/namespaces/:reponame/robotacct',
     defaultPermissionsTab = '/namespaces/:reponame/permissions',
-    usagelogs = '/namespaces/:reponame/logs'
+    oauth = '/namespaces/:reponame/oauth',
+    usagelogs = '/namespaces/:reponame/logs',
+    settings = '/namespaces/:reponame/settings'
 
 }

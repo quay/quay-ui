@@ -319,7 +319,7 @@ export default function Namespaces() {
                     }}
                   />
                   <Td dataLabel={columnNames.name}>
-                    <Link to={`namespaces/${ns.name}`}>{ns.name}</Link>
+                    <Link to={`${ns.name}`}>{ns.name}</Link>
                     {/* <Link to={'namespaces/builds'}> {ns.name} </Link> */}
                   </Td>
                   <Td dataLabel={columnNames.repoCount}>{ns.repoCount}</Td>
