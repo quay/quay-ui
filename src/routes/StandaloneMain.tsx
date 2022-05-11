@@ -213,19 +213,3 @@ type SideNavProps = {
     title: string;
     component: JSX.Element | any;
 };
-
-
-/* export function StandaloneMain() {
-    const pageId = 'quay-app-container';
-
-    return (
-        <Page
-            mainContainerId={pageId}
-            header={<QuayHeader />}
-            sidebar={<QuaySidebar />}
-        >
-            <Namespaces />
-        </Page>
-
-    )
-} */

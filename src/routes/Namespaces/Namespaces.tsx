@@ -150,7 +150,7 @@ export default function Namespaces() {
   }, []);
 
   // Fetch all namespaces for the user logged in
-  React.useEffect(() => {
+  /* React.useEffect(() => {
     const fetchData = async () => {
       const data = await fetch(`${quayAuth.QUAY_HOSTNAME}/api/v1/user/`, {
         method: 'GET',
@@ -181,7 +181,7 @@ export default function Namespaces() {
         });
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, []); */
 
   const onDelete = async () => {
     console.log('Delete clicked');
@@ -222,7 +222,7 @@ export default function Namespaces() {
           <Toolbar>
             <ToolbarContent>
               <ToolbarItem spacer={{ default: 'spacerNone' }}>
-                {/* <ListPageFilter 
+                {/* <ListPageFilter
                   data={data}
                   loaded={loaded}
                   rowFilters=
@@ -247,7 +247,7 @@ export default function Namespaces() {
                   {options}
                 </Select>
               </ToolbarItem>
-              {/* try for search field  
+              {/* try for search field
               <ToolbarItem variant='search-filter' className="co-filter-search--full-width"></ToolbarItem>  */}
               <ToolbarItem>
                 <TextInput
