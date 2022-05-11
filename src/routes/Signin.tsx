@@ -3,15 +3,18 @@ import {LoginForm, LoginMainFooterBandItem, LoginPage} from "@patternfly/react-c
 import logo from 'src/assets/RH_QuayIO2.svg';
 import loginBg from 'src/assets/rh_login.jpeg'
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
+import {loginUser} from "../resources/AuthResource";
 
 export function Signin() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
 
-    const onLoginButtonClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const onLoginButtonClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         console.log(`login submit ${username}, ${password}`);
+        const response = await loginUser(username, password)
+        console.log(response.data);
     }
 
     const signUpForAccountMessage = (

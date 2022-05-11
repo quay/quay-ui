@@ -33,15 +33,9 @@ module.exports = env => {
                         path.resolve(__dirname, 'node_modules/@patternfly/patternfly/assets/fonts'),
                         path.resolve(__dirname, 'node_modules/@patternfly/patternfly/assets/pficon'),
                     ],
-                    use: {
-                        loader: 'file-loader',
-                        options: {
-                            // Limit at 50k. larger files emited into separate files
-                            limit: 5000,
-                            outputPath: 'fonts/',
-                            name: '[name].[ext]',
-                        }
-                    }
+                    generator: {
+                        filename: 'assets/[name].[ext]',
+                    },
                 },
                 {
                     test: /\.svg$/,
