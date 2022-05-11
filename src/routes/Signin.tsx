@@ -4,17 +4,23 @@ import logo from 'src/assets/RH_QuayIO2.svg';
 import loginBg from 'src/assets/rh_login.jpeg'
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import {loginUser} from "../resources/AuthResource";
+import {useNavigate} from "react-router-dom";
 
 export function Signin() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+    const navigate = useNavigate();
 
     const onLoginButtonClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         console.log(`login submit ${username}, ${password}`);
         const response = await loginUser(username, password)
-        console.log(response.data);
+        console.log(response);
+        if (response.success) {
+            navigate("/")
+        }
+        // TODO: handle login error
     }
 
     const signUpForAccountMessage = (

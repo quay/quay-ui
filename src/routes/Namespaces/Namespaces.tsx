@@ -31,7 +31,8 @@ import './css/Namespaces.scss';
 import { CreateNamespaceModal } from './CreateNamespaceModal';
 import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { authState } from '../../atoms/AuthState';
+import { authState } from 'src/atoms/AuthState';
+import axios from "../../libs/axios";
 
 export default function Namespaces() {
 
@@ -150,38 +151,32 @@ export default function Namespaces() {
   }, []);
 
   // Fetch all namespaces for the user logged in
-  /* React.useEffect(() => {
+  React.useEffect(() => {
     const fetchData = async () => {
-      const data = await fetch(`${quayAuth.QUAY_HOSTNAME}/api/v1/user/`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${quayAuth.QUAY_OAUTH_TOKEN}`,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-      });
-      return await data.json();
+      const response = await axios.get(`/api/v1/user/`);
+      return response.data;
     };
 
     fetchData()
-      .then((response) => {
-        console.log('resp:', response);
-        response?.organizations?.map((org : any) => {
-          setNamespacesList((prevNamespaces) => [
-            ...prevNamespaces,
-            {
-              name: org.name,
-              repoCount: 1,
-              tagCount: 1,
-              size: '1.1GB',
-              pulls: 108,
-              lastPull: 'TBA',
-              lastModified: 'TBA',
-            },
-          ]);
-        });
-      })
-      .catch((err) => console.error(err));
-  }, []); */
+        .then((response) => {
+          console.log('resp:', response);
+          response?.organizations?.map((org : any) => {
+            setNamespacesList((prevNamespaces) => [
+              ...prevNamespaces,
+              {
+                name: org.name,
+                repoCount: 1,
+                tagCount: 1,
+                size: '1.1GB',
+                pulls: 108,
+                lastPull: 'TBA',
+                lastModified: 'TBA',
+              },
+            ]);
+          });
+        })
+        .catch((err) => console.log(err));
+  }, []);
 
   const onDelete = async () => {
     console.log('Delete clicked');
