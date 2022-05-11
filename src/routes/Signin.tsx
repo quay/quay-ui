@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {LoginForm, LoginMainFooterBandItem, LoginPage} from "@patternfly/react-core";
 import logo from 'src/assets/RH_QuayIO2.svg';
-import loginBg from 'src/assets/rh_login.jpeg'
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 import {loginUser} from "../resources/AuthResource";
 import {useNavigate} from "react-router-dom";

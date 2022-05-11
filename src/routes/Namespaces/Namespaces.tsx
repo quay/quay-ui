@@ -33,6 +33,7 @@ import { Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { authState } from 'src/atoms/AuthState';
 import axios from "../../libs/axios";
+import {UserOrgs} from "../../atoms/UserState";
 
 export default function Namespaces() {
 
@@ -49,6 +50,8 @@ export default function Namespaces() {
   const [selectedNamespace, setSelectedNamespace] = React.useState<string[]>(
     [],
   );
+
+  const userOrgs  = useRecoilValue(UserOrgs);
 
   const columnNames = {
     name: 'Namespace',
@@ -150,8 +153,26 @@ export default function Namespaces() {
     };
   }, []);
 
-  // Fetch all namespaces for the user logged in
   React.useEffect(() => {
+    if (userOrgs) {
+      userOrgs.map((org: any) =>  {
+        setNamespacesList((prevNamespaces) => [
+          ...prevNamespaces,
+          {
+            name: org.name,
+            repoCount: 1,
+            tagCount: 1,
+            size: '1.1GB',
+            pulls: 108,
+            lastPull: 'TBA',
+            lastModified: 'TBA',
+          }])
+      });
+    }
+  }, [userOrgs]);
+
+  // Fetch all namespaces for the user logged in
+  /* React.useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get(`/api/v1/user/`);
       return response.data;
@@ -176,7 +197,7 @@ export default function Namespaces() {
           });
         })
         .catch((err) => console.log(err));
-  }, []);
+  }, []); */
 
   const onDelete = async () => {
     console.log('Delete clicked');
