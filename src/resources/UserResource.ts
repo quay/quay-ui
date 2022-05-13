@@ -1,3 +1,4 @@
+import axios from "src/libs/axios";
 
 interface IAvatar {
     name: string,
@@ -6,14 +7,6 @@ interface IAvatar {
     kind: string,
 }
 
-export interface IOrganization {
-    name: string,
-    avatar: IAvatar
-    can_create_repo: boolean,
-    public: boolean,
-    is_org_admin: boolean,
-    preferred_namespace: boolean
-}
 
 export interface IUserResource {
     anonymous: boolean,
@@ -44,4 +37,13 @@ export interface IUserResource {
     is_free_account: boolean,
     has_password_set: boolean,
     organizations: IOrganization[];
+}
+
+export async function getUser() {
+    try {
+        const response = await axios.get('/api/v1/user/');
+        return response.data;
+    } catch(error)  {
+        throw new Error(`API error getting user ${error.message}`);
+    }
 }

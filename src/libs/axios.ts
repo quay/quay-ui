@@ -39,7 +39,7 @@ axiosIns.interceptors.response.use((response) => {
     console.log(response);
     return response;
 }, (error) => {
-    console.error(error)
+    // console.error(error)
     if (error.response.status === 401) {
         window.location.href = '/signin';
     }

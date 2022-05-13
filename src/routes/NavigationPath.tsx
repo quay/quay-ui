@@ -1,7 +1,7 @@
 export enum NavigationPath {
-    
     // Side NAV
     home = '/',
+    overview = '/overview',
     search = '/search',
     namespace = '/namespaces',
     builds ='/builds',

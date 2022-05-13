@@ -57,7 +57,7 @@ export default function Repositories(props) {
           )}
         >
           <Link to={`/namespaces/${repoName}/team`}> Team & Membership </Link>
-          
+
         </NavItem>
         <NavItem
           isActive={location.pathname.startsWith(
@@ -129,7 +129,7 @@ export default function Repositories(props) {
     <Page>
       <PageSection variant={PageSectionVariants.light} hasShadowBottom>
         <Breadcrumb>
-          <BreadcrumbItem to="/namespaces">Namespace</BreadcrumbItem>
+          <BreadcrumbItem to="/namespaces">Namespaces</BreadcrumbItem>
           <BreadcrumbItem to="#">{repositoryName}</BreadcrumbItem>
         </Breadcrumb>
         <PageSection variant={PageSectionVariants.light}>

@@ -21,13 +21,13 @@ import {
   Tr,
 } from "@patternfly/react-table";
 import { useRecoilValue } from "recoil";
-import { authState } from "../../atoms/AuthState";
+import { AuthState } from "../../atoms/AuthState";
 
 export const CreateNamespaceModal = (
   props: CreateNamespaceModalProps
 ): JSX.Element => {
   const { isModalOpen, handleModalToggle } = props;
-  const quayAuth = useRecoilValue(authState);
+  const quayAuth = useRecoilValue(AuthState);
 
   const [namespaceName, setNamespaceName] = React.useState("");
   const [namespaceEmail, setNamespaceEmail] = React.useState("");
