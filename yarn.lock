@@ -1428,7 +1428,7 @@
     "semver" "6.x"
     "webpack" "^5.68.0"
 
-"@openshift-console/dynamic-plugin-sdk@0.0.7":
+"@openshift-console/dynamic-plugin-sdk@^0.0.7":
   "integrity" "sha512-7IR84mIQ6vz73WxLZ7QazWdajGXyMvsrT94tuiHqG1QyVGRCZUw8vVHBHlTEa8yDDIEE9JdVwaF2IRtWpHe3Uw=="
   "resolved" "https://registry.npmjs.org/@openshift-console/dynamic-plugin-sdk/-/dynamic-plugin-sdk-0.0.7.tgz"
   "version" "0.0.7"

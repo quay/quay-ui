@@ -13,19 +13,10 @@ import {
 import BarsIcon from '@patternfly/react-icons/dist/js/icons/bars-icon';
 import logo from 'src/assets/RH_QuayIO2.svg';
 import {HeaderToolbar} from "./HeaderToolbar";
+import {Link} from "react-router-dom";
 
-// import {useNavigate} from "react-router-dom";
 
 export function QuayHeader() {
-    /* function LogoImg() {
-        const navigate = useNavigate();
-        function handleClick() {
-            navigate('/');
-        }
-        return (
-            <img src={logo} onClick={handleClick} alt="Red Hat Quay" />
-        );
-    } */
 
   return (
     <Masthead>
@@ -35,8 +26,8 @@ export function QuayHeader() {
         </Button>
       </MastheadToggle>
       <MastheadMain>
-        <MastheadBrand >
-            <Brand src={logo} alt="Red Hat Quay" className={'header-logo'} />
+        <MastheadBrand component={props => <Link {...props} to="/" />} >
+            <Brand src={logo} alt="Red Hat Quay" className={'header-logo'}  />
         </MastheadBrand>
       </MastheadMain>
         <MastheadContent>

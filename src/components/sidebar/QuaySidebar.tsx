@@ -1,38 +1,64 @@
 import React from 'react';
-import {Nav, NavItem, NavList, PageSidebar, Sidebar, SidebarContent, SidebarPanel} from '@patternfly/react-core';
-import { NavLink } from 'react-router-dom';
+import {Nav, NavItem, NavList, PageSidebar} from '@patternfly/react-core';
+import {Link} from 'react-router-dom';
+import {NavigationPath} from "src/routes/NavigationPath";
+import Namespaces from "src/routes/Namespaces/Namespaces";
+import Repositories from "src/routes/Namespaces/Repositories/Repositories";
+import {Overview} from "../../routes/Overview/Overview";
+
+
+interface SideNavProps {
+    isSideNav: boolean;
+    navPath: NavigationPath;
+    title: string;
+    component: JSX.Element | any;
+}
+
+
+const routes: SideNavProps[] = [
+    {
+        isSideNav: true,
+        navPath: NavigationPath.overview,
+        title: "Overview",
+        component: <Overview />,
+    },
+    {
+        isSideNav: true,
+        navPath: NavigationPath.namespace,
+        title: "Namespaces",
+        component: <Namespaces />,
+    },
+    {
+        isSideNav: true,
+        navPath: NavigationPath.repositories,
+        title: "Repositories",
+        component: <Repositories />,
+    },
+];
+
 
 export function QuaySidebar() {
-  const Navigation = (
-      <Nav id="nav-primary-simple" theme="dark">
-        <NavList id="nav-list-simple">
-          {/* routes.map(
-              (route, idx) => route.label && (!route.routes ? renderNavItem(route, idx) : renderNavGroup(route, idx))
-          ) */}
-            <NavItem key={`test-nav`} id={`test-nav`} isActive={false}>
-                <NavLink to={'/namespaces'}>
-                    Overview
-                </NavLink>
-            </NavItem>
-            <NavItem key={`test-nav`} id={`test-nav`} isActive={false}>
-                <NavLink to={'/repositories'}>
-                   Repositories
-                </NavLink>
-            </NavItem>
-            <NavItem key={`test-nav`} id={`test-nav`} isActive={false}>
-                <NavLink to={'/namespaces'}>
-                    Namespaces
-                </NavLink>
-            </NavItem>
-        </NavList>
-      </Nav>
-  );
+    const Navigation = (
+        <Nav>
+            <NavList>
+                {routes.map((route) =>
+                    route.isSideNav ? (
+                        <NavItem
+                            key={route.navPath}
+                            isActive={location.pathname === route.navPath}
+                        >
+                            <Link to={route.navPath}>{route.title}</Link>
+                        </NavItem>
+                    ) : null
+                )}
+            </NavList>
+        </Nav>
+    );
 
-  return (
-      <PageSidebar
-          className="page-sidebar"
-          theme="dark"
-          nav={Navigation} />
-  );
-
+    return (
+        <PageSidebar
+            className="page-sidebar"
+            theme="dark"
+            nav={Navigation} />
+    );
 }

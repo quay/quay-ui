@@ -22,22 +22,17 @@ import {
   SelectVariant,
   SelectGroup,
 } from '@patternfly/react-core';
-// import {
-//   // ListPageFilter,
-//   // ListPageFilterProps
-// } from '@openshift-console/dynamic-plugin-sdk';
 
 import './css/Namespaces.scss';
 import { CreateNamespaceModal } from './CreateNamespaceModal';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { authState } from 'src/atoms/AuthState';
-import axios from "../../libs/axios";
-import {UserOrgs} from "../../atoms/UserState";
+import { AuthState } from 'src/atoms/AuthState';
+import {UserOrgs} from "src/atoms/UserState";
 
 export default function Namespaces() {
-
-  const quayAuth = useRecoilValue(authState);
+  const authState = useRecoilValue(AuthState);
+  const navigate = useNavigate();
 
   const [namespacesList, setNamespacesList] = React.useState<
     NamespaceListProps[]
@@ -171,43 +166,10 @@ export default function Namespaces() {
     }
   }, [userOrgs]);
 
-  // Fetch all namespaces for the user logged in
-  /* React.useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get(`/api/v1/user/`);
-      return response.data;
-    };
-
-    fetchData()
-        .then((response) => {
-          console.log('resp:', response);
-          response?.organizations?.map((org : any) => {
-            setNamespacesList((prevNamespaces) => [
-              ...prevNamespaces,
-              {
-                name: org.name,
-                repoCount: 1,
-                tagCount: 1,
-                size: '1.1GB',
-                pulls: 108,
-                lastPull: 'TBA',
-                lastModified: 'TBA',
-              },
-            ]);
-          });
-        })
-        .catch((err) => console.log(err));
-  }, []); */
-
   const onDelete = async () => {
     console.log('Delete clicked');
     selectedNamespace?.forEach(async (nsToBeDeleted) => {
-      await fetch(`${quayAuth.QUAY_HOSTNAME}/api/v1/organization/${nsToBeDeleted}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${quayAuth.QUAY_OAUTH_TOKEN}`,
-          'X-Requested-With': 'XMLHttpRequest',
-        },
+      await deleteOrg(nsToBeDeleted)
       })
         .then(() =>
           setNamespacesList((prev) =>
@@ -238,18 +200,6 @@ export default function Namespaces() {
           <Toolbar>
             <ToolbarContent>
               <ToolbarItem spacer={{ default: 'spacerNone' }}>
-                {/* <ListPageFilter
-                  data={data}
-                  loaded={loaded}
-                  rowFilters=
-                  nameFilterPlaceholder,
-                  labelFilterPlaceholder,
-                  hideNameLabelFilters,
-                  hideLabelFilter,
-                  columnLayout,
-                  onFilterChange,
-                  hideColumnManagement,
-                  /> */}
                 <Select
                   variant={SelectVariant.checkbox}
                   aria-label="Select Input"
