@@ -29,6 +29,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { AuthState } from 'src/atoms/AuthState';
 import {UserOrgs} from "src/atoms/UserState";
+import { deleteOrg } from 'src/resources/OrganisationResource';
 
 export default function Namespaces() {
   const authState = useRecoilValue(AuthState);
@@ -168,15 +169,13 @@ export default function Namespaces() {
 
   const onDelete = async () => {
     console.log('Delete clicked');
-    selectedNamespace?.forEach(async (nsToBeDeleted) => {
-      await deleteOrg(nsToBeDeleted)
-      })
-        .then(() =>
-          setNamespacesList((prev) =>
-            prev.filter((ns) => ns.name !== nsToBeDeleted),
-          ),
-        )
-        .catch((err) => console.error(err));
+    const x = selectedNamespace?.forEach(async (nsToBeDeleted) => {
+      try {
+        await deleteOrg(nsToBeDeleted);
+        setNamespacesList((prev) => prev.filter((ns) => ns.name !== nsToBeDeleted));
+      } catch (e) {
+        console.error(e);
+      }
     });
   };
 

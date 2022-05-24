@@ -1,5 +1,12 @@
 import axios from "src/libs/axios"
 
+export interface IAvatar {
+    name: string,
+    hash: string,
+    color: string,
+    kind: string,
+}
+
 export interface IOrganization {
     name: string,
     avatar: IAvatar
@@ -9,10 +16,11 @@ export interface IOrganization {
     preferred_namespace: boolean
 }
 
-async function deleteOrg(orgname: string) {
+export async function deleteOrg(orgname: string) {
+    const deleteApiUrl = `/api/v1/organization/${orgname}`
     try {
         const response =  await axios.delete(deleteApiUrl);
     } catch (e) {
-
+        console.error(e);
     }
 }
