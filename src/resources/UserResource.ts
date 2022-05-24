@@ -1,11 +1,6 @@
 import axios from "src/libs/axios";
+import { IAvatar, IOrganization } from "./OrganisationResource";
 
-interface IAvatar {
-    name: string,
-    hash: string,
-    color: string,
-    kind: string,
-}
 
 
 export interface IUserResource {
