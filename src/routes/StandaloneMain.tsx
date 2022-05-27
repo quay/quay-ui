@@ -12,6 +12,7 @@ import {
 import Builds from "src/routes/Builds/Builds";
 import Search from "src/routes/Search/Search";
 import Repositories from "src/routes/Namespaces/Repositories/Repositories";
+import Repository from "src/routes/Namespaces/Repository/Repository";
 import Administration from "src/routes/Admin/Administration";
 import Namespaces from "src/routes/Namespaces/Namespaces";
 import TeamMembershipTab from "src/routes/Namespaces/Repositories/Tabs/TeamMembershipTab";
@@ -42,6 +43,7 @@ export function StandaloneMain() {
                     <Route path={"/namespaces"} element={<Namespaces />} >
                         <Route path={":repoName"} element={<Repositories />} />
                     </Route>
+                    <Route path={"/namespaces/:namespaceName/:repoName"} element={<Repository />} />
                     <Route path={"/overview"} element={<Overview />} />
                     <Route path={"/builds"} element={<Builds />} />
                     <Route path={"/administration"} element={<Administration />} />
