@@ -13,13 +13,14 @@ interface Tag {
     LastModified: string;
     Manifest: string;
     Pull: string;
+    Digest: string;
 }
 
 export default function Tags(props) {
     // Mock Tags
     const tags: Tag[] = [
-        { Tag: 'one', OS: 'Mac', Security: 'a', Size: '4', LastModified: '123', Manifest: 'dummy', Pull: 'icon' },
-        { Tag: 'two', OS: 'Linux', Security: 'b', Size: '6', LastModified: '456', Manifest: 'dummy', Pull: 'icon' }
+        { Tag: 'one', OS: 'Mac', Security: 'a', Size: '4', LastModified: '123', Manifest: 'dummy', Pull: 'icon', Digest: 'sha256:fd0922dc4a00da2dbe38de82762c45ea5acbb0803d64de673bb57df1e' },
+        { Tag: 'two', OS: 'Linux', Security: 'b', Size: '6', LastModified: '456', Manifest: 'dummy', Pull: 'icon', Digest: 'sha256:fd0922dc4a00da2dbe38de82762c45ea5acbb0803d64de673bb57df1e' }
     ];
     const columnNames = {
         Tag: 'Tag',
@@ -31,6 +32,8 @@ export default function Tags(props) {
         Pull: 'Pull'
     }
     const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [modalImageTag, setModalImageTag] = React.useState("");
+    const [modalImageDigest, setModalImageDigest] = React.useState("");
 
     const [selectedTagNames, setSelectedTagNames] = React.useState<string[]>([]);
     const [recentSelectedRowIndex, setRecentSelectedRowIndex] = React.useState<number | null>(null);
@@ -51,11 +54,17 @@ export default function Tags(props) {
         setTagSelected(repo, isSelecting);
         setRecentSelectedRowIndex(rowIndex);
     };
+
+    const openModal = (tag: string, digest: string) => {
+        setModalImageTag(tag)
+        setModalImageDigest(digest)
+        setIsModalOpen(!isModalOpen)
+    }
     
     return (
         <>
         <Modal
-            title="Simple modal header"
+            title={`Fetch Tag: ${modalImageTag}`}
             isOpen={isModalOpen}
             onClose={()=>{setIsModalOpen(!isModalOpen)}}
             variant={ModalVariant.small}
@@ -66,13 +75,15 @@ export default function Tags(props) {
             ]}
         >
             <Text component={TextVariants.h5}>Docker Pull (By Tag)</Text>
+            {/* TODO: Pull in repo name */}
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
-                This is read-only one
+                docker pull quay.io/testorg/testrepo:{modalImageTag}
             </ClipboardCopy>
             <br></br>
             <Text component={TextVariants.h5}>Docker Pull (By Digest)</Text>
+            {/* TODO: Pull in repo name */}
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
-                This is read-only two
+                docker pull quay.io/testorg/testrepo@sha256:{modalImageDigest}
             </ClipboardCopy>
         </Modal>
 
@@ -112,7 +123,7 @@ export default function Tags(props) {
                     <Td dataLabel={columnNames.Size}>{tag.Size}</Td>
                     <Td dataLabel={columnNames.LastModified}>{tag.LastModified}</Td>
                     <Td dataLabel={columnNames.Manifest}>{tag.Manifest}</Td>
-                    <Td dataLabel={columnNames.Pull} onClick={()=>{setIsModalOpen(!isModalOpen)}}>{tag.Pull}</Td>
+                    <Td dataLabel={columnNames.Pull} onClick={()=>{openModal(tag.Tag, tag.Digest)}}>{tag.Pull}</Td>
                 </Tr>
             ))}
             </Tbody>
