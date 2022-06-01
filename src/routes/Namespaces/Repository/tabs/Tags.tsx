@@ -1,6 +1,6 @@
 import { TagsToolbar } from './Filter';
 import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
-import { Button, ClipboardCopy, Modal, TextVariants, Text } from '@patternfly/react-core';
+import { Button, ClipboardCopy, Modal, TextVariants, ModalVariant, Text } from '@patternfly/react-core';
 import * as React from 'react';
 import axios from 'src/libs/axios';
 import {useAxios} from 'src/hooks/UseAxios';
@@ -58,23 +58,26 @@ export default function Tags(props) {
             title="Simple modal header"
             isOpen={isModalOpen}
             onClose={()=>{setIsModalOpen(!isModalOpen)}}
+            variant={ModalVariant.small}
             actions={[
-            <Button key="cancel" variant="link" onClick={()=>{setIsModalOpen(!isModalOpen)}}>
+            <Button key="cancel" variant="primary" onClick={()=>{setIsModalOpen(!isModalOpen)}}>
                 Close
             </Button>
             ]}
         >
-            <Text component={TextVariants.h6}>Docker Pull (By Tag)</Text>
+            <Text component={TextVariants.h5}>Docker Pull (By Tag)</Text>
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
                 This is read-only one
             </ClipboardCopy>
-
-            <Text component={TextVariants.h6}>Docker Pull (By Digest)</Text>
+            <br></br>
+            <Text component={TextVariants.h5}>Docker Pull (By Digest)</Text>
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
                 This is read-only two
             </ClipboardCopy>
         </Modal>
+
         <TagsToolbar></TagsToolbar>
+        
         <TableComposable>
             <Thead>
                 <Tr>
@@ -105,7 +108,7 @@ export default function Tags(props) {
                     />
                     <Td dataLabel={columnNames.Tag}>{tag.Tag}</Td>
                     <Td dataLabel={columnNames.OS}>{tag.OS}</Td>
-                    <Td dataLabel={columnNames.Security}>{tag.Security}</Td>
+                    <Td dataLabel={columnNames.Security}>{tag.Security}</Td>    
                     <Td dataLabel={columnNames.Size}>{tag.Size}</Td>
                     <Td dataLabel={columnNames.LastModified}>{tag.LastModified}</Td>
                     <Td dataLabel={columnNames.Manifest}>{tag.Manifest}</Td>
