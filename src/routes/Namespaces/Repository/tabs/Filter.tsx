@@ -7,6 +7,7 @@ import {
     SelectGroup,
     SelectOption,
     SelectVariant,
+    Pagination,
 } from '@patternfly/react-core';
 import * as React from 'react';
   
@@ -56,6 +57,17 @@ export function TagsToolbar() {
                         name="search input"
                         value={namespaceSearchInput}
                         onChange={handleFilteredSearch}
+                    />
+                </ToolbarItem>
+                <ToolbarItem alignment={{ default: "alignRight" }}>
+                    <Pagination
+                        perPageComponent="button"
+                        itemCount={523}
+                        // perPage={this.state.perPage}
+                        // page={this.state.page}
+                        // onSetPage={this.onSetPage}
+                        widgetId="pagination-options-menu-top"
+                        // onPerPageSelect={this.onPerPageSelect}
                     />
                 </ToolbarItem>
             </ToolbarContent>
