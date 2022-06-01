@@ -1,6 +1,6 @@
 import { TagsToolbar } from './Filter';
 import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
-import { Button, ClipboardCopy, Modal, TextVariants, ModalVariant, Text } from '@patternfly/react-core';
+import { Button, ClipboardCopy, Modal, ModalVariant, Text } from '@patternfly/react-core';
 import * as React from 'react';
 import axios from 'src/libs/axios';
 import {useAxios} from 'src/hooks/UseAxios';
@@ -32,8 +32,8 @@ export default function Tags(props) {
         Pull: 'Pull'
     }
     const [isModalOpen, setIsModalOpen] = React.useState(false);
-    const [modalImageTag, setModalImageTag] = React.useState("");
-    const [modalImageDigest, setModalImageDigest] = React.useState("");
+    const [modalImageTag, setModalImageTag] = React.useState<string>("");
+    const [modalImageDigest, setModalImageDigest] = React.useState<string>("");
 
     const [selectedTagNames, setSelectedTagNames] = React.useState<string[]>([]);
     const [recentSelectedRowIndex, setRecentSelectedRowIndex] = React.useState<number | null>(null);
@@ -74,13 +74,13 @@ export default function Tags(props) {
             </Button>
             ]}
         >
-            <Text component={TextVariants.h5}>Docker Pull (By Tag)</Text>
+            <Text style={{fontWeight: "bold"}}>Docker Pull (By Tag)</Text>
             {/* TODO: Pull in repo name */}
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
                 docker pull quay.io/testorg/testrepo:{modalImageTag}
             </ClipboardCopy>
             <br></br>
-            <Text component={TextVariants.h5}>Docker Pull (By Digest)</Text>
+            <Text style={{fontWeight: "bold"}}>Docker Pull (By Digest)</Text>
             {/* TODO: Pull in repo name */}
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
                 docker pull quay.io/testorg/testrepo@sha256:{modalImageDigest}
