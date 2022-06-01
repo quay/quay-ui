@@ -35,7 +35,10 @@ export default function Repository(props) {
     let navigate = useNavigate();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [organization, repository] = location.pathname.split('/').slice(2);
+
+    // TODO: refactor
+    let [organization, ...repo] = location.pathname.split('/').slice(2);
+    let repository = repo.join("/")
 
     let requestedTabIndex = getTabIndex(searchParams.get("tab"))
     if(requestedTabIndex && requestedTabIndex !== activeTabKey) {
@@ -64,7 +67,7 @@ export default function Repository(props) {
                     onSelect={tabsOnSelect}
                 >
                     <Tab eventKey={TabIndex.Tags} title={<TabTitleText>Tags</TabTitleText>}>
-                        <Tags/>
+                        <Tags organization={organization} repository={repository}/>
                     </Tab>
                     <Tab eventKey={TabIndex.Information} title={<TabTitleText>Information</TabTitleText>}>
                         <div>Information tab work in progress</div>

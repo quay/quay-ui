@@ -16,11 +16,11 @@ interface Tag {
     Digest: string;
 }
 
-export default function Tags(props) {
+export default function Tags(props: TagsProps,) {
     // Mock Tags
     const tags: Tag[] = [
-        { Tag: 'one', OS: 'Mac', Security: 'a', Size: '4', LastModified: '123', Manifest: 'dummy', Pull: 'icon', Digest: 'sha256:fd0922dc4a00da2dbe38de82762c45ea5acbb0803d64de673bb57df1e' },
-        { Tag: 'two', OS: 'Linux', Security: 'b', Size: '6', LastModified: '456', Manifest: 'dummy', Pull: 'icon', Digest: 'sha256:fd0922dc4a00da2dbe38de82762c45ea5acbb0803d64de673bb57df1e' }
+        { Tag: 'latest', OS: 'Mac', Security: 'a', Size: '4', LastModified: '123', Manifest: 'dummy', Pull: 'icon', Digest: 'sha256:fd0922dc4a00da2dbe38de82762c45ea5acbb0803d64de673bb57df1e' },
+        { Tag: 'slim', OS: 'Linux', Security: 'b', Size: '6', LastModified: '456', Manifest: 'dummy', Pull: 'icon', Digest: 'sha256:fd0922dc4a00da2dbe38de82762c45ea5acbb0803d64de673bb57df1e' }
     ];
     const columnNames = {
         Tag: 'Tag',
@@ -55,9 +55,9 @@ export default function Tags(props) {
         setRecentSelectedRowIndex(rowIndex);
     };
 
-    const openModal = (tag: string, digest: string) => {
-        setModalImageTag(tag)
-        setModalImageDigest(digest)
+    const openModal = (tag: Tag) => {
+        setModalImageTag(tag.Tag)
+        setModalImageDigest(tag.Digest)
         setIsModalOpen(!isModalOpen)
     }
     
@@ -77,13 +77,13 @@ export default function Tags(props) {
             <Text style={{fontWeight: "bold"}}>Docker Pull (By Tag)</Text>
             {/* TODO: Pull in repo name */}
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
-                docker pull quay.io/testorg/testrepo:{modalImageTag}
+                docker pull quay.io/{props.organization}/{props.repository}:{modalImageTag}
             </ClipboardCopy>
             <br></br>
             <Text style={{fontWeight: "bold"}}>Docker Pull (By Digest)</Text>
             {/* TODO: Pull in repo name */}
             <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
-                docker pull quay.io/testorg/testrepo@sha256:{modalImageDigest}
+                docker pull quay.io/{props.organization}/{props.repository}@{modalImageDigest}
             </ClipboardCopy>
         </Modal>
 
@@ -123,7 +123,7 @@ export default function Tags(props) {
                     <Td dataLabel={columnNames.Size}>{tag.Size}</Td>
                     <Td dataLabel={columnNames.LastModified}>{tag.LastModified}</Td>
                     <Td dataLabel={columnNames.Manifest}>{tag.Manifest}</Td>
-                    <Td dataLabel={columnNames.Pull} onClick={()=>{openModal(tag.Tag, tag.Digest)}}>{tag.Pull}</Td>
+                    <Td dataLabel={columnNames.Pull} onClick={()=>{openModal(tag)}}><i className="fa fa-download"></i></Td>
                 </Tr>
             ))}
             </Tbody>
@@ -131,3 +131,8 @@ export default function Tags(props) {
         </>
     )
 }
+
+type TagsProps = {
+    organization: string;
+    repository: string;
+};

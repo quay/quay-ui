@@ -36,7 +36,7 @@ export function StandaloneMain() {
                     <Route path={"/namespaces"} element={<Namespaces />} >
                         <Route path={":repoName"} element={<Repositories />} />
                     </Route>
-                    <Route path={"/namespaces/:namespaceName/:repoName"} element={<Repository />} />
+                    <Route path={"/namespaces/:namespaceName/*"} element={<Repository />} />
                     <Route path={"/overview"} element={<Overview />} />
                     <Route path={"/builds"} element={<Builds />} />
                     <Route path={"/administration"} element={<Administration />} />
