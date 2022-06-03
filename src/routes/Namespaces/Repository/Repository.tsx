@@ -10,7 +10,7 @@ import {
     TabTitleText,
     PageBreadcrumb,
   } from "@patternfly/react-core";
-import Tags from './tabs/Tags';
+import Tags from './Tabs/Tags/Tags';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
