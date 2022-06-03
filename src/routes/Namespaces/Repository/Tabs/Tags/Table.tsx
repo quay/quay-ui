@@ -1,17 +1,8 @@
 import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 import { Button, ClipboardCopy, Modal, ModalVariant, Text } from '@patternfly/react-core';
-import {useState} from 'react';
+import { useState } from 'react';
+import { Tag, TagsResponse, getTags } from 'src/resources/TagResource';
 
-export interface Tag {
-    Name: string;
-    OS: string;
-    Security: string;
-    Size: string;
-    LastModified: string;
-    Manifest: string;
-    Pull: string;
-    Digest: string;
-}
 
 const columnNames = {
     Tag: 'Tag',
@@ -29,19 +20,19 @@ export default function Table(props: TableProps) {
     const [modalImageDigest, setModalImageDigest] = useState<string>("");
     const [selectedTagNames, setSelectedTagNames] = useState<string[]>([]);
     const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<number | null>(null);
- 
-    const isTagSelectable = (tag: Tag) => tag.Name !== 'a'; // Arbitrary logic for this example
+
+    const isTagSelectable = (tag: Tag) => tag.name !== 'a'; // Arbitrary logic for this example
     const selectableTags = props.tags.filter(isTagSelectable);
 
     const selectAllTags = (isSelecting = true) => {
-        setSelectedTagNames(isSelecting ? selectableTags.map(t => t.Name) : []);
+        setSelectedTagNames(isSelecting ? selectableTags.map(t => t.name) : []);
     }
-    
+
     const setTagSelected = (tag: Tag, isSelecting = true) =>
         setSelectedTagNames(prevSelected => {
-            const otherSelectedRepoNames = prevSelected.filter(r => r !== tag.Name);
-            return isSelecting && isTagSelectable(tag) ? [...otherSelectedRepoNames, tag.Name] : otherSelectedRepoNames;
-    });
+            const otherSelectedRepoNames = prevSelected.filter(r => r !== tag.name);
+            return isSelecting && isTagSelectable(tag) ? [...otherSelectedRepoNames, tag.name] : otherSelectedRepoNames;
+        });
 
     const onSelectTag = (repo: Tag, rowIndex: number, isSelecting: boolean) => {
         setTagSelected(repo, isSelecting);
@@ -49,8 +40,8 @@ export default function Table(props: TableProps) {
     };
 
     const openModal = (tag: Tag) => {
-        setModalImageTag(tag.Name)
-        setModalImageDigest(tag.Digest)
+        setModalImageTag(tag.name)
+        setModalImageDigest(tag.manifest_digest)
         setIsModalOpen(!isModalOpen)
     }
 
@@ -59,21 +50,21 @@ export default function Table(props: TableProps) {
             <Modal
                 title={`Fetch Tag: ${modalImageTag}`}
                 isOpen={isModalOpen}
-                onClose={()=>{setIsModalOpen(!isModalOpen)}}
+                onClose={() => { setIsModalOpen(!isModalOpen) }}
                 variant={ModalVariant.small}
                 actions={[
-                <Button key="cancel" variant="primary" onClick={()=>{setIsModalOpen(!isModalOpen)}}>
-                    Close
-                </Button>
+                    <Button key="cancel" variant="primary" onClick={() => { setIsModalOpen(!isModalOpen) }}>
+                        Close
+                    </Button>
                 ]}
             >
-                <Text style={{fontWeight: "bold"}}>Docker Pull (By Tag)</Text>
+                <Text style={{ fontWeight: "bold" }}>Docker Pull (By Tag)</Text>
                 {/* TODO: Pull in repo name */}
                 <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
                     docker pull quay.io/{props.organization}/{props.repository}:{modalImageTag}
                 </ClipboardCopy>
                 <br></br>
-                <Text style={{fontWeight: "bold"}}>Docker Pull (By Digest)</Text>
+                <Text style={{ fontWeight: "bold" }}>Docker Pull (By Digest)</Text>
                 {/* TODO: Pull in repo name */}
                 <ClipboardCopy isReadOnly hoverTip="Copy" clickTip="Copied">
                     docker pull quay.io/{props.organization}/{props.repository}@{modalImageDigest}
@@ -84,8 +75,8 @@ export default function Table(props: TableProps) {
                     <Tr>
                         <Th
                             select={{
-                            onSelect: (_event, isSelecting) => selectAllTags(isSelecting),
-                            isSelected: selectedTagNames.length === selectableTags.length
+                                onSelect: (_event, isSelecting) => selectAllTags(isSelecting),
+                                isSelected: selectedTagNames.length === selectableTags.length
                             }}
                         />
                         <Th>Tag</Th>
@@ -98,31 +89,31 @@ export default function Table(props: TableProps) {
                     </Tr>
                 </Thead>
                 <Tbody>
-                {props.tags.map((tag, rowIndex) => (
-                    <Tr key={rowIndex}>
-                        <Td
-                        select={{
-                            rowIndex,
-                            onSelect: (_event, isSelecting) => onSelectTag(tag, rowIndex, isSelecting),
-                            isSelected: selectedTagNames.includes(tag.Name),
-                        }}
-                        />
-                        <Td dataLabel={columnNames.Tag}>{tag.Name}</Td>
-                        <Td dataLabel={columnNames.OS}>{tag.OS}</Td>
-                        <Td dataLabel={columnNames.Security}>{tag.Security}</Td>    
-                        <Td dataLabel={columnNames.Size}>{tag.Size}</Td>
-                        <Td dataLabel={columnNames.LastModified}>{tag.LastModified}</Td>
-                        <Td dataLabel={columnNames.Manifest}>{tag.Manifest}</Td>
-                        <Td dataLabel={columnNames.Pull} onClick={()=>{openModal(tag)}}><i className="fa fa-download"></i></Td>
-                    </Tr>
-                ))}
+                    {props.tags.map((tag, rowIndex) => (
+                        <Tr key={rowIndex}>
+                            <Td
+                                select={{
+                                    rowIndex,
+                                    onSelect: (_event, isSelecting) => onSelectTag(tag, rowIndex, isSelecting),
+                                    isSelected: selectedTagNames.includes(tag.name),
+                                }}
+                            />
+                            <Td dataLabel={columnNames.Tag}>{tag.name}</Td>
+                            <Td dataLabel={columnNames.OS}>os-mocked</Td>                         {/* TODO: Get info from API */}
+                            <Td dataLabel={columnNames.Security}>sec-mocked</Td>       {/* TODO: Get info from API */}
+                            <Td dataLabel={columnNames.Size}>{tag.size}</Td>
+                            <Td dataLabel={columnNames.LastModified}>{tag.last_modified}</Td>
+                            <Td dataLabel={columnNames.Manifest}>{tag.manifest_digest}</Td>
+                            <Td dataLabel={columnNames.Pull} onClick={() => { openModal(tag) }}><i className="fa fa-download"></i></Td>
+                        </Tr>
+                    ))}
                 </Tbody>
             </TableComposable>
         </>
     )
 }
 
-type TableProps =  {
+type TableProps = {
     organization: string;
     repository: string;
     tags: Tag[];
