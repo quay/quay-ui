@@ -24,12 +24,12 @@ import {
 } from '@patternfly/react-core';
 
 import './css/Namespaces.scss';
-import { CreateNamespaceModal } from './CreateNamespaceModal';
-import { Link, useNavigate } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import { AuthState } from 'src/atoms/AuthState';
-import {UserOrgs} from "src/atoms/UserState";
-import { deleteOrg } from 'src/resources/OrganisationResource';
+import {CreateNamespaceModal} from './CreateNamespaceModal';
+import {Link, useNavigate} from 'react-router-dom';
+import {useRecoilValue} from 'recoil';
+import {AuthState} from 'src/atoms/AuthState';
+import {UserOrgs} from 'src/atoms/UserState';
+import {deleteOrg} from 'src/resources/OrganisationResource';
 
 export default function Namespaces() {
   const authState = useRecoilValue(AuthState);
@@ -47,7 +47,7 @@ export default function Namespaces() {
     [],
   );
 
-  const userOrgs  = useRecoilValue(UserOrgs);
+  const userOrgs = useRecoilValue(UserOrgs);
 
   const columnNames = {
     name: 'Namespace',
@@ -63,7 +63,7 @@ export default function Namespaces() {
     setNamespaceModalOpen(!isNamespaceModalOpen);
   };
 
-  const handleFilteredSearch = (value : any) => {
+  const handleFilteredSearch = (value: any) => {
     setNamespaceSearchInput(value);
   };
 
@@ -151,7 +151,7 @@ export default function Namespaces() {
 
   React.useEffect(() => {
     if (userOrgs) {
-      userOrgs.map((org: any) =>  {
+      userOrgs.map((org: any) => {
         setNamespacesList((prevNamespaces) => [
           ...prevNamespaces,
           {
@@ -162,7 +162,8 @@ export default function Namespaces() {
             pulls: 108,
             lastPull: 'TBA',
             lastModified: 'TBA',
-          }])
+          },
+        ]);
       });
     }
   }, [userOrgs]);
@@ -172,7 +173,9 @@ export default function Namespaces() {
     const x = selectedNamespace?.forEach(async (nsToBeDeleted) => {
       try {
         await deleteOrg(nsToBeDeleted);
-        setNamespacesList((prev) => prev.filter((ns) => ns.name !== nsToBeDeleted));
+        setNamespacesList((prev) =>
+          prev.filter((ns) => ns.name !== nsToBeDeleted),
+        );
       } catch (e) {
         console.error(e);
       }
@@ -198,7 +201,7 @@ export default function Namespaces() {
         <PageSection variant={PageSectionVariants.light}>
           <Toolbar>
             <ToolbarContent>
-              <ToolbarItem spacer={{ default: 'spacerNone' }}>
+              <ToolbarItem spacer={{default: 'spacerNone'}}>
                 <Select
                   variant={SelectVariant.checkbox}
                   aria-label="Select Input"
@@ -237,7 +240,7 @@ export default function Namespaces() {
                   <i className="fas fa-trash"></i>{' '}
                 </Button>
               </ToolbarItem>
-              <ToolbarItem alignment={{ xl: 'alignRight' }}>
+              <ToolbarItem alignment={{xl: 'alignRight'}}>
                 <Button
                   variant="primary"
                   onClick={() => setNamespaceModalOpen(true)}

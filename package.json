@@ -26,7 +26,9 @@
     "start": "webpack serve --color --progress --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "prettier --config .prettierrc \"src/**/*.{ts,tsx}\" --write",
+    "prepare": "husky install"
   },
   "browserslist": {
     "production": [
@@ -57,14 +59,19 @@
     "dotenv-webpack": "^7.1.0",
     "eslint": "^8.13.0",
     "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^6.15.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
+    "husky": ">=6",
+    "lint-staged": ">=10",
+    "prettier": "^2.1.2",
     "raw-loader": "^4.0.2",
     "react-docgen-typescript-loader": "^3.7.2",
     "react-dom": "^17.0.2",
@@ -79,5 +86,8 @@
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.8.1",
     "webpack-merge": "^5.8.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint --cache --fix"
   }
 }

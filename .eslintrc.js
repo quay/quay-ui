@@ -6,9 +6,10 @@ module.exports = {
     jest: true,
   },
   extends: [
-    "eslint:recommended",
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
+    'prettier',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -16,17 +17,21 @@ module.exports = {
       jsx: true,
     },
   },
-  plugins: [
-    'import',
-    'react',
-    '@typescript-eslint',
-  ],
+  plugins: ['import', 'react', '@typescript-eslint', 'prettier'],
   rules: {
+    'prettier/prettier': ['error'],
     '@typescript-eslint/no-var-requires': 'off',
     'import/no-unresolved': 'error',
     'import/prefer-default-export': 'off',
-    'import/extensions': ['error', 'ignorePackages', { ts: 'never', tsx: 'never' }],
-    'react/jsx-filename-extension': [2, { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {ts: 'never', tsx: 'never'},
+    ],
+    'react/jsx-filename-extension': [
+      2,
+      {extensions: ['.js', '.jsx', '.ts', '.tsx']},
+    ],
   },
   settings: {
     'import/resolver': {

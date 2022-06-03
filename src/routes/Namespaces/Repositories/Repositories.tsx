@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,14 +10,14 @@ import {
   PageSectionTypes,
   PageSectionVariants,
   Title,
-} from "@patternfly/react-core";
-import { Link, useLocation, useParams } from "react-router-dom";
+} from '@patternfly/react-core';
+import {Link, useLocation, useParams} from 'react-router-dom';
 
 // import {
 //   HorizontalNav,
 // } from '@openshift-console/dynamic-plugin-sdk';
-import RepositoriesTab from "./Tabs/RepositoriesTab/RepositoriesTab";
-import { NavigationPath } from "../../NavigationPath";
+import RepositoriesTab from './Tabs/RepositoriesTab/RepositoriesTab';
+import {NavigationPath} from '../../NavigationPath';
 // import TeamMembershipTab from "./Tabs/TeamMembershipTab";
 // import RobotAccountTab from "./Tabs/RobotAccountTab";
 // import DefaultPermissionsTab from "./Tabs/DefaultPermissionsTab";
@@ -25,11 +25,11 @@ import { NavigationPath } from "../../NavigationPath";
 
 export default function Repositories(props) {
   const location = useLocation();
-  const repositoryName = location.pathname.split("/")[2];
+  const repositoryName = location.pathname.split('/')[2];
   const [activeSubNavItem, setAativeSubNavItem] = React.useState(0);
-  const { repoName } = useParams();
+  const {repoName} = useParams();
 
-  console.log("repositoryName", repositoryName);
+  console.log('repositoryName', repositoryName);
 
   const onSubNavSelect = (result) => {
     setAativeSubNavItem(result.itemId);
@@ -45,7 +45,7 @@ export default function Repositories(props) {
       <NavList>
         <NavItem
           isActive={location.pathname.startsWith(
-            NavigationPath.repositoriesTab
+            NavigationPath.repositoriesTab,
           )}
           to="#"
         >
@@ -53,15 +53,14 @@ export default function Repositories(props) {
         </NavItem>
         <NavItem
           isActive={location.pathname.startsWith(
-            NavigationPath.teamMembershipTab
+            NavigationPath.teamMembershipTab,
           )}
         >
           <Link to={`/namespaces/${repoName}/team`}> Team & Membership </Link>
-
         </NavItem>
         <NavItem
           isActive={location.pathname.startsWith(
-            NavigationPath.robotAccountTab
+            NavigationPath.robotAccountTab,
           )}
           to="#"
         >
@@ -69,7 +68,7 @@ export default function Repositories(props) {
         </NavItem>
         <NavItem
           isActive={location.pathname.startsWith(
-            NavigationPath.defaultPermissionsTab
+            NavigationPath.defaultPermissionsTab,
           )}
           to="#"
         >
@@ -138,7 +137,7 @@ export default function Repositories(props) {
         <PageSection type={PageSectionTypes.subNav} isWidthLimited>
           {RepositorySubNav}
         </PageSection>
-         <RepositoriesTab/>
+        <RepositoriesTab />
       </PageSection>
       {/* <HorizontalNav pages={pages} /> */}
     </Page>

@@ -1,48 +1,52 @@
 // axios
 import axios from 'axios';
-import { GlobalAuthState } from 'src/resources/AuthResource';
+import {GlobalAuthState} from 'src/resources/AuthResource';
 
-axios.defaults.baseURL = process.env.QUAY_APP_API_URL || 'http://localhost:8080';
-axios.defaults.withCredentials = true
+axios.defaults.baseURL =
+  process.env.QUAY_APP_API_URL || 'http://localhost:8080';
+axios.defaults.withCredentials = true;
 
 export async function getCsrfToken() {
-    try {
-        const response = await axios.get('/csrf_token');
-        console.log('setting csrf token');
-        console.log(response.data);
-        GlobalAuthState.csrfToken = response.data.csrf_token;
-        return response.data;
-    } catch (error: any) {
-        throw new Error(`API error login user ${error.message}`);
-    }
+  try {
+    const response = await axios.get('/csrf_token');
+    console.log('setting csrf token');
+    console.log(response.data);
+    GlobalAuthState.csrfToken = response.data.csrf_token;
+    return response.data;
+  } catch (error: any) {
+    throw new Error(`API error login user ${error.message}`);
+  }
 }
 
 const axiosIns = axios.create();
 axiosIns.interceptors.request.use(async (config) => {
-    console.log(config);
-    // TODO: Handle error if we can't get a CSRF token
-    if (!GlobalAuthState.csrfToken) {
-        const r = await getCsrfToken();
-        GlobalAuthState.csrfToken = r.csrf_token;
-    }
+  console.log(config);
+  // TODO: Handle error if we can't get a CSRF token
+  if (!GlobalAuthState.csrfToken) {
+    const r = await getCsrfToken();
+    GlobalAuthState.csrfToken = r.csrf_token;
+  }
 
-    if (config.headers && GlobalAuthState.csrfToken) {
-        config.headers['X-CSRF-Token'] = GlobalAuthState.csrfToken;
-        config.headers['X-XSRF-Token'] = GlobalAuthState.csrfToken;
-    }
+  if (config.headers && GlobalAuthState.csrfToken) {
+    config.headers['X-CSRF-Token'] = GlobalAuthState.csrfToken;
+    config.headers['X-XSRF-Token'] = GlobalAuthState.csrfToken;
+  }
 
-    return config
+  return config;
 });
 
-axiosIns.interceptors.response.use((response) => {
+axiosIns.interceptors.response.use(
+  (response) => {
     console.log('axios response');
     console.log(response);
     return response;
-}, (error) => {
+  },
+  (error) => {
     // console.error(error)
     if (error.response.status === 401) {
-        window.location.href = '/signin';
+      window.location.href = '/signin';
     }
-});
+  },
+);
 
 export default axiosIns;

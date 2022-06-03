@@ -1,8 +1,13 @@
 import React from 'react';
 import {
-  Button, EmptyState, EmptyStateBody, EmptyStateIcon, PageSection, Title,
+  Button,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateIcon,
+  PageSection,
+  Title,
 } from '@patternfly/react-core';
-import { ExclamationTriangleIcon } from '@patternfly/react-icons';
+import {ExclamationTriangleIcon} from '@patternfly/react-icons';
 
 function NotFound() {
   return (

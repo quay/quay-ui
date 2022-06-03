@@ -9,13 +9,19 @@ import {
   ToolbarContent,
   ToolbarItem,
 } from '@patternfly/react-core';
-import { TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
+import {
+  TableComposable,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+} from '@patternfly/react-table';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
-import { CreateRepositoryModal } from './CreateRepositoryModal';
+import {Link} from 'react-router-dom';
+import {CreateRepositoryModal} from './CreateRepositoryModal';
 
 export default function RepositoriesTab() {
-
   const QUAY_ENDPOINT = {
     QUAY_OAUTH_TOKEN: '7xahJf2TH8uOZPF1Xya8DkWanOZ75F0MjRX4RnvW',
     QUAY_HOSTNAME:
@@ -25,12 +31,14 @@ export default function RepositoriesTab() {
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = React.useState(false);
   const [isSelectDropDownOpen, setSelectDropDownOpen] = React.useState(false);
   const [isKebabOpen, setKebabOpen] = React.useState(false);
-  const [repositoryList, setRepositoryList] = React.useState<RepositoryListProps[]>([]);
+  const [repositoryList, setRepositoryList] = React.useState<
+    RepositoryListProps[]
+  >([]);
 
- const dummy = () => {
-  setRepositoryList(repositoryList); // dummy line added to fix compilation
- }
- console.log(dummy);
+  const dummy = () => {
+    setRepositoryList(repositoryList); // dummy line added to fix compilation
+  };
+  console.log(dummy);
 
   const data = ['dummy1', 'dummy2'];
   const onFilterChange = () => {};
@@ -59,39 +67,44 @@ export default function RepositoriesTab() {
 
   return (
     <>
-    <Toolbar>
-      <ToolbarContent>
-        <ToolbarItem variant="bulk-select">
-          <Dropdown
-            onSelect={() => setSelectDropDownOpen(!isSelectDropDownOpen)}
-            toggle={
-              <DropdownToggle
-                id="stacked-example-toggle"
-                splitButtonItems={[
-                  <DropdownToggleCheckbox
-                    id="example-checkbox-1"
-                    key="split-checkbox"
-                    aria-label="Select all"
-                  />,
-                ]}
-                onToggle={() => setSelectDropDownOpen(!isSelectDropDownOpen)}
-              />
-            }
-            isOpen={isSelectDropDownOpen}
-            dropdownItems={selectDropdownItems}
-          />
-        </ToolbarItem>  
-        <ToolbarItem>
-        <Dropdown
-        onSelect={()=>setKebabOpen(!isKebabOpen)}
-        toggle={<KebabToggle onToggle={()=>setKebabOpen(!isKebabOpen)} id="toggle-id-6" />}
-        isOpen={isKebabOpen}
-        isPlain
-        dropdownItems={kebabItems}
-      />
-        </ToolbarItem>
-        <ToolbarItem>
-          {/* <ListPageFilter
+      <Toolbar>
+        <ToolbarContent>
+          <ToolbarItem variant="bulk-select">
+            <Dropdown
+              onSelect={() => setSelectDropDownOpen(!isSelectDropDownOpen)}
+              toggle={
+                <DropdownToggle
+                  id="stacked-example-toggle"
+                  splitButtonItems={[
+                    <DropdownToggleCheckbox
+                      id="example-checkbox-1"
+                      key="split-checkbox"
+                      aria-label="Select all"
+                    />,
+                  ]}
+                  onToggle={() => setSelectDropDownOpen(!isSelectDropDownOpen)}
+                />
+              }
+              isOpen={isSelectDropDownOpen}
+              dropdownItems={selectDropdownItems}
+            />
+          </ToolbarItem>
+          <ToolbarItem>
+            <Dropdown
+              onSelect={() => setKebabOpen(!isKebabOpen)}
+              toggle={
+                <KebabToggle
+                  onToggle={() => setKebabOpen(!isKebabOpen)}
+                  id="toggle-id-6"
+                />
+              }
+              isOpen={isKebabOpen}
+              isPlain
+              dropdownItems={kebabItems}
+            />
+          </ToolbarItem>
+          <ToolbarItem>
+            {/* <ListPageFilter
             data={data}
             loaded={true}
             // rowFilters={filters}
@@ -100,84 +113,84 @@ export default function RepositoriesTab() {
             hideColumnManagement={false}
             onFilterChange={onFilterChange}
           /> */}
-        </ToolbarItem>
-        <ToolbarItem>
-          <Button
-            variant="primary"
-            onClick={() => setCreateRepoModalOpen(true)}
-          >
-            Create Repository
-          </Button>
-          {isCreateRepoModalOpen ? (
-            <CreateRepositoryModal
-              isModalOpen={isCreateRepoModalOpen}
-              handleModalToggle={() =>
-                setCreateRepoModalOpen(!isCreateRepoModalOpen)
-              }
-              quayEndPoint={QUAY_ENDPOINT}
-            />
-          ) : null}{' '}
-        </ToolbarItem>
-      </ToolbarContent>
-    </Toolbar>
+          </ToolbarItem>
+          <ToolbarItem>
+            <Button
+              variant="primary"
+              onClick={() => setCreateRepoModalOpen(true)}
+            >
+              Create Repository
+            </Button>
+            {isCreateRepoModalOpen ? (
+              <CreateRepositoryModal
+                isModalOpen={isCreateRepoModalOpen}
+                handleModalToggle={() =>
+                  setCreateRepoModalOpen(!isCreateRepoModalOpen)
+                }
+                quayEndPoint={QUAY_ENDPOINT}
+              />
+            ) : null}{' '}
+          </ToolbarItem>
+        </ToolbarContent>
+      </Toolbar>
       <TableComposable aria-label="Selectable table">
-      <Thead>
-        <Tr>
-          <Th
+        <Thead>
+          <Tr>
+            <Th
             // select={{
             //   onSelect: (_event, isSelecting) =>
             //     selectAllNamespaces(isSelecting),
             //   isSelected: areAllNamespacesSelected,
             // }}
-          />
-          <Th>{columnNames.repoName}</Th>
-          <Th>{columnNames.users}</Th>
-          <Th>{columnNames.tagCount}</Th>
-          <Th>{columnNames.size}</Th>
-          <Th>{columnNames.pulls}</Th>
-          <Th>{columnNames.lastPull}</Th>
-          <Th>{columnNames.vunerabilities}</Th>
-        </Tr>
-      </Thead>
-      <Tbody>
-        {repositoryList.map((repo, rowIndex) => (
-          <Tr key={repo.repoName}>
-            <Td
+            />
+            <Th>{columnNames.repoName}</Th>
+            <Th>{columnNames.users}</Th>
+            <Th>{columnNames.tagCount}</Th>
+            <Th>{columnNames.size}</Th>
+            <Th>{columnNames.pulls}</Th>
+            <Th>{columnNames.lastPull}</Th>
+            <Th>{columnNames.vunerabilities}</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {repositoryList.map((repo, rowIndex) => (
+            <Tr key={repo.repoName}>
+              <Td
               // select={{
               //   rowIndex,
               //   onSelect: (_event, isSelecting) =>
               //     onSelectNamespace(repo, rowIndex, isSelecting),
               //   isSelected: isNamespaceSelected(repo),
               // }}
-            />
-            <Td dataLabel={columnNames.repoName}>
-              <Link to={`/quay/namespaces/${repo.repoName}`}>{repo.repoName}</Link>
-              {/* <Link to={'namespaces/builds'}> {ns.name} </Link> */}
-            </Td>
-            <Td dataLabel={columnNames.users}>{repo.users}</Td>
-            <Td dataLabel={columnNames.tagCount}>{repo.tagCount}</Td>
-            <Td dataLabel={columnNames.size}>{repo.size}</Td>
-            <Td dataLabel={columnNames.pulls}>{repo.pulls}</Td>
-            <Td dataLabel={columnNames.lastPull}>{repo.lastPull}</Td>
-            <Td dataLabel={columnNames.vunerabilities}>
-              {repo.vunerabilities}
-            </Td>
-          </Tr>
-        ))}
-      </Tbody>
-    </TableComposable>
+              />
+              <Td dataLabel={columnNames.repoName}>
+                <Link to={`/quay/namespaces/${repo.repoName}`}>
+                  {repo.repoName}
+                </Link>
+                {/* <Link to={'namespaces/builds'}> {ns.name} </Link> */}
+              </Td>
+              <Td dataLabel={columnNames.users}>{repo.users}</Td>
+              <Td dataLabel={columnNames.tagCount}>{repo.tagCount}</Td>
+              <Td dataLabel={columnNames.size}>{repo.size}</Td>
+              <Td dataLabel={columnNames.pulls}>{repo.pulls}</Td>
+              <Td dataLabel={columnNames.lastPull}>{repo.lastPull}</Td>
+              <Td dataLabel={columnNames.vunerabilities}>
+                {repo.vunerabilities}
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </TableComposable>
     </>
   );
 }
 
-
 type RepositoryListProps = {
-    repoName: string;
-    users: number;
+  repoName: string;
+  users: number;
   tagCount: number;
   size: string;
   pulls: number;
   lastPull: string;
   vunerabilities: string;
 };
-

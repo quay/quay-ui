@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from 'axios';
+import {AxiosRequestConfig} from 'axios';
 import MockAxios from '../../MockAxios';
 
 const response = {
@@ -6,7 +6,7 @@ const response = {
 };
 
 MockAxios.onPost('/signin').reply((request: AxiosRequestConfig) => {
-  const { username, password } = JSON.parse(request.data);
+  const {username, password} = JSON.parse(request.data);
 
   // eslint-disable-next-line no-console
   console.log(`login request ${username}: ${password}`);

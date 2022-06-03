@@ -11,13 +11,12 @@ import {
 export const CreateRepositoryModal = (
   props: CreateRepositoryModalProps,
 ): JSX.Element => {
-  const { isModalOpen, handleModalToggle, quayEndPoint } = props;
+  const {isModalOpen, handleModalToggle, quayEndPoint} = props;
 
   const [namespaceName, setNamespaceName] = React.useState('');
-  const [namespaceEmail, setNamespaceEmail] = React.useState('')
+  const [namespaceEmail, setNamespaceEmail] = React.useState('');
 
   const [repoVisibility, setrepoVisibility] = React.useState('');
-
 
   const nameInputRef = React.useRef();
 
@@ -29,7 +28,6 @@ export const CreateRepositoryModal = (
     setNamespaceEmail(value);
   };
 
-
   const createRepositoryHandler = async () => {
     handleModalToggle(); // check if this is needed
     await fetch(`${quayEndPoint.QUAY_HOSTNAME}/api/v1/organization/`, {
@@ -38,7 +36,7 @@ export const CreateRepositoryModal = (
         Authorization: `Bearer ${quayEndPoint.QUAY_OAUTH_TOKEN}`,
         'X-Requested-With': 'XMLHttpRequest',
       },
-      body: JSON.stringify({ name: namespaceName, email: namespaceEmail }),
+      body: JSON.stringify({name: namespaceName, email: namespaceEmail}),
     }).then;
 
     // await consoleFetch(`${SECRET_SERVICE_URL}/api/v1/namespaces/${namespace}/secrets`, {
@@ -123,7 +121,6 @@ export const CreateRepositoryModal = (
         </FormGroup> */}
         <br />
       </Form>
-
     </Modal>
   );
 };
