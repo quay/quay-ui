@@ -22,6 +22,7 @@ module.exports = {
     '@typescript-eslint',
   ],
   rules: {
+    "prettier/prettier": ["error"],
     '@typescript-eslint/no-var-requires': 'off',
     'import/no-unresolved': 'error',
     'import/prefer-default-export': 'off',

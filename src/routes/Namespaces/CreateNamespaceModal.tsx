@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import {
   Modal,
   ModalVariant,
@@ -10,8 +10,8 @@ import {
   TextVariants,
   Slider,
   Popover,
-} from "@patternfly/react-core";
-import "./css/Namespaces.scss";
+} from '@patternfly/react-core';
+import './css/Namespaces.scss';
 import {
   TableComposable,
   Tbody,
@@ -19,30 +19,30 @@ import {
   Th,
   Thead,
   Tr,
-} from "@patternfly/react-table";
-import { useRecoilValue } from "recoil";
-import { AuthState } from "../../atoms/AuthState";
+} from '@patternfly/react-table';
+import {useRecoilValue} from 'recoil';
+import {AuthState} from '../../atoms/AuthState';
 
 export const CreateNamespaceModal = (
-  props: CreateNamespaceModalProps
+  props: CreateNamespaceModalProps,
 ): JSX.Element => {
-  const { isModalOpen, handleModalToggle } = props;
+  const {isModalOpen, handleModalToggle} = props;
   const quayAuth = useRecoilValue(AuthState);
 
-  const [namespaceName, setNamespaceName] = React.useState("");
-  const [namespaceEmail, setNamespaceEmail] = React.useState("");
+  const [namespaceName, setNamespaceName] = React.useState('');
+  const [namespaceEmail, setNamespaceEmail] = React.useState('');
   const [repoCount, setRepoCount] = React.useState(250);
 
   const reposWithCost = [
-    { value: 0, label: "0" },
-    { value: 30, label: "10" },
-    { value: 60, label: "20" },
-    { value: 125, label: "50" },
-    { value: 250, label: "125" },
-    { value: 450, label: "250" },
-    { value: 850, label: "500" },
-    { value: 1600, label: "1000" },
-    { value: 2100, label: "2000" },
+    {value: 0, label: '0'},
+    {value: 30, label: '10'},
+    {value: 60, label: '20'},
+    {value: 125, label: '50'},
+    {value: 250, label: '125'},
+    {value: 450, label: '250'},
+    {value: 850, label: '500'},
+    {value: 1600, label: '1000'},
+    {value: 2100, label: '2000'},
   ];
 
   const handleNameInputChange = (value: any) => {
@@ -59,49 +59,49 @@ export const CreateNamespaceModal = (
 
   const orgPricing = [
     {
-      PLAN: "Open Source",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$0",
+      PLAN: 'Open Source',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$0',
     },
     {
-      PLAN: "Micro",
-      "PRIVATE REPOSITORIES": 10,
-      PRICE: "$30",
+      PLAN: 'Micro',
+      'PRIVATE REPOSITORIES': 10,
+      PRICE: '$30',
     },
     {
-      PLAN: "Small",
-      "PRIVATE REPOSITORIES": 20,
-      PRICE: "$50",
+      PLAN: 'Small',
+      'PRIVATE REPOSITORIES': 20,
+      PRICE: '$50',
     },
     {
-      PLAN: "Medium",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$100",
+      PLAN: 'Medium',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$100',
     },
     {
-      PLAN: "Large",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$0",
+      PLAN: 'Large',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$0',
     },
     {
-      PLAN: "Extra Large",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$0",
+      PLAN: 'Extra Large',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$0',
     },
     {
-      PLAN: "XXL",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$0",
+      PLAN: 'XXL',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$0',
     },
     {
-      PLAN: "XXXL",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$0",
+      PLAN: 'XXXL',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$0',
     },
     {
-      PLAN: "XXXXL",
-      "PRIVATE REPOSITORIES": 5,
-      PRICE: "$0",
+      PLAN: 'XXXXL',
+      'PRIVATE REPOSITORIES': 5,
+      PRICE: '$0',
     },
   ];
 
@@ -109,7 +109,7 @@ export const CreateNamespaceModal = (
     return (
       <TableComposable
         aria-label="Simple table"
-        variant={"compact"}
+        variant={'compact'}
         borders={false}
       >
         <Thead>
@@ -123,7 +123,7 @@ export const CreateNamespaceModal = (
           {orgPricing.map((org) => (
             <Tr key={org.PLAN}>
               <Td>{org.PLAN}</Td>
-              <Td>{org["PRIVATE REPOSITORIES"]}</Td>
+              <Td>{org['PRIVATE REPOSITORIES']}</Td>
               <Td>{org.PRICE}</Td>
             </Tr>
           ))}
@@ -135,12 +135,12 @@ export const CreateNamespaceModal = (
   const createNamespaceHandler = async () => {
     // handleModalToggle(); // check if this is needed
     await fetch(`${quayAuth.QUAY_HOSTNAME}/api/v1/organization/`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${quayAuth.QUAY_OAUTH_TOKEN}`,
-        "X-Requested-With": "XMLHttpRequest",
+        'X-Requested-With': 'XMLHttpRequest',
       },
-      body: JSON.stringify({ name: namespaceName, email: namespaceEmail }),
+      body: JSON.stringify({name: namespaceName, email: namespaceEmail}),
     }).then;
   };
 
@@ -207,8 +207,8 @@ export const CreateNamespaceModal = (
         fieldId="modal-with-form-form-email"
       >
         <Text component={TextVariants.small}>
-          {" "}
-          Number of private repositories{" "}
+          {' '}
+          Number of private repositories{' '}
           <Popover
             aria-label="Basic popover"
             headerContent={<div>Organization Plans</div>}

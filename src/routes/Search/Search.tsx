@@ -3,8 +3,8 @@ import {
   PageSection,
   PageSectionVariants,
   Title,
-} from "@patternfly/react-core";
-import * as React from "react";
+} from '@patternfly/react-core';
+import * as React from 'react';
 
 export default function Search() {
   return (
