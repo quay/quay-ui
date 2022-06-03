@@ -1,10 +1,12 @@
 import {
+    Dropdown,
+    DropdownItem,
+    KebabToggle,
     TextInput,
     Toolbar,
     ToolbarContent,
     ToolbarItem,
     Select,
-    SelectGroup,
     SelectOption,
     SelectVariant,
     Pagination,
@@ -24,6 +26,11 @@ export function TagsToolbar(props: ToolBarProps) {
         setFilter(value)
         setPagination({ page: 1, perPage: 25, })
     }
+
+    const kebabItems = [
+        <DropdownItem key="delete">Delete</DropdownItem>,
+    ];
+    const [isKebabOpen, setKebabOpen] = useState(false);
 
     return (
         <Toolbar>
@@ -52,6 +59,15 @@ export function TagsToolbar(props: ToolBarProps) {
                         placeholder="Filter by Tag name"
                         value={filter}
                         onChange={filterTags}
+                    />
+                </ToolbarItem>
+                <ToolbarItem>
+                    <Dropdown
+                        onSelect={()=>setKebabOpen(!isKebabOpen)}
+                        toggle={<KebabToggle onToggle={()=>setKebabOpen(!isKebabOpen)} id="toggle-id-6" />}
+                        isOpen={isKebabOpen}
+                        isPlain
+                        dropdownItems={kebabItems}
                     />
                 </ToolbarItem>
                 <ToolbarItem alignment={{ default: "alignRight" }}>
