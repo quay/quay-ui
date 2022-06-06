@@ -1,32 +1,15 @@
 import { ExpandableRowContent, TableComposable, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 import { Button, ClipboardCopy, Modal, ModalVariant, Text } from '@patternfly/react-core';
-import {useState} from 'react';
-import React from 'react';
+import { useState } from 'react';
+import { Tag, TagsResponse, getTags, ManifestList } from 'src/resources/TagResource';
 
-export interface Tag {
-    Name: string;
-    OS: string;
-    Security: string;
-    Size: string;
-    LastModified: string;
-    Expires: string;
-    Manifest: string;
-    Pull: string;
-    Digest: string;
-    ManifestLists?: {
-        Arch?: string;
-        Security?: string;
-        Size?: string;
-        Manifest?: string;
-        Format: 0 | 1 | 2 | 3;
-    };
-}
 
 const columnNames = {
     Tag: 'Tag',
     OS: 'OS',
     Security: 'Security',
     Size: 'Size',
+    Expires: 'Expires',
     LastModified: 'Last Modified',
     Manifest: 'Manifest',
     Pull: 'Pull'
@@ -48,8 +31,8 @@ export default function Table(props: TableProps) {
 
     const setTagSelected = (tag: Tag, isSelecting = true) =>
         setSelectedTagNames(prevSelected => {
-            const otherSelectedtagNames = prevSelected.filter(r => r !== tag.Name);
-            return isSelecting && isTagSelectable(tag) ? [...otherSelectedtagNames, tag.Name] : otherSelectedtagNames;
+            const otherSelectedtagNames = prevSelected.filter(r => r !== tag.name);
+            return isSelecting && isTagSelectable(tag) ? [...otherSelectedtagNames, tag.name] : otherSelectedtagNames;
     });
 
     const onSelectTag = (tag: Tag, rowIndex: number, isSelecting: boolean) => {
@@ -64,17 +47,17 @@ export default function Table(props: TableProps) {
     }
 
     // Tag expansion
-    const initialExpandedTagNames = props.tags.filter(tag => !!tag.ManifestLists).map(tag => tag.Name);
+    const initialExpandedTagNames = props.tags.filter(tag => tag.is_manifest_list).map(tag => tag.name);
     const [expandedTagNames, setExpandedTagNames] = useState<string[]>(initialExpandedTagNames);
     const setTagExpanded = (tag: Tag, isExpanding = true) =>
     setExpandedTagNames(prevExpanded => {
-      const otherExpandedtagNames = prevExpanded.filter(r => r !== tag.Name);
-      return isExpanding ? [...otherExpandedtagNames, tag.Name] : otherExpandedtagNames;
+      const otherExpandedtagNames = prevExpanded.filter(r => r !== tag.name);
+      return isExpanding ? [...otherExpandedtagNames, tag.name] : otherExpandedtagNames;
     });
-    const isTagExpanded = (tag: Tag) => expandedTagNames.includes(tag.Name);
+    const isTagExpanded = (tag: Tag) => expandedTagNames.includes(tag.name);
 
     return (
-        <React.Fragment>
+        <>
             <Modal
                 title={`Fetch Tag: ${modalImageTag}`}
                 isOpen={isModalOpen}
@@ -118,7 +101,7 @@ export default function Table(props: TableProps) {
             <Th>Pull</Th>
           </Tr>
         </Thead>
-        {props.tags.map((tag, rowIndex) => {
+        {props.tags.map((tag: Tag, rowIndex: number) => {
           // Some arbitrary examples of how you could customize the child row based on your needs
           const childHasNoPadding = false;
           const archColspan = 2;
@@ -126,11 +109,11 @@ export default function Table(props: TableProps) {
           const sizeColspan = 3;
           const manifestColspan = 1;
           return (
-            <Tbody key={tag.Name} isExpanded={isTagExpanded(tag)}>
+            <Tbody key={tag.name} isExpanded={isTagExpanded(tag)}>
               <Tr>
                 <Td
                   expand={
-                    tag.ManifestLists
+                    tag.is_manifest_list
                       ? {
                           rowIndex,
                           isExpanded: isTagExpanded(tag),
@@ -143,16 +126,17 @@ export default function Table(props: TableProps) {
                     select={{
                         rowIndex,
                         onSelect: (_event, isSelecting) => onSelectTag(tag, rowIndex, isSelecting),
-                        isSelected: selectedTagNames.includes(tag.Name),
+                        isSelected: selectedTagNames.includes(tag.name),
                     }}
                 />
-                <Td dataLabel={columnNames.Tag}>{tag.Name}</Td>
-                <Td dataLabel={columnNames.OS}>{tag.OS}</Td>
-                <Td dataLabel={columnNames.Security}>{typeof(tag.ManifestLists) != 'undefined' ? "See Child Manifest" : tag.Security}</Td>
-                <Td dataLabel={columnNames.Size}>{typeof(tag.ManifestLists) != 'undefined' ? "N/A" : tag.Size}</Td>
-                <Td dataLabel={columnNames.LastModified}>{tag.LastModified}</Td>
-                <Td dataLabel={columnNames.LastModified}>{tag.Expires}</Td>
-                <Td dataLabel={columnNames.Manifest}>{tag.Manifest}</Td>
+                
+                <Td dataLabel={columnNames.Tag}>{tag.name}</Td>
+                <Td dataLabel={columnNames.OS}>os-mock</Td> {/* TODO: get this info later  */}
+                <Td dataLabel={columnNames.Security}>{typeof(tag.ManifestLists) != 'undefined' ? "See Child Manifest" : tag.security}</Td>
+                <Td dataLabel={columnNames.Size}>{typeof(tag.ManifestLists) != 'undefined' ? "N/A" : tag.size}</Td>
+                <Td dataLabel={columnNames.LastModified}>{tag.last_modified}</Td>
+                <Td dataLabel={columnNames.Expires}>expires-mock</Td>  {/* TODO: get this info later  */}
+                <Td dataLabel={columnNames.Manifest}>{tag.manifest_digest}</Td>
                 <Td dataLabel={columnNames.Pull} onClick={()=>{openModal(tag)}}><i className="fa fa-download"></i></Td>
               </Tr>
               {tag.ManifestLists ? (
@@ -174,9 +158,9 @@ export default function Table(props: TableProps) {
                       <ExpandableRowContent>{tag.ManifestLists.Size}</ExpandableRowContent>
                     </Td>
                   ) : null}
-                  {tag.ManifestLists.Manifest ? (
+                  {tag.ManifestLists.manifest_digest ? (
                     <Td dataLabel="tag detail 3" noPadding={childHasNoPadding} colSpan={manifestColspan}>
-                      <ExpandableRowContent>{tag.ManifestLists.Manifest}</ExpandableRowContent>
+                      <ExpandableRowContent>{tag.ManifestLists.manifest_digest}</ExpandableRowContent>
                     </Td>
                   ) : null}
                 </Tr>
@@ -185,7 +169,7 @@ export default function Table(props: TableProps) {
           );
         })}
       </TableComposable>
-        </React.Fragment>
+        </>
     )
 }
 
