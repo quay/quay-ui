@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   TableComposable,
   Thead,
@@ -30,21 +29,22 @@ import {useRecoilValue} from 'recoil';
 import {AuthState} from 'src/atoms/AuthState';
 import {UserOrgs} from 'src/atoms/UserState';
 import {deleteOrg} from 'src/resources/OrganisationResource';
+import {useEffect, useState} from 'react';
 
 export default function Organizations() {
   const authState = useRecoilValue(AuthState);
   const navigate = useNavigate();
 
-  const [organizationsList, setOrganizationsList] = React.useState<
+  const [organizationsList, setOrganizationsList] = useState<
     OrganizationsListProps[]
   >([]);
   const [isOrganizationModalOpen, setOrganizationModalOpen] =
-    React.useState(false);
-  const [organizationSearchInput, setOrganizationSearchInput] = React.useState(
+    useState(false);
+  const [organizationSearchInput, setOrganizationSearchInput] = useState(
     'Filter by name or ID..',
   );
-  const [filterOpen, setFilterOpen] = React.useState(false);
-  const [selectedOrganization, setSelectedOrganization] = React.useState<
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState<
     string[]
   >([]);
 
@@ -100,10 +100,10 @@ export default function Organizations() {
     });
 
   // To allow shift+click to select/deselect multiple rows
-  const [recentSelectedRowIndex, setRecentSelectedRowIndex] = React.useState<
+  const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
     number | null
   >(null);
-  const [shifting, setShifting] = React.useState(false);
+  const [shifting, setShifting] = useState(false);
 
   const onSelectOrganization = (
     currentOrganization: OrganizationsListProps,
@@ -132,7 +132,7 @@ export default function Organizations() {
     setRecentSelectedRowIndex(rowIndex);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Shift') {
         setShifting(true);
@@ -153,7 +153,7 @@ export default function Organizations() {
     };
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (userOrgs) {
       userOrgs.map((org: any) => {
         setOrganizationsList((prevOrganizations) => [

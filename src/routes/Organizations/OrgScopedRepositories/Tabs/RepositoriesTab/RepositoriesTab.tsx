@@ -19,7 +19,7 @@ import {
 } from '@patternfly/react-table';
 import * as React from 'react';
 import {Link} from 'react-router-dom';
-import {CreateRepositoryModal} from './CreateRepositoryModal';
+import {CreateRepositoryModal} from 'src/routes/Repositories/CreateRepositoryModal';
 
 export default function RepositoriesTab() {
   const QUAY_ENDPOINT = {
@@ -116,7 +116,6 @@ export default function RepositoriesTab() {
                 handleModalToggle={() =>
                   setCreateRepoModalOpen(!isCreateRepoModalOpen)
                 }
-                quayEndPoint={QUAY_ENDPOINT}
               />
             ) : null}{' '}
           </ToolbarItem>
