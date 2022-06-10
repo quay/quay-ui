@@ -9,18 +9,15 @@ axios.defaults.withCredentials = true;
 export async function getCsrfToken() {
   try {
     const response = await axios.get('/csrf_token');
-    console.log('setting csrf token');
-    console.log(response.data);
     GlobalAuthState.csrfToken = response.data.csrf_token;
     return response.data;
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`API error login user ${error.message}`);
   }
 }
 
 const axiosIns = axios.create();
 axiosIns.interceptors.request.use(async (config) => {
-  console.log(config);
   // TODO: Handle error if we can't get a CSRF token
   if (!GlobalAuthState.csrfToken) {
     const r = await getCsrfToken();
@@ -37,8 +34,6 @@ axiosIns.interceptors.request.use(async (config) => {
 
 axiosIns.interceptors.response.use(
   (response) => {
-    console.log('axios response');
-    console.log(response);
     return response;
   },
   (error) => {
