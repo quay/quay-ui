@@ -49,14 +49,17 @@ export default function Repositories(props) {
           )}
           to="#"
         >
-          <Link to={`/namespaces/${repoName}`}>Repositories</Link>
+          <Link to={`/organizations/${repoName}`}>Repositories</Link>
         </NavItem>
         <NavItem
           isActive={location.pathname.startsWith(
             NavigationPath.teamMembershipTab,
           )}
         >
-          <Link to={`/namespaces/${repoName}/team`}> Team & Membership </Link>
+          <Link to={`/organizations/${repoName}/team`}>
+            {' '}
+            Team & Membership{' '}
+          </Link>
         </NavItem>
         <NavItem
           isActive={location.pathname.startsWith(
@@ -96,39 +99,11 @@ export default function Repositories(props) {
     </Nav>
   );
 
-  // const pages = [
-  //   {
-  //     href: NavigationPath.repositoriesTab,
-  //     name: "Repositories",
-  //     component: () => <RepositoriesTab />,
-  //   },
-  //   {
-  //     href: NavigationPath.teamMembershipTab,
-  //     name: "Team & Membership",
-  //     component: () => <TeamMembershipTab />,
-  //   },
-  //   {
-  //     href: NavigationPath.teamMembershipTab,
-  //     name: "Robot Accounts",
-  //     component: () => <RobotAccountTab />,
-  //   },
-  //   {
-  //     href: NavigationPath.defaultPermissionsTab,
-  //     name: "Default Permissions",
-  //     component: () => <DefaultPermissionsTab />,
-  //   },
-  //   {
-  //     href: NavigationPath.usagelogs,
-  //     name: "Usage Logs",
-  //     component: () => <UsageLogsTab />,
-  //   },
-  // ];
-
   return (
     <Page>
       <PageSection variant={PageSectionVariants.light} hasShadowBottom>
         <Breadcrumb>
-          <BreadcrumbItem to="/namespaces">Namespaces</BreadcrumbItem>
+          <BreadcrumbItem to="/organizations">Organizations</BreadcrumbItem>
           <BreadcrumbItem to="#">{repositoryName}</BreadcrumbItem>
         </Breadcrumb>
         <PageSection variant={PageSectionVariants.light}>

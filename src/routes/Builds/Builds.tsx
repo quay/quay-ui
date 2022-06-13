@@ -5,17 +5,8 @@ import {
   PageSectionVariants,
   Title,
 } from '@patternfly/react-core';
-// import {
-//   HorizontalNav,
-//   ListPageHeader,
-// } from '@openshift-console/dynamic-plugin-sdk';
-// import { useHistory } from "react-router-dom";
 
 export default function Builds() {
-  //   const history = useHistory();
-  //   const namespaceName = history.location.pathname.split('/');
-  //   console.log('namespaceName', namespaceName);
-
   return (
     <Page>
       <PageSection variant={PageSectionVariants.light} hasShadowBottom>
@@ -27,9 +18,6 @@ export default function Builds() {
       <PageSection>
         <PageSection variant={PageSectionVariants.light}></PageSection>
       </PageSection>
-      {/* <ListPageHeader title={namespaceName[3]}></ListPageHeader> */}
-
-      {/* <HorizontalNav pages={pages} /> */}
     </Page>
   );
 }
