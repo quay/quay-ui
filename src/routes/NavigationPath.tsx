@@ -1,19 +1,17 @@
 export enum NavigationPath {
   // Side NAV
   home = '/',
-  overview = '/overview',
-  search = '/search',
-  namespace = '/namespaces',
+  organizations = '/organizations',
   builds = '/builds',
   administration = '/administration',
 
   // Repositories Nav
-  repositories = '/namespaces/:reponame',
-  repositoriesTab = '/namespaces/:reponame/repo',
-  teamMembershipTab = '/namespaces/:reponame/team',
-  robotAccountTab = '/namespaces/:reponame/robotacct',
-  defaultPermissionsTab = '/namespaces/:reponame/permissions',
-  oauth = '/namespaces/:reponame/oauth',
-  usagelogs = '/namespaces/:reponame/logs',
-  settings = '/namespaces/:reponame/settings',
+  repositories = '/organizations/:reponame',
+  repositoriesTab = '/organizations/:reponame/repo',
+  teamMembershipTab = '/organizations/:reponame/team',
+  robotAccountTab = '/organizations/:reponame/robotacct',
+  defaultPermissionsTab = '/organizations/:reponame/permissions',
+  oauth = '/organizations/:reponame/oauth',
+  usagelogs = '/organizations/:reponame/logs',
+  settings = '/organizations/:reponame/settings',
 }

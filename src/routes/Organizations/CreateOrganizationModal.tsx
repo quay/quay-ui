@@ -11,7 +11,7 @@ import {
   Slider,
   Popover,
 } from '@patternfly/react-core';
-import './css/Namespaces.scss';
+import './css/Organizations.scss';
 import {
   TableComposable,
   Tbody,
@@ -23,14 +23,14 @@ import {
 import {useRecoilValue} from 'recoil';
 import {AuthState} from '../../atoms/AuthState';
 
-export const CreateNamespaceModal = (
-  props: CreateNamespaceModalProps,
+export const CreateOrganizationModal = (
+  props: CreateOrganizationModalProps,
 ): JSX.Element => {
   const {isModalOpen, handleModalToggle} = props;
   const quayAuth = useRecoilValue(AuthState);
 
-  const [namespaceName, setNamespaceName] = React.useState('');
-  const [namespaceEmail, setNamespaceEmail] = React.useState('');
+  const [organizationName, setOrganizationName] = React.useState('');
+  const [organizationEmail, setOrganizationEmail] = React.useState('');
   const [repoCount, setRepoCount] = React.useState(250);
 
   const reposWithCost = [
@@ -46,11 +46,11 @@ export const CreateNamespaceModal = (
   ];
 
   const handleNameInputChange = (value: any) => {
-    setNamespaceName(value);
+    setOrganizationName(value);
   };
 
   const handleEmailInputChange = (value: any) => {
-    setNamespaceEmail(value);
+    setOrganizationEmail(value);
   };
 
   const handleRepoCountChange = (value: any) => {
@@ -132,7 +132,7 @@ export const CreateNamespaceModal = (
     );
   };
 
-  const createNamespaceHandler = async () => {
+  const createOrganizationHandler = async () => {
     // handleModalToggle(); // check if this is needed
     await fetch(`${quayAuth.QUAY_HOSTNAME}/api/v1/organization/`, {
       method: 'POST',
@@ -140,13 +140,13 @@ export const CreateNamespaceModal = (
         Authorization: `Bearer ${quayAuth.QUAY_OAUTH_TOKEN}`,
         'X-Requested-With': 'XMLHttpRequest',
       },
-      body: JSON.stringify({name: namespaceName, email: namespaceEmail}),
+      body: JSON.stringify({name: organizationName, email: organizationEmail}),
     }).then;
   };
 
   return (
     <Modal
-      title="Create Namespace"
+      title="Create Organization"
       variant={ModalVariant.medium}
       isOpen={isModalOpen}
       onClose={handleModalToggle}
@@ -154,7 +154,7 @@ export const CreateNamespaceModal = (
         <Button
           key="confirm"
           variant="primary"
-          onClick={createNamespaceHandler}
+          onClick={createOrganizationHandler}
           form="modal-with-form-form"
         >
           Create Organization
@@ -164,7 +164,7 @@ export const CreateNamespaceModal = (
       <Form id="modal-with-form-form" isWidthLimited>
         <FormGroup
           isInline
-          label="Namespace Name"
+          label="Organization Name"
           isRequired
           fieldId="modal-with-form-form-name"
           helperText="This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long"
@@ -174,13 +174,13 @@ export const CreateNamespaceModal = (
             isRequired
             type="text"
             id="modal-with-form-form-name"
-            value={namespaceName}
+            value={organizationName}
             onChange={handleNameInputChange}
             // ref={nameInputRef}
           />
         </FormGroup>
         <FormGroup
-          label="Namespace Email"
+          label="Organization Email"
           isRequired
           fieldId="modal-with-form-form-email"
           helperText="This address must be different from your account's email"
@@ -191,7 +191,7 @@ export const CreateNamespaceModal = (
             type="email"
             id="modal-with-form-form-name"
             name="modal-with-form-form-name"
-            value={namespaceEmail}
+            value={organizationEmail}
             onChange={handleEmailInputChange}
             // ref={nameInputRef}
           />
@@ -228,7 +228,7 @@ export const CreateNamespaceModal = (
   );
 };
 
-type CreateNamespaceModalProps = {
+type CreateOrganizationModalProps = {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
 };

@@ -2,29 +2,22 @@ import React from 'react';
 import {Nav, NavItem, NavList, PageSidebar} from '@patternfly/react-core';
 import {Link} from 'react-router-dom';
 import {NavigationPath} from 'src/routes/NavigationPath';
-import Namespaces from 'src/routes/Namespaces/Namespaces';
-import Repositories from 'src/routes/Namespaces/Repositories/Repositories';
-import {Overview} from '../../routes/Overview/Overview';
+import Organizations from 'src/routes/Organizations/Organizations';
+import Repositories from 'src/routes/Organizations/Repositories/Repositories';
 
 interface SideNavProps {
   isSideNav: boolean;
   navPath: NavigationPath;
   title: string;
-  component: JSX.Element | any;
+  component: JSX.Element;
 }
 
 const routes: SideNavProps[] = [
   {
     isSideNav: true,
-    navPath: NavigationPath.overview,
-    title: 'Overview',
-    component: <Overview />,
-  },
-  {
-    isSideNav: true,
-    navPath: NavigationPath.namespace,
-    title: 'Namespaces',
-    component: <Namespaces />,
+    navPath: NavigationPath.organizations,
+    title: 'Organizations',
+    component: <Organizations />,
   },
   {
     isSideNav: true,

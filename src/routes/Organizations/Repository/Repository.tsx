@@ -54,7 +54,7 @@ export default function Repository(props) {
       <PageBreadcrumb>
         <Breadcrumb>
           <BreadcrumbItem data-testid="namespace-breadcrumb" to="#">
-            namespaces
+            organizations
           </BreadcrumbItem>
           <BreadcrumbItem data-testid="org-breadcrumb" to="#">
             {organization}

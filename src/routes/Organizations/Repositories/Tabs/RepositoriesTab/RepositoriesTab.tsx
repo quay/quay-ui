@@ -41,7 +41,6 @@ export default function RepositoriesTab() {
   console.log(dummy);
 
   const data = ['dummy1', 'dummy2'];
-  const onFilterChange = () => {};
 
   const selectDropdownItems = [
     <DropdownItem key="Select all">Select all</DropdownItem>,
@@ -103,17 +102,7 @@ export default function RepositoriesTab() {
               dropdownItems={kebabItems}
             />
           </ToolbarItem>
-          <ToolbarItem>
-            {/* <ListPageFilter
-            data={data}
-            loaded={true}
-            // rowFilters={filters}
-            hideNameLabelFilters={false}
-            hideLabelFilter={false}
-            hideColumnManagement={false}
-            onFilterChange={onFilterChange}
-          /> */}
-          </ToolbarItem>
+          <ToolbarItem></ToolbarItem>
           <ToolbarItem>
             <Button
               variant="primary"
@@ -136,13 +125,7 @@ export default function RepositoriesTab() {
       <TableComposable aria-label="Selectable table">
         <Thead>
           <Tr>
-            <Th
-            // select={{
-            //   onSelect: (_event, isSelecting) =>
-            //     selectAllNamespaces(isSelecting),
-            //   isSelected: areAllNamespacesSelected,
-            // }}
-            />
+            <Th />
             <Th>{columnNames.repoName}</Th>
             <Th>{columnNames.users}</Th>
             <Th>{columnNames.tagCount}</Th>
@@ -155,19 +138,11 @@ export default function RepositoriesTab() {
         <Tbody>
           {repositoryList.map((repo, rowIndex) => (
             <Tr key={repo.repoName}>
-              <Td
-              // select={{
-              //   rowIndex,
-              //   onSelect: (_event, isSelecting) =>
-              //     onSelectNamespace(repo, rowIndex, isSelecting),
-              //   isSelected: isNamespaceSelected(repo),
-              // }}
-              />
+              <Td />
               <Td dataLabel={columnNames.repoName}>
                 <Link to={`/quay/namespaces/${repo.repoName}`}>
                   {repo.repoName}
                 </Link>
-                {/* <Link to={'namespaces/builds'}> {ns.name} </Link> */}
               </Td>
               <Td dataLabel={columnNames.users}>{repo.users}</Td>
               <Td dataLabel={columnNames.tagCount}>{repo.tagCount}</Td>

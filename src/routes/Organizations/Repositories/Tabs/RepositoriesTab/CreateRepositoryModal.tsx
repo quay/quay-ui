@@ -38,17 +38,7 @@ export const CreateRepositoryModal = (
       },
       body: JSON.stringify({name: namespaceName, email: namespaceEmail}),
     }).then;
-
-    // await consoleFetch(`${SECRET_SERVICE_URL}/api/v1/namespaces/${namespace}/secrets`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(getNewPartialSecret('destination', namespace)),
-    // });
   };
-
-  // const openNamespaceModal = () => {
-
-  // }
 
   return (
     <Modal
@@ -70,7 +60,7 @@ export const CreateRepositoryModal = (
       <Form id="modal-with-form-form" isWidthLimited>
         <FormGroup
           isInline
-          label="Namespace Name"
+          label="Organization Name"
           isRequired
           fieldId="modal-with-form-form-name"
           helperText="This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long"
