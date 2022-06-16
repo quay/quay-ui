@@ -211,16 +211,12 @@ export default function Organizations() {
                   aria-label="Select Input"
                   onToggle={() => setFilterOpen(!filterOpen)}
                   onSelect={onSelect}
-                  // selections={selected}
                   isOpen={filterOpen}
                   placeholderText="Filter"
-                  // aria-labelledby={titleId}
                 >
                   {options}
                 </Select>
               </ToolbarItem>
-              {/* try for search field
-              <ToolbarItem variant='search-filter' className="co-filter-search--full-width"></ToolbarItem>  */}
               <ToolbarItem>
                 <TextInput
                   isRequired
@@ -232,16 +228,14 @@ export default function Organizations() {
                 />
               </ToolbarItem>
               <ToolbarItem>
-                {' '}
                 <Button
                   isDisabled={selectedOrganization.length === 0}
                   variant="primary"
                   className="pf-c-button pf-m-plain"
                   type="button"
-                  // aria-label={t('notification-drawer~Close')}
                   onClick={onDelete}
                 >
-                  <i className="fas fa-trash"></i>{' '}
+                  <i className="fas fa-trash"></i>
                 </Button>
               </ToolbarItem>
               <ToolbarItem alignment={{xl: 'alignRight'}}>
@@ -256,7 +250,7 @@ export default function Organizations() {
                     isModalOpen={isOrganizationModalOpen}
                     handleModalToggle={handleModalToggle}
                   />
-                ) : null}{' '}
+                ) : null}
               </ToolbarItem>
             </ToolbarContent>
           </Toolbar>
@@ -291,7 +285,7 @@ export default function Organizations() {
                     }}
                   />
                   <Td dataLabel={columnNames.name}>
-                    <Link to={`${ns.name}`}>{ns.name}</Link>
+                    <Link to={ns.name}>{ns.name}</Link>
                   </Td>
                   <Td dataLabel={columnNames.repoCount}>{ns.repoCount}</Td>
                   <Td dataLabel={columnNames.tagCount}>{ns.tagCount}</Td>

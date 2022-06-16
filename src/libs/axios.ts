@@ -2,6 +2,10 @@
 import axios from 'axios';
 import {GlobalAuthState} from 'src/resources/AuthResource';
 
+if (process.env.MOCK_API === 'true') {
+  require('src/tests/fake-db/ApiMock');
+}
+
 axios.defaults.baseURL =
   process.env.QUAY_APP_API_URL || 'http://localhost:8080';
 axios.defaults.withCredentials = true;
@@ -26,7 +30,6 @@ axiosIns.interceptors.request.use(async (config) => {
 
   if (config.headers && GlobalAuthState.csrfToken) {
     config.headers['X-CSRF-Token'] = GlobalAuthState.csrfToken;
-    config.headers['X-XSRF-Token'] = GlobalAuthState.csrfToken;
   }
 
   return config;

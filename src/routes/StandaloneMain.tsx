@@ -31,9 +31,7 @@ export function StandaloneMain() {
       defaultManagedSidebarIsOpen={true}
     >
       <Routes>
-        <Route path={'/organizations'} element={<Organizations />}>
-          <Route path={':repoName'} element={<Repositories />} />
-        </Route>
+        <Route path={'/organizations'} element={<Organizations />} />
         <Route
           path={'/organizations/:organizationName/*'}
           element={<Repository />}
