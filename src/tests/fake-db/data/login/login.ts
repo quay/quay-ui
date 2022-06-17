@@ -9,7 +9,7 @@ const csrfResponse = {
   csrf_token: 'test-csrf-token',
 };
 
-mock.onPost('/signin').reply((request: AxiosRequestConfig) => {
+mock.onPost('/api/v1/signin').reply((request: AxiosRequestConfig) => {
   const {username, password} = JSON.parse(request.data);
 
   // eslint-disable-next-line no-console

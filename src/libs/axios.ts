@@ -12,6 +12,9 @@ axios.defaults.withCredentials = true;
 
 export async function getCsrfToken() {
   try {
+    if (process.env.MOCK_API === 'true') {
+      return 'test-csrf-token';
+    }
     const response = await axios.get('/csrf_token');
     GlobalAuthState.csrfToken = response.data.csrf_token;
     return response.data;
