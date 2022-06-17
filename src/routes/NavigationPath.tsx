@@ -1,12 +1,16 @@
 export enum NavigationPath {
-  // Side NAV
+  // Side Nav
   home = '/',
-  organizations = '/organizations',
-  repositories = '/repositories',
+  organizationsList = '/organizations',
+  repositoriesList = '/repositories',
 
-  // Scoped Repositories Sub Nav
-  orgScopedRepository = '/organizations/:organizationName',
-  orgScopedRepositoryTab = '/organizations/:organizationName/repo',
+  // Organization detail
+  organizationDetail = '/organizations/:organizationName',
+  repositoryListForOrg = '/organizations/:organizationName/repotab',
+  tagListForRepository = '/organizations/:organizationName/:repositoryName',
+
+  // Repository detail
+  repositoryDetail = '/repositories/:repositoryName',
   usagelogs = '/organizations/:reponame/logs',
   settings = '/organizations/:reponame/settings',
 }

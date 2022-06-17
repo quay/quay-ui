@@ -22,21 +22,20 @@ import {
   Tbody,
   Td,
 } from '@patternfly/react-table';
-import * as React from 'react';
 import {useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
 import {fetchAllRepos} from 'src/resources/RepositoryResource';
 import {DeleteRepositoryModal} from './DeleteRepositoryModal';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {useEffect, useState} from 'react';
-import {useLocation} from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
 }
 
-export default function Repositories() {
+export default function RepositoriesList() {
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = useState(false);
   const [isSelectDropDownOpen, setSelectDropDownOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
@@ -45,6 +44,55 @@ export default function Repositories() {
   const [repositoryList, setRepositoryList] = useState<RepositoryListProps[]>(
     [],
   );
+
+  const isRepoSelectable = (repo: Repository) => repo.name !== ''; // Arbitrary logic for this example
+  const selectableRepos = repositoryList.filter(isRepoSelectable);
+  const [selectedRepoNames, setSelectedRepoNames] = useState<string[]>([]);
+
+  const setRepoSelected = (repo: Repository, isSelecting = true) =>
+    setSelectedRepoNames((prevSelected) => {
+      const otherSelectedRepoNames = prevSelected.filter(
+        (r) => r !== repo.path,
+      );
+      return isSelecting && isRepoSelectable(repo)
+        ? [...otherSelectedRepoNames, repo.path]
+        : otherSelectedRepoNames;
+    });
+
+  const selectAllRepos = (isSelecting = true) =>
+    setSelectedRepoNames(isSelecting ? selectableRepos.map((r) => r.path) : []);
+
+  const areAllReposSelected =
+    selectedRepoNames.length === selectableRepos.length;
+
+  const isRepoSelected = (repo: Repository) =>
+    selectedRepoNames.includes(repo.path);
+
+  const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
+    number | null
+  >(null);
+
+  const onSelectRepo = (
+    repo: Repository,
+    rowIndex: number,
+    isSelecting: boolean,
+  ) => {
+    // If the user is shift + selecting the checkboxes, then all intermediate checkboxes should be selected
+    // if (shifting && recentSelectedRowIndex !== null) {
+    //   const numberSelected = rowIndex - recentSelectedRowIndex;
+    //   const intermediateIndexes =
+    //     numberSelected > 0
+    //       ? Array.from(new Array(numberSelected + 1), (_x, i) => i + recentSelectedRowIndex)
+    //       : Array.from(new Array(Math.abs(numberSelected) + 1), (_x, i) => i + rowIndex);
+    //   intermediateIndexes.forEach(index => setRepoSelected(repositories[index], isSelecting));
+    // } else {
+    setRepoSelected(repo, isSelecting);
+    // }
+    setRecentSelectedRowIndex(rowIndex);
+  };
+
+  // const selectAllNamespaces = (isSelecting = true) =>
+  //   setSelectedRepoNames(isSelecting ? selectableRepos.map(r => r.path) : []);
 
   const toggleMakePublicClick = () => {
     setmakePublicModal(!makePublicModalOpen);
@@ -55,7 +103,7 @@ export default function Repositories() {
   };
 
   const [repositorySearchInput, setRepositorySearchInput] =
-    React.useState('Filter by name..');
+    useState('Filter by name..');
 
   const [deleteKebabOption, setDeleteKebabOption] = useState({
     isModalOpen: false,
@@ -75,6 +123,28 @@ export default function Repositories() {
     setKebabOpen(!isKebabOpen);
     handleDeleteModalToggle();
     // TODO: ADD API calls for bulk/ selected repo deletion
+  };
+
+  const fetchMakePublicDescription = () => {
+    if (selectedRepoNames.length == 0) {
+      return 'Please select one/more repositories to change visibility.';
+    }
+    return (
+      'Update ' +
+      selectedRepoNames.length +
+      ' repositories visibility to be public so they are visible to all user, and may be pulled by all users.'
+    );
+  };
+
+  const fetchMakePrivateDescription = () => {
+    if (selectedRepoNames.length == 0) {
+      return 'Please select one/more repositories to change visibility.';
+    }
+    return (
+      'Update ' +
+      selectedRepoNames.length +
+      ' repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.'
+    );
   };
 
   const selectDropdownItems = [
@@ -136,12 +206,13 @@ export default function Repositories() {
           await fetchAllRepos(listOfOrgNames).then((response) => {
             response.map((eachResponse) =>
               eachResponse?.data.repositories.map((repo) => {
-                console.log('repo', repo);
                 setRepositoryList((prevRepos) => [
                   ...prevRepos,
                   {
                     name: repo.name,
-                    visibility: repo.is_public,
+                    namespace: repo.namespace,
+                    path: repo.namespace + '/' + repo.name,
+                    isPublic: repo.is_public,
                     tags: 1,
                     size: '1.1GB',
                     pulls: 108,
@@ -160,6 +231,10 @@ export default function Repositories() {
 
     fetchRepos();
   }, [userOrgs]);
+
+  const updateListHandler = (value: RepositoryListProps) => {
+    setRepositoryList((prev) => [value, ...prev]);
+  };
 
   return (
     <Page>
@@ -220,6 +295,7 @@ export default function Repositories() {
                     setCreateRepoModalOpen(!isCreateRepoModalOpen)
                   }
                   orgNameProp={currentOrg}
+                  updateListHandler={updateListHandler}
                 />
               ) : null}{' '}
             </ToolbarItem>
@@ -247,28 +323,32 @@ export default function Repositories() {
           </ToolbarContent>
           <ConfirmationModal
             title="Make repositories public"
-            description="Update repositories visibility to be public so they are visible to all user, and may be pulled by all users."
+            description={fetchMakePublicDescription()}
             modalOpen={makePublicModalOpen}
+            selectedItems={selectedRepoNames}
             toggleModal={toggleMakePublicClick}
             buttonText="Make public"
+            makePublic={true}
           />
           <ConfirmationModal
             title="Make repositories private"
-            description="Update repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users."
+            description={fetchMakePrivateDescription()}
             modalOpen={makePrivateModalOpen}
             toggleModal={toggleMakePrivateClick}
             buttonText="Make private"
+            selectedItems={selectedRepoNames}
+            makePublic={false}
           />
         </Toolbar>
         <TableComposable aria-label="Selectable table">
           <Thead>
             <Tr>
               <Th
-              // select={{
-              //   onSelect: (_event, isSelecting) =>
-              //     selectAllNamespaces(isSelecting),
-              //   isSelected: areAllNamespacesSelected,
-              // }}
+                select={{
+                  onSelect: (_event, isSelecting) =>
+                    selectAllRepos(isSelecting),
+                  isSelected: areAllReposSelected,
+                }}
               />
               <Th>{columnNames.repoName}</Th>
               <Th>{columnNames.visibility}</Th>
@@ -280,17 +360,34 @@ export default function Repositories() {
             </Tr>
           </Thead>
           <Tbody>
-            {repositoryList.map((repo, idx) => {
-              <Tr key={idx}>
-                <Td dataLabel={columnNames.repoName}> {repo.name} </Td>
-                <Td dataLabel={columnNames.visibility}>{repo.visibility}</Td>
-                <Td dataLabel={columnNames.tags}>TBA</Td>
-                <Td dataLabel={columnNames.size}>TBA</Td>
-                <Td dataLabel={columnNames.pulls}>TBA</Td>
-                <Td dataLabel={columnNames.lastPull}>TBA</Td>
-                <Td dataLabel={columnNames.lastModified}>TBA</Td>
-              </Tr>;
-            })}
+            {repositoryList.map((repo, rowIndex) => (
+              <Tr key={repo.path}>
+                <Td
+                  select={{
+                    rowIndex,
+                    onSelect: (_event, isSelecting) =>
+                      onSelectRepo(repo, rowIndex, isSelecting),
+                    isSelected: isRepoSelected(repo),
+                    disable: !isRepoSelectable(repo),
+                  }}
+                />
+                <Td dataLabel={columnNames.repoName}>
+                  <Link to={repo.name}>{repo.name}</Link>
+                </Td>
+                <Td dataLabel={columnNames.visibility}>
+                  {' '}
+                  {repo.isPublic ? 'public' : 'private'}
+                </Td>
+                <Td dataLabel={columnNames.tags}> {repo.tags} </Td>
+                <Td dataLabel={columnNames.size}> {repo.size} </Td>
+                <Td dataLabel={columnNames.pulls}> {repo.pulls} </Td>
+                <Td dataLabel={columnNames.lastPull}> {repo.lastPull} </Td>
+                <Td dataLabel={columnNames.lastModified}>
+                  {' '}
+                  {repo.lastModified}{' '}
+                </Td>
+              </Tr>
+            ))}
           </Tbody>
         </TableComposable>
       </PageSection>
@@ -298,12 +395,26 @@ export default function Repositories() {
   );
 }
 
-type RepositoryListProps = {
+export type RepositoryListProps = {
   name: string;
-  visibility: boolean;
+  namespace: string;
+  path: string;
+  isPublic: boolean;
   tags: number;
   size: string;
   pulls: number;
   lastPull: string;
   lastModified: string;
 };
+
+interface Repository {
+  name: string;
+  namespace: string;
+  path: string;
+  isPublic: boolean;
+  tags: number;
+  size: string;
+  pulls: number;
+  lastPull: string;
+  lastModified: string;
+}
