@@ -6,7 +6,7 @@ export enum NavigationPath {
   administration = '/administration',
 
   // Repositories Nav
-  repositories = '/organizations/:reponame',
+  repositories = '/organizations/:organizationName',
   repositoriesTab = '/organizations/:reponame/repo',
   teamMembershipTab = '/organizations/:reponame/team',
   robotAccountTab = '/organizations/:reponame/robotacct',

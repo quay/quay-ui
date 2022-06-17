@@ -12,27 +12,19 @@ import {
   Title,
 } from '@patternfly/react-core';
 import {Link, useLocation, useParams} from 'react-router-dom';
-
-// import {
-//   HorizontalNav,
-// } from '@openshift-console/dynamic-plugin-sdk';
 import RepositoriesTab from './Tabs/RepositoriesTab/RepositoriesTab';
 import {NavigationPath} from '../../NavigationPath';
-// import TeamMembershipTab from "./Tabs/TeamMembershipTab";
-// import RobotAccountTab from "./Tabs/RobotAccountTab";
-// import DefaultPermissionsTab from "./Tabs/DefaultPermissionsTab";
-// import UsageLogsTab from "./Tabs/UsageLogs";
 
 export default function Repositories(props) {
   const location = useLocation();
   const repositoryName = location.pathname.split('/')[2];
-  const [activeSubNavItem, setAativeSubNavItem] = React.useState(0);
+  const [activeSubNavItem, setActiveSubNavItem] = React.useState(0);
   const {repoName} = useParams();
 
   console.log('repositoryName', repositoryName);
 
   const onSubNavSelect = (result) => {
-    setAativeSubNavItem(result.itemId);
+    setActiveSubNavItem(result.itemId);
   };
 
   const RepositorySubNav = (

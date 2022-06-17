@@ -27,6 +27,10 @@ Open [http://localhost:9000](http://localhost:9000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
+By default the UI connects to the quay backend for API. If you don't have 
+a backend or want to develop without a backend you can set the environment
+variable `MOCK_API=true` before running `npm start`.
+
 In order for you to use this with a Quay backend, you need to configure CORS on the Quay side.
 Add the following to your `config.yaml` in Quay
 
