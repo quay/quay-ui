@@ -1,8 +1,8 @@
 import {Nav, NavItem, NavList, PageSidebar} from '@patternfly/react-core';
 import {Link, useLocation} from 'react-router-dom';
 import {NavigationPath} from 'src/routes/NavigationPath';
-import Organizations from 'src/routes/Organizations/Organizations';
-import Repositories from 'src/routes/Repositories/Repositories';
+import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
+import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
 
 interface SideNavProps {
   isSideNav: boolean;
@@ -14,15 +14,15 @@ interface SideNavProps {
 const routes: SideNavProps[] = [
   {
     isSideNav: true,
-    navPath: NavigationPath.organizations,
+    navPath: NavigationPath.organizationsList,
     title: 'Organizations',
-    component: <Organizations />,
+    component: <OrganizationsList />,
   },
   {
     isSideNav: true,
-    navPath: NavigationPath.repositories,
+    navPath: NavigationPath.repositoriesList,
     title: 'Repositories',
-    component: <Repositories />,
+    component: <RepositoriesList />,
   },
 ];
 

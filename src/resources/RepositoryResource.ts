@@ -13,6 +13,12 @@ export interface IRepository {
   is_starred?: boolean;
 }
 
+export interface RepositoryCreationResponse {
+  namespace: string;
+  name: string;
+  kind: string;
+}
+
 // TO DO - use axios.all for doing multiple GETs for all ns query parameter
 export async function fetchAllRepos(namespaces: string[]) {
   try {
@@ -23,31 +29,10 @@ export async function fetchAllRepos(namespaces: string[]) {
         );
       }),
     );
-    // console.log('repoList', repoList);
     return repoList;
   } catch (error) {
     console.log(error);
   }
-
-  // await Promise.all(
-  //   namespaces.map((ns) => {
-  //     return axios.get(`/api/v1/repository?last_modified=true&namespace=${ns}`);
-  //   }),
-  // )
-  //   .then(data => data)
-  //   .catch((e) => console.log(e));
-
-  // try {
-  //   const repoList = namespaces.map(async (ns) => {
-  //     return await axios.get(
-  //       `/api/v1/repository?last_modified=true&namespace=${ns}`,
-  //     );
-  //   });
-  //   console.log('repoList1', repoList);
-  //   return repoList;
-  // } catch (error) {
-  //   console.log(error);
-  // }
 }
 
 export async function createNewRepository(
@@ -59,14 +44,37 @@ export async function createNewRepository(
 ) {
   const newRepositoryApiUrl = `/api/v1/repository`;
   try {
-    const response = await axios.post(newRepositoryApiUrl, {
-      namespace,
-      repository,
+    const response: AxiosResponse<RepositoryCreationResponse> =
+      await axios.post(newRepositoryApiUrl, {
+        namespace,
+        repository,
+        visibility,
+        description,
+        repo_kind,
+      });
+    return response;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+export async function setRepositoryVisibility(
+  namespace: string,
+  repositoryName: string,
+  visibility: string,
+) {
+  const repositoryVisibilityUrl =
+    `/api/v1/repository/` +
+    namespace +
+    `/` +
+    repositoryName +
+    `/changevisibility`;
+  try {
+    const response = await axios.post(repositoryVisibilityUrl, {
       visibility,
-      description,
-      repo_kind,
     });
   } catch (e) {
+    // TODO: Find a better way to propagate errors
     console.error(e);
   }
 }

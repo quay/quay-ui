@@ -15,8 +15,13 @@ import {
 } from '@patternfly/react-core';
 import {useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
-import {createNewRepository} from 'src/resources/RepositoryResource';
+import {
+  createNewRepository,
+  RepositoryCreationResponse,
+} from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
+import {AxiosResponse} from 'axios';
+import {RepositoryListProps} from 'src/routes/RepositoriesList/RepositoriesList';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -26,7 +31,8 @@ enum visibilityType {
 export const CreateRepositoryModalTemplate = (
   props: CreateRepositoryModalTemplateProps,
 ): JSX.Element => {
-  const {isModalOpen, handleModalToggle, orgNameProp} = props;
+  const {isModalOpen, handleModalToggle, orgNameProp, updateListHandler} =
+    props;
 
   const userOrgs = useRecoilValue(UserOrgs);
   const loggedInUser = useRecoilValue(UserState);
@@ -70,13 +76,32 @@ export const CreateRepositoryModalTemplate = (
     repoVisibility === visibilityType.PUBLIC
       ? (visibility = 'public')
       : (visibility = 'private');
-    await createNewRepository(
-      currentOrganization.name,
-      newRepository.name,
-      visibility,
-      newRepository.description,
-      'image',
-    );
+
+    const repoCreationResponse: AxiosResponse<RepositoryCreationResponse> =
+      await createNewRepository(
+        currentOrganization.name,
+        newRepository.name,
+        visibility,
+        newRepository.description,
+        'image',
+      );
+    // update the repository list once the creation is succesful
+    if (repoCreationResponse.status === 201) {
+      updateListHandler({
+        name: repoCreationResponse.data.name,
+        namespace: repoCreationResponse.data.namespace,
+        path:
+          repoCreationResponse.data.namespace +
+          '/' +
+          repoCreationResponse.data.name,
+        isPublic: visibility,
+        tags: 1,
+        size: '1.1GB',
+        pulls: 108,
+        lastPull: 'TBA',
+        lastModified: 'TBA',
+      });
+    }
   };
 
   const handleNamespaceSelection = (e, value) => {
@@ -236,4 +261,5 @@ type CreateRepositoryModalTemplateProps = {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
   orgNameProp?: string;
+  updateListHandler: (value: RepositoryListProps) => void;
 };

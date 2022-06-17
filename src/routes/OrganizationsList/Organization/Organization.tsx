@@ -12,11 +12,11 @@ import {
 } from '@patternfly/react-core';
 import {useLocation} from 'react-router-dom';
 import {NavigationPath} from '../../NavigationPath';
-import UsageLogsTab from './Tabs/UsageLogsTab';
+import UsageLogsTab from './Tabs/UsageLogs/UsageLogsTab';
 import {useCallback, useState} from 'react';
-import Repositories from 'src/routes/Repositories/Repositories';
+import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
 
-export default function OrgScopedRepositories() {
+export default function Organization() {
   const location = useLocation();
   const repositoryName = location.pathname.split('/')[2];
 
@@ -32,9 +32,9 @@ export default function OrgScopedRepositories() {
 
   const repositoriesSubNav = [
     {
-      href: NavigationPath.orgScopedRepositoryTab,
+      href: NavigationPath.repositoryListForOrg,
       name: 'Repositories',
-      component: <Repositories />,
+      component: <RepositoriesList />,
     },
     {
       href: NavigationPath.usagelogs,
@@ -49,7 +49,7 @@ export default function OrgScopedRepositories() {
         <Breadcrumb>
           <BreadcrumbItem
             data-testid="organization-breadcrumb"
-            to={NavigationPath.organizations}
+            to={NavigationPath.organizationsList}
           >
             Organizations
           </BreadcrumbItem>
