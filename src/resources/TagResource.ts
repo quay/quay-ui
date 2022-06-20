@@ -64,7 +64,29 @@ export interface Feature {
   NamespaceName: string;
   AddedBy: string;
   Version: string;
-  Vulnerabilities: any[];
+  Vulnerabilities?: Vulnerability[];
+}
+
+export interface Vulnerability {
+  Severity: string;
+  NamespaceName: string;
+  Link: string;
+  FixedBy: string;
+  Description: string;
+  Name: string;
+  Metadata: {
+    UpdatedBy: string;
+    RepoName: string;
+    RepoLink: string;
+    DistroName: string;
+    DistroVersion: string;
+    NVD: {
+      CVSSv3: {
+        Vectors: string;
+        Score: number;
+      };
+    };
+  };
 }
 
 export async function getTags(
