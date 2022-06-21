@@ -10,7 +10,6 @@ import {
   TitleSizes,
 } from '@patternfly/react-core';
 import {ExclamationTriangleIcon} from '@patternfly/react-icons';
-import './SecurityDetailsChart.scss';
 
 function VulnerabilitySummary() {
   return (
