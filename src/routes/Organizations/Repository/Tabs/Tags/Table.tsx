@@ -15,13 +15,10 @@ import {
   Text,
 } from '@patternfly/react-core';
 import {useState} from 'react';
-import {
-  Tag,
-  TagsResponse,
-  getTags,
-  ManifestList,
-} from 'src/resources/TagResource';
+import {Tag} from 'src/resources/TagResource';
 import SecurityDetails from './SecurityDetails';
+import {selectedTagsState} from 'src/atoms/TagListState';
+import {useRecoilState} from 'recoil';
 
 const columnNames = {
   Tag: 'Tag',
@@ -38,20 +35,20 @@ export default function Table(props: TableProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalImageTag, setModalImageTag] = useState<string>('');
   const [modalImageDigest, setModalImageDigest] = useState<string>('');
-  const [selectedTagNames, setSelectedTagNames] = useState<string[]>([]);
   const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
     number | null
   >(null);
+  const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
 
   const isTagSelectable = (tag: Tag) => tag.name !== 'a'; // Arbitrary logic for this example
   const selectableTags = props.tags.filter(isTagSelectable);
 
   const selectAllTags = (isSelecting = true) => {
-    setSelectedTagNames(isSelecting ? selectableTags.map((t) => t.name) : []);
+    setSelectedTags(isSelecting ? selectableTags.map((t) => t.name) : []);
   };
 
   const setTagSelected = (tag: Tag, isSelecting = true) =>
-    setSelectedTagNames((prevSelected) => {
+    setSelectedTags((prevSelected) => {
       const otherSelectedtagNames = prevSelected.filter((r) => r !== tag.name);
       return isSelecting && isTagSelectable(tag)
         ? [...otherSelectedtagNames, tag.name]
@@ -138,7 +135,7 @@ export default function Table(props: TableProps) {
             <Th
               select={{
                 onSelect: (_event, isSelecting) => selectAllTags(isSelecting),
-                isSelected: selectedTagNames.length === selectableTags.length,
+                isSelected: selectedTags.length === selectableTags.length,
               }}
             />
             <Th>Tag</Th>
@@ -183,7 +180,7 @@ export default function Table(props: TableProps) {
                     rowIndex,
                     onSelect: (_event, isSelecting) =>
                       onSelectTag(tag, rowIndex, isSelecting),
-                    isSelected: selectedTagNames.includes(tag.name),
+                    isSelected: selectedTags.includes(tag.name),
                   }}
                 />
                 <Td dataLabel={columnNames.Tag}>{tag.name}</Td>

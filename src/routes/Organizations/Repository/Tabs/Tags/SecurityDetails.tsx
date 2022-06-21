@@ -3,7 +3,6 @@ import {
   SecurityDetailsResponse,
   getSecurityDetails,
 } from 'src/resources/TagResource';
-import React from 'react';
 
 export default function SecurityDetails(props: SecurityDetails) {
   const [status, setStatus] = useState<string>('');

@@ -1,4 +1,4 @@
-import {TagsToolbar} from './Filter';
+import {Toolbar} from './Toolbar';
 import Table from './Table';
 import {useState, useEffect} from 'react';
 import {filterState, paginationState} from 'src/atoms/TagListState';
@@ -8,10 +8,7 @@ import {
   TagsResponse,
   getTags,
   getManifestByDigest,
-  getSecurityDetails,
   ManifestByDigestResponse,
-  ManifestList,
-  SecurityDetailsResponse,
 } from 'src/resources/TagResource';
 
 const mockTags: Tag[] = [];
@@ -27,6 +24,43 @@ export default function Tags(props: TagsProps) {
     pagination.page * pagination.perPage,
   );
 
+  const loadTags = async () => {
+    const getManifest = async (tag: Tag) => {
+      const manifestResp: ManifestByDigestResponse = await getManifestByDigest(
+        props.organization,
+        props.repository,
+        tag.manifest_digest,
+      );
+      tag.manifest_list = JSON.parse(manifestResp.manifest_data);
+    };
+    let page = 1;
+    let hasAdditional = true;
+    do {
+      try {
+        const resp: TagsResponse = await getTags(
+          props.organization,
+          props.repository,
+          page,
+        );
+        await Promise.all(
+          resp.tags.map((tag: Tag) =>
+            tag.is_manifest_list ? getManifest(tag) : null,
+          ),
+        );
+        if (page == 1) {
+          setTags(resp.tags);
+        } else {
+          setTags((currentTags) => [...currentTags, ...resp.tags]);
+        }
+        hasAdditional = resp.has_additional;
+        page++;
+      } catch (error: any) {
+        console.log('error');
+        console.log(error);
+      }
+    } while (hasAdditional);
+  };
+
   useEffect(() => {
     // TESTING: Automatically populates list with mock tags to test filter and pagination
     // let tagNames = ["latest","slim","alpine"]
@@ -40,56 +74,22 @@ export default function Tags(props: TagsProps) {
     //         reversion: false,
     //         start_ts: 1654197152,
     //         security: "Passed",
-    //         ManifestLists:
-    //             {
-    //                 Arch: 'Linux on amd64',
-    //                 Security: 'a',
-    //                 Size: '1',
-    //                 manifest_digest: 'dummy',
-    //                 Format: 0
-    //             }
+    //         manifest_list: null
     //     }
     //     mockTags.push(tag)
     // }
     // setTags(mockTags);
-    (async () => {
-      const getManifest = async (tag: Tag) => {
-        const manifestResp: ManifestByDigestResponse =
-          await getManifestByDigest(
-            props.organization,
-            props.repository,
-            tag.manifest_digest,
-          );
-        tag.manifest_list = JSON.parse(manifestResp.manifest_data);
-      };
-      let page = 1;
-      let hasAdditional = true;
-      do {
-        try {
-          const resp: TagsResponse = await getTags(
-            props.organization,
-            props.repository,
-            page,
-          );
-          await Promise.all(
-            resp.tags.map((tag: Tag) =>
-              tag.is_manifest_list ? getManifest(tag) : null,
-            ),
-          );
-          hasAdditional = resp.has_additional;
-          page++;
-          setTags((currentTags) => [...currentTags, ...resp.tags]);
-        } catch (error: any) {
-          console.log('error');
-          console.log(error);
-        }
-      } while (hasAdditional);
-    })();
+    loadTags();
   }, []);
 
   return (
     <>
-      <TagsToolbar tagCount={filteredTags.length}></TagsToolbar>
+      <Toolbar
+        organization={props.organization}
+        repository={props.repository}
+        tagCount={filteredTags.length}
+        loadTags={loadTags}
+      ></Toolbar>
       <Table
         organization={props.organization}
         repository={props.repository}

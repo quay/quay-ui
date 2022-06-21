@@ -2,18 +2,13 @@ import Tags from './Tags';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {RecoilRoot} from 'recoil';
 import {mocked} from 'ts-jest/utils';
-import {
-  Tag,
-  TagsResponse,
-  getTags,
-  getManifestByDigest,
-  getSecurityDetails,
-} from 'src/resources/TagResource';
+import {Tag, TagsResponse, getTags, deleteTag} from 'src/resources/TagResource';
 
 jest.mock('src/resources/TagResource', () => ({
   getTags: jest.fn(),
   getManifestByDigest: jest.fn(),
   getSecurityDetails: jest.fn(),
+  deleteTag: jest.fn(),
 }));
 
 const testOrg = 'testorg';
@@ -154,4 +149,94 @@ test('Copy modal should show org and repo', async () => {
   expect(screen.getByTestId(`copy-digest`).querySelector('input').value).toBe(
     `docker pull quay.io/${testOrg}/${testRepo}@${tag.manifest_digest}`,
   );
+});
+
+test('Delete a single tag', async () => {
+  const mockResponse = createTagResponse();
+  const tag = createTag();
+  mockResponse.tags.push(tag);
+  mocked(getTags, true)
+    .mockResolvedValueOnce(mockResponse)
+    .mockResolvedValueOnce(createTagResponse());
+  mocked(deleteTag, true).mockResolvedValue();
+  render(
+    <RecoilRoot>
+      <Tags organization={testOrg} repository={testRepo} />
+    </RecoilRoot>,
+  );
+  expect(await screen.findByText(tag.name)).toBeTruthy();
+  const rowSelect = screen.getByLabelText('Select row 0', {selector: 'input'});
+  fireEvent(
+    rowSelect,
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  const actionsKebab = screen.getByLabelText('Actions', {selector: 'button'});
+  fireEvent(
+    actionsKebab,
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  fireEvent(
+    screen.getByText('Delete'),
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  expect(screen.getByText('Delete the following tag?')).toBeTruthy();
+  expect(screen.getByTestId('delete-tags-modal')).toHaveTextContent('latest');
+  expect(screen.getByText('Cancel')).toBeTruthy();
+  expect(screen.getByText('Delete')).toBeTruthy();
+  fireEvent(
+    screen.getByText('Delete'),
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  expect(await screen.findByText('This repository is empty.')).toBeTruthy();
+});
+
+test('Delete a multiple tags', async () => {
+  const tagNames = ['latest', 'slim', 'alpine'];
+  const mockResponse = createTagResponse();
+  for (const tag of tagNames) {
+    mockResponse.tags.push(createTag(tag));
+  }
+  mocked(getTags, true)
+    .mockResolvedValueOnce(mockResponse)
+    .mockResolvedValueOnce(createTagResponse());
+  mocked(deleteTag, true).mockResolvedValue();
+  render(
+    <RecoilRoot>
+      <Tags organization={testOrg} repository={testRepo} />
+    </RecoilRoot>,
+  );
+  expect(await screen.findByText('latest')).toBeTruthy();
+  expect(await screen.findByText('slim')).toBeTruthy();
+  expect(await screen.findByText('alpine')).toBeTruthy();
+  const rowSelect = screen.getByLabelText('Select all rows', {
+    selector: 'input',
+  });
+  fireEvent(
+    rowSelect,
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  const actionsKebab = screen.getByLabelText('Actions', {selector: 'button'});
+  fireEvent(
+    actionsKebab,
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  fireEvent(
+    screen.getByText('Delete'),
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  expect(screen.getByText('Delete the following tags?')).toBeTruthy();
+  expect(screen.getByTestId('delete-tags-modal')).toHaveTextContent('latest');
+  expect(screen.getByTestId('delete-tags-modal')).toHaveTextContent('slim');
+  expect(screen.getByTestId('delete-tags-modal')).toHaveTextContent('alpine');
+  expect(
+    screen.getByText('This operation can take several minutes.'),
+  ).toBeTruthy();
+  expect(screen.getByText('Cancel')).toBeTruthy();
+  expect(screen.getByText('Delete')).toBeTruthy();
+  const deletebutton = screen.getByText('Delete');
+  fireEvent(
+    deletebutton,
+    new MouseEvent('click', {bubbles: true, cancelable: true}),
+  );
+  expect(await screen.findByText('This repository is empty.')).toBeTruthy();
 });
