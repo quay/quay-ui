@@ -25,6 +25,7 @@ export function SecurityDetails() {
   return (
     <>
       <SecurityDetailsChart />
+      <hr />
       {data ? <SecurityDetailsTable features={data.Layer.Features} /> : <></>}
     </>
   );
