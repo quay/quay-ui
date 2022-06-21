@@ -14,7 +14,8 @@ import {QuaySidebar} from 'src/components/sidebar/QuaySidebar';
 import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
-import SecurityDetails from './Organizations/Repository/Tabs/Tags/SecurityDetails';
+import SecurityDetailsTable from './Organizations/Repository/Tabs/Tags/SecurityDetails/SecurityDetailsTable';
+import {SecurityDetails} from './Organizations/Repository/Tabs/Tags/SecurityDetails/SecurityDetails';
 
 export function StandaloneMain() {
   const [, setUserState] = useRecoilState(UserState);
@@ -43,12 +44,7 @@ export function StandaloneMain() {
           path={'/organizations/:repoName/team'}
           element={<TeamMembershipTab />}
         />
-        <Route
-          path={'/security_details'}
-          element={
-            <SecurityDetails org={'blue'} repo={'quay'} digest={'test'} />
-          }
-        />
+        <Route path={'/security_details'} element={<SecurityDetails />} />
       </Routes>
       <Outlet />
     </Page>
