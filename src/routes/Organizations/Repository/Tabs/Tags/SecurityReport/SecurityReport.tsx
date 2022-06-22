@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import SecurityDetailsTable from './SecurityDetailsTable';
+import SecurityReportTable from './SecurityReportTable';
 import {
   Data,
   getSecurityDetails,
   SecurityDetailsResponse,
 } from 'src/resources/TagResource';
-import {SecurityDetailsChart} from './SecurityDetailsChart';
+import {SecurityReportChart} from './SecurityReportChart';
 
-export function SecurityDetails() {
+export function SecurityReport() {
   const [data, setData] = useState<Data>(null);
 
   useEffect(() => {
@@ -26,9 +26,9 @@ export function SecurityDetails() {
     <>
       {data ? (
         <>
-          <SecurityDetailsChart features={data.Layer.Features} />
+          <SecurityReportChart features={data.Layer.Features} />
           <hr />
-          <SecurityDetailsTable features={data.Layer.Features} />
+          <SecurityReportTable features={data.Layer.Features} />
         </>
       ) : (
         <></>

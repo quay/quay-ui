@@ -10,7 +10,7 @@ import {
   Td,
   ExpandableRowContent,
 } from '@patternfly/react-table';
-import {SecurityDetailsMetadataTable} from './SecurityDetailsMetadataTable';
+import {SecurityReportMetadataTable} from './SecurityReportMetadataTable';
 import {cyrb53} from 'src/libs/utils.js';
 import {
   Checkbox,
@@ -76,7 +76,7 @@ function TableHead() {
   );
 }
 
-export default function SecurityDetailsTable(props: SecurityDetailsProps) {
+export default function SecurityReportTable(props: SecurityDetailsProps) {
   const [expandedRepoNames, setExpandedRepoNames] = React.useState<string[]>(
     [],
   );
@@ -154,7 +154,7 @@ export default function SecurityDetailsTable(props: SecurityDetailsProps) {
                       cellPadding="span"
                     >
                       <ExpandableRowContent>
-                        <SecurityDetailsMetadataTable
+                        <SecurityReportMetadataTable
                           vulnerability={vulnerability}
                         />
                       </ExpandableRowContent>

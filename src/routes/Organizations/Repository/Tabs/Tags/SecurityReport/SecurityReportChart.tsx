@@ -67,14 +67,14 @@ function VulnerabilityChart(props: vulnerabilityStatsProps) {
           {x: 'Unknown', y: props.stats.Unknown},
         ]}
         colorScale={['red', 'orange', 'gold', 'grey']}
-        labels={({datum}) => `${datum.x}: ${datum.y}%`}
+        labels={({datum}) => `${datum.x}: ${datum.y}`}
         title={`${props.total}`}
       />
     </div>
   );
 }
 
-export function SecurityDetailsChart(props: SecurityDetailsChartProps) {
+export function SecurityReportChart(props: SecurityDetailsChartProps) {
   const stats = {
     Critical: 0,
     High: 0,

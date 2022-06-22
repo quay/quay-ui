@@ -21,7 +21,7 @@ import {
   getTags,
   ManifestList,
 } from 'src/resources/TagResource';
-import SecurityDetailsTable from './SecurityDetails/SecurityDetailsTable';
+import SecurityReportTable from './SecurityReport/SecurityReportTable';
 
 const columnNames = {
   Tag: 'Tag',
@@ -192,7 +192,7 @@ export default function Table(props: TableProps) {
                   {typeof tag.manifest_list != 'undefined' ? (
                     'See Child Manifest'
                   ) : (
-                    <SecurityDetailsTable
+                    <SecurityReportTable
                       org={props.organization}
                       repo={props.repository}
                       digest={tag.manifest_digest}
@@ -242,7 +242,7 @@ export default function Table(props: TableProps) {
                           colSpan={securityColspan}
                         >
                           <ExpandableRowContent>
-                            <SecurityDetailsTable
+                            <SecurityReportTable
                               org={props.organization}
                               repo={props.repository}
                               digest={manifest.digest}

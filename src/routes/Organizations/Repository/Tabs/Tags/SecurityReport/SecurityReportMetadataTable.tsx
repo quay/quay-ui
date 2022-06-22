@@ -29,7 +29,7 @@ const getSeverityTooltip = function (vuln: Vulnerability) {
   return result;
 };
 
-export function SecurityDetailsMetadataTable(
+export function SecurityReportMetadataTable(
   props: SecurityDetailsMetadataProps,
 ) {
   return (
