@@ -4,7 +4,7 @@ import {
   Data,
   getSecurityDetails,
   SecurityDetailsResponse,
-} from '../../../../../../resources/TagResource';
+} from 'src/resources/TagResource';
 import {SecurityDetailsChart} from './SecurityDetailsChart';
 
 export function SecurityDetails() {
@@ -24,9 +24,15 @@ export function SecurityDetails() {
 
   return (
     <>
-      <SecurityDetailsChart />
-      <hr />
-      {data ? <SecurityDetailsTable features={data.Layer.Features} /> : <></>}
+      {data ? (
+        <>
+          <SecurityDetailsChart features={data.Layer.Features} />
+          <hr />
+          <SecurityDetailsTable features={data.Layer.Features} />
+        </>
+      ) : (
+        <></>
+      )}
     </>
   );
 }

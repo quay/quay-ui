@@ -29,7 +29,9 @@ const getSeverityTooltip = function (vuln: Vulnerability) {
   return result;
 };
 
-export function SecurityDetailsMetadata(props: SecurityDetailsMetadataProps) {
+export function SecurityDetailsMetadataTable(
+  props: SecurityDetailsMetadataProps,
+) {
   return (
     <TextContent style={{paddingRight: '30px'}}>
       <Text component={TextVariants.p}>Severity Note</Text>
