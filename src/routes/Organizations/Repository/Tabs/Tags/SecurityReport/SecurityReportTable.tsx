@@ -11,7 +11,6 @@ import {
   ExpandableRowContent,
 } from '@patternfly/react-table';
 import {SecurityReportMetadataTable} from './SecurityReportMetadataTable';
-import {cyrb53} from 'src/libs/utils.js';
 import {PageSection, PageSectionVariants, Title} from '@patternfly/react-core';
 import {useRecoilState} from 'recoil';
 import {
@@ -20,6 +19,7 @@ import {
   vulnListState,
 } from 'src/atoms/VulnerabilityReportState';
 import {SecurityReportFilter} from './SecurityReportFilter';
+import sha1 from 'js-sha1';
 
 const columnNames = {
   advisory: 'Advisory',
@@ -55,9 +55,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
     filteredVulnListState,
   );
 
-  const [expandedRepoNames, setExpandedRepoNames] = React.useState<string[]>(
-    [],
-  );
+  const [expandedVulnKeys, setExpandedVulnKeys] = React.useState<string[]>([]);
 
   const generateUniqueKey = (vulnerability: VulnerabilityListItem) => {
     let hashInput = vulnerability.Advisory + vulnerability.Description;
@@ -65,24 +63,18 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
     if (vulnerability.Metadata) {
       hashInput += vulnerability.Metadata.RepoName;
     }
-    return cyrb53(hashInput);
+    const key = sha1(hashInput);
+    console.log(`input: ${hashInput}, key: ${key}`);
+    return key;
   };
 
-  const setRepoExpanded = (
-    vulnerability: VulnerabilityListItem,
-    isExpanding = true,
-  ) =>
-    setExpandedRepoNames((prevExpanded) => {
-      const otherExpandedRepoNames = prevExpanded.filter(
-        (r) => r !== vulnerability.Advisory,
-      );
-      return isExpanding
-        ? [...otherExpandedRepoNames, vulnerability.Advisory]
-        : otherExpandedRepoNames;
+  const setRepoExpanded = (key: string, isExpanding = true) =>
+    setExpandedVulnKeys((prevExpanded) => {
+      const otherExpandedKeys = prevExpanded.filter((k) => k !== key);
+      return isExpanding ? [...otherExpandedKeys, key] : otherExpandedKeys;
     });
 
-  const isRepoExpanded = (vulnerability: VulnerabilityListItem) =>
-    expandedRepoNames.includes(vulnerability.Advisory);
+  const isRepoExpanded = (key: string) => expandedVulnKeys.includes(key);
 
   useEffect(() => {
     const vulnList: VulnerabilityListItem[] = [];
@@ -113,20 +105,18 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
         {filteredVulnList ? (
           filteredVulnList.map(
             (vulnerability: VulnerabilityListItem, rowIndex) => {
+              const uniqueKey = generateUniqueKey(vulnerability);
               return (
-                <Tbody
-                  key={generateUniqueKey(vulnerability)}
-                  isExpanded={isRepoExpanded(vulnerability)}
-                >
+                <Tbody key={uniqueKey} isExpanded={isRepoExpanded(uniqueKey)}>
                   <Tr>
                     <Td
                       expand={{
                         rowIndex,
-                        isExpanded: isRepoExpanded(vulnerability),
+                        isExpanded: isRepoExpanded(uniqueKey),
                         onToggle: () =>
                           setRepoExpanded(
-                            vulnerability,
-                            !isRepoExpanded(vulnerability),
+                            uniqueKey,
+                            !isRepoExpanded(uniqueKey),
                           ),
                       }}
                     />
@@ -148,7 +138,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
                     </Td>
                   </Tr>
 
-                  <Tr isExpanded={isRepoExpanded(vulnerability)}>
+                  <Tr isExpanded={isRepoExpanded(uniqueKey)}>
                     <Td />
                     <Td
                       dataLabel="Repo detail 1"
