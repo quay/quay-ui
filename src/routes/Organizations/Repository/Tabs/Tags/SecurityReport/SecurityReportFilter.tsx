@@ -4,7 +4,7 @@ import {
   filteredVulnListState,
   VulnerabilityListItem,
   vulnListState,
-} from 'src/atoms/VulnurabilityReportState';
+} from 'src/atoms/VulnerabilityReportState';
 import {Checkbox, Flex, FlexItem, SearchInput} from '@patternfly/react-core';
 
 export function SecurityReportFilter() {

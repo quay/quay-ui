@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, TextContent, TextVariants} from '@patternfly/react-core';
 import {TableComposable, Tbody, Th, Thead, Tr} from '@patternfly/react-table';
-import {VulnerabilityListItem} from 'src/atoms/VulnurabilityReportState';
+import {VulnerabilityListItem} from 'src/atoms/VulnerabilityReportState';
 
 const getDistro = function (vuln: VulnerabilityListItem) {
   if (vuln.Metadata.DistroName) {

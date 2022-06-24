@@ -18,7 +18,7 @@ import {
   filteredVulnListState,
   VulnerabilityListItem,
   vulnListState,
-} from 'src/atoms/VulnurabilityReportState';
+} from 'src/atoms/VulnerabilityReportState';
 import {SecurityReportFilter} from './SecurityReportFilter';
 
 const columnNames = {
