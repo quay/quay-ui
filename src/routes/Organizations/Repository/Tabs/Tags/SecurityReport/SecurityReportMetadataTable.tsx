@@ -1,16 +1,16 @@
 import React from 'react';
 import {Text, TextContent, TextVariants} from '@patternfly/react-core';
 import {TableComposable, Tbody, Th, Thead, Tr} from '@patternfly/react-table';
-import {Vulnerability} from 'src/resources/TagResource';
+import {VulnerabilityListItem} from 'src/atoms/VulnurabilityReportState';
 
-const getDistro = function (vuln: Vulnerability) {
+const getDistro = function (vuln: VulnerabilityListItem) {
   if (vuln.Metadata.DistroName) {
     return vuln.NamespaceName.split(':', 1);
   }
   return 'Unknown';
 };
 
-const getSeverityTooltip = function (vuln: Vulnerability) {
+const getSeverityTooltip = function (vuln: VulnerabilityListItem) {
   const distro = getDistro(vuln);
 
   let result =
@@ -803,5 +803,5 @@ const NVD_VECTORS = {
 };
 
 export interface SecurityDetailsMetadataProps {
-  vulnerability: Vulnerability;
+  vulnerability: VulnerabilityListItem;
 }

@@ -74,17 +74,19 @@ export interface Vulnerability {
   FixedBy: string;
   Description: string;
   Name: string;
-  Metadata: {
-    UpdatedBy: string;
-    RepoName: string;
-    RepoLink: string;
-    DistroName: string;
-    DistroVersion: string;
-    NVD: {
-      CVSSv3: {
-        Vectors: string;
-        Score: number;
-      };
+  Metadata: VulnerabilityMetadata;
+}
+
+export interface VulnerabilityMetadata {
+  UpdatedBy: string;
+  RepoName: string;
+  RepoLink: string;
+  DistroName: string;
+  DistroVersion: string;
+  NVD: {
+    CVSSv3: {
+      Vectors: string;
+      Score: number;
     };
   };
 }

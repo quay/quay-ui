@@ -1,15 +1,14 @@
-import { atom } from 'recoil';
-
+import {atom} from 'recoil';
 
 export const filterState = atom({
-    key: 'filterState',
-    default: "",
+  key: 'filterState',
+  default: '',
 });
 
 export const paginationState = atom({
-    key: 'paginationState',
-    default: {
-        page: 1,
-        perPage: 25,
-    },
+  key: 'paginationState',
+  default: {
+    page: 1,
+    perPage: 25,
+  },
 });

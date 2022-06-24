@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {Data, Vulnerability, Feature} from 'src/resources/TagResource';
+import {useEffect} from 'react';
+import {Vulnerability, Feature} from 'src/resources/TagResource';
 import React from 'react';
 import {
   TableComposable,
@@ -12,17 +12,14 @@ import {
 } from '@patternfly/react-table';
 import {SecurityReportMetadataTable} from './SecurityReportMetadataTable';
 import {cyrb53} from 'src/libs/utils.js';
+import {PageSection, PageSectionVariants, Title} from '@patternfly/react-core';
+import {useRecoilState} from 'recoil';
 import {
-  Checkbox,
-  Flex,
-  FlexItem,
-  Form,
-  FormGroup,
-  PageSection,
-  PageSectionVariants,
-  TextInput,
-  Title,
-} from '@patternfly/react-core';
+  filteredVulnListState,
+  VulnerabilityListItem,
+  vulnListState,
+} from 'src/atoms/VulnurabilityReportState';
+import {SecurityReportFilter} from './SecurityReportFilter';
 
 const columnNames = {
   advisory: 'Advisory',
@@ -34,31 +31,6 @@ const columnNames = {
 
 function TableTitle() {
   return <Title headingLevel={'h1'}> Vulnerabilities </Title>;
-}
-
-function TableFilter() {
-  return (
-    <Flex className="pf-u-mt-md">
-      <FlexItem>
-        <TextInput
-          isRequired
-          type="text"
-          id="filter-vulnerabilities-input"
-          name="filter-vulnerabilities-input"
-          placeholder="Filter Vulnerabilities..."
-          value={''}
-          onChange={console.log}
-        />
-      </FlexItem>
-      <FlexItem>
-        <Checkbox
-          label="Only show fixable"
-          aria-label="fixable"
-          id="fixable-checkbox"
-        />
-      </FlexItem>
-    </Flex>
-  );
 }
 
 function TableHead() {
@@ -76,13 +48,19 @@ function TableHead() {
   );
 }
 
-export default function SecurityReportTable(props: SecurityDetailsProps) {
+export default function SecurityReportTable({features}: SecurityDetailsProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [vulnList, setVulnList] = useRecoilState(vulnListState);
+  const [filteredVulnList, setFilteredVulnList] = useRecoilState(
+    filteredVulnListState,
+  );
+
   const [expandedRepoNames, setExpandedRepoNames] = React.useState<string[]>(
     [],
   );
 
-  const generateUniqueKey = (vulnerability: Vulnerability) => {
-    let hashInput = vulnerability.Name + vulnerability.Description;
+  const generateUniqueKey = (vulnerability: VulnerabilityListItem) => {
+    let hashInput = vulnerability.Advisory + vulnerability.Description;
 
     if (vulnerability.Metadata) {
       hashInput += vulnerability.Metadata.RepoName;
@@ -90,30 +68,51 @@ export default function SecurityReportTable(props: SecurityDetailsProps) {
     return cyrb53(hashInput);
   };
 
-  const setRepoExpanded = (vulnerability: Vulnerability, isExpanding = true) =>
+  const setRepoExpanded = (
+    vulnerability: VulnerabilityListItem,
+    isExpanding = true,
+  ) =>
     setExpandedRepoNames((prevExpanded) => {
       const otherExpandedRepoNames = prevExpanded.filter(
-        (r) => r !== vulnerability.Name,
+        (r) => r !== vulnerability.Advisory,
       );
       return isExpanding
-        ? [...otherExpandedRepoNames, vulnerability.Name]
+        ? [...otherExpandedRepoNames, vulnerability.Advisory]
         : otherExpandedRepoNames;
     });
 
-  const isRepoExpanded = (vulnerability: Vulnerability) =>
-    expandedRepoNames.includes(vulnerability.Name);
+  const isRepoExpanded = (vulnerability: VulnerabilityListItem) =>
+    expandedRepoNames.includes(vulnerability.Advisory);
+
+  useEffect(() => {
+    const vulnList: VulnerabilityListItem[] = [];
+    features.map((feature: Feature) => {
+      feature.Vulnerabilities.map((vulnerability: Vulnerability) => {
+        vulnList.push({
+          PackageName: feature.Name,
+          CurrentVersion: feature.Version,
+          Description: vulnerability.Description,
+          NamespaceName: vulnerability.NamespaceName,
+          Advisory: vulnerability.Name,
+          Severity: vulnerability.Severity,
+          FixedInVersion: vulnerability.FixedBy,
+          Metadata: vulnerability.Metadata,
+        } as VulnerabilityListItem);
+      });
+    });
+    setVulnList(vulnList);
+    setFilteredVulnList(vulnList);
+  }, [features]);
 
   return (
     <PageSection variant={PageSectionVariants.light}>
       <TableTitle />
-      <TableFilter />
+      <SecurityReportFilter />
       <TableComposable aria-label="Expandable table" variant={'compact'}>
         <TableHead />
-        {props.features ? (
-          props.features.map((feature, rowIndex) => {
-            const packageName = feature.Name;
-            const packageVersion = feature.Version;
-            return feature.Vulnerabilities.map((vulnerability) => {
+        {filteredVulnList ? (
+          filteredVulnList.map(
+            (vulnerability: VulnerabilityListItem, rowIndex) => {
               return (
                 <Tbody
                   key={generateUniqueKey(vulnerability)}
@@ -131,18 +130,21 @@ export default function SecurityReportTable(props: SecurityDetailsProps) {
                           ),
                       }}
                     />
+
                     <Td dataLabel={columnNames.advisory}>
-                      {vulnerability.Name}
+                      {vulnerability.Advisory}
                     </Td>
                     <Td dataLabel={columnNames.severity}>
                       {vulnerability.Severity}
                     </Td>
-                    <Td dataLabel={columnNames.package}>{packageName}</Td>
+                    <Td dataLabel={columnNames.package}>
+                      {vulnerability.PackageName}
+                    </Td>
                     <Td dataLabel={columnNames.currentVersion}>
-                      {packageVersion}
+                      {vulnerability.CurrentVersion}
                     </Td>
                     <Td dataLabel={columnNames.fixedInVersion}>
-                      {vulnerability.FixedBy}
+                      {vulnerability.FixedInVersion}
                     </Td>
                   </Tr>
 
@@ -162,8 +164,8 @@ export default function SecurityReportTable(props: SecurityDetailsProps) {
                   </Tr>
                 </Tbody>
               );
-            });
-          })
+            },
+          )
         ) : (
           <tbody>
             <tr>

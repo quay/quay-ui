@@ -22,17 +22,15 @@ export function SecurityReport() {
     })();
   }, []);
 
-  return (
-    <>
-      {data ? (
-        <>
-          <SecurityReportChart features={data.Layer.Features} />
-          <hr />
-          <SecurityReportTable features={data.Layer.Features} />
-        </>
-      ) : (
-        <></>
-      )}
-    </>
-  );
+  if (data) {
+    return (
+      <>
+        <SecurityReportChart features={data.Layer.Features} />
+        <hr />
+        <SecurityReportTable features={data.Layer.Features} />
+      </>
+    );
+  }
+
+  return <div>Loading</div>;
 }
