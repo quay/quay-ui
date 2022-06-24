@@ -3,9 +3,8 @@ import {useRecoilState} from 'recoil';
 import {
   filteredVulnListState,
   VulnerabilityListItem,
-  vulnFilterState,
   vulnListState,
-} from '../../../../../../atoms/VulnurabilityReportState';
+} from 'src/atoms/VulnurabilityReportState';
 import {Checkbox, Flex, FlexItem, SearchInput} from '@patternfly/react-core';
 
 export function SecurityReportFilter() {
@@ -18,14 +17,13 @@ export function SecurityReportFilter() {
   );
 
   const filterVulnList = (searchTerm: string, fixedOnlyChecked: boolean) => {
-    const newList = vulnList.filter((item: VulnerabilityListItem) => {
+    return vulnList.filter((item: VulnerabilityListItem) => {
+      const searchStr = item.PackageName + item.Advisory;
       return (
-        item.PackageName.includes(searchTerm) &&
+        searchStr.includes(searchTerm) &&
         (!fixedOnlyChecked || item.FixedInVersion)
       );
     });
-    console.log(`newList ${newList.length}`);
-    return newList;
   };
 
   const onSearchTermChanged = (newSearchTerm: string) => {
