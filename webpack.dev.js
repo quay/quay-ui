@@ -1,4 +1,5 @@
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 const { merge } = require("webpack-merge");
 const common = require("./webpack.common.js");
 const { stylePaths } = require("./stylePaths.js");
@@ -24,6 +25,13 @@ module.exports = merge(common('development'), {
                 ],
                 use: ["style-loader", "css-loader"]
             }
-        ]
-    }
+        ],
+    },
+    plugins: [
+        new Dotenv({
+            systemvars: true,
+            silent: true,
+            path: './.env.development',
+        }),
+    ],
 });
