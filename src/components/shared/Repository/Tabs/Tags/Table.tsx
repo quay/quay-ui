@@ -32,6 +32,7 @@ const columnNames = {
 };
 
 export default function Table(props: TableProps) {
+  const quayDomain = process.env.REACT_APP_QUAY_DOMAIN || 'quay.io';
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalImageTag, setModalImageTag] = useState<string>('');
   const [modalImageDigest, setModalImageDigest] = useState<string>('');
@@ -112,7 +113,7 @@ export default function Table(props: TableProps) {
           hoverTip="Copy"
           clickTip="Copied"
         >
-          docker pull quay.io/{props.organization}/{props.repository}:
+          docker pull {quayDomain}/{props.organization}/{props.repository}:
           {modalImageTag}
         </ClipboardCopy>
         <br></br>
@@ -124,7 +125,7 @@ export default function Table(props: TableProps) {
           hoverTip="Copy"
           clickTip="Copied"
         >
-          docker pull quay.io/{props.organization}/{props.repository}@
+          docker pull {quayDomain}/{props.organization}/{props.repository}@
           {modalImageDigest}
         </ClipboardCopy>
       </Modal>
