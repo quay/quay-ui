@@ -1,11 +1,6 @@
-import {atom, selector, useRecoilState} from 'recoil';
-import {
-  getUser,
-  IOrganization,
-  IUserResource,
-} from 'src/resources/UserResource';
-import axios from 'src/libs/axios';
-import {GlobalAuthState} from 'src/resources/AuthResource';
+import {atom, selector} from 'recoil';
+import {IUserResource} from 'src/resources/UserResource';
+import {IOrganization} from 'src/resources/OrganisationResource';
 
 // TODO: Error handling
 export const UserState = atom<IUserResource | undefined>({

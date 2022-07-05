@@ -30,7 +30,7 @@ function getTabIndex(tab: string) {
   }
 }
 
-export default function Repository(props) {
+export default function TagsList(props) {
   const [activeTabKey, setActiveTabKey] = useState(TabIndex.Tags);
   const navigate = useNavigate();
   const location = useLocation();

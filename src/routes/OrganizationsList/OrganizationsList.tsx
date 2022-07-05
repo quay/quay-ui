@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   TableComposable,
   Thead,
@@ -25,28 +24,24 @@ import {
 
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {useRecoilValue} from 'recoil';
-import {AuthState} from 'src/atoms/AuthState';
 import {UserOrgs} from 'src/atoms/UserState';
 import {deleteOrg} from 'src/resources/OrganisationResource';
+import {useEffect, useState} from 'react';
 
-export default function Organizations() {
-  const authState = useRecoilValue(AuthState);
-  const navigate = useNavigate();
-
-  const [organizationsList, setOrganizationsList] = React.useState<
+export default function OrganizationsList() {
+  const [organizationsList, setOrganizationsList] = useState<
     OrganizationsListProps[]
   >([]);
-  const [isOrganizationModalOpen, setOrganizationModalOpen] =
-    React.useState(false);
-  const [organizationSearchInput, setOrganizationSearchInput] = React.useState(
+  const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
+  const [organizationSearchInput, setOrganizationSearchInput] = useState(
     'Filter by name or ID..',
   );
-  const [filterOpen, setFilterOpen] = React.useState(false);
-  const [selectedOrganization, setSelectedOrganization] = React.useState<
-    string[]
-  >([]);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState<string[]>(
+    [],
+  );
 
   const userOrgs = useRecoilValue(UserOrgs);
 
@@ -100,10 +95,10 @@ export default function Organizations() {
     });
 
   // To allow shift+click to select/deselect multiple rows
-  const [recentSelectedRowIndex, setRecentSelectedRowIndex] = React.useState<
+  const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
     number | null
   >(null);
-  const [shifting, setShifting] = React.useState(false);
+  const [shifting, setShifting] = useState(false);
 
   const onSelectOrganization = (
     currentOrganization: OrganizationsListProps,
@@ -132,7 +127,7 @@ export default function Organizations() {
     setRecentSelectedRowIndex(rowIndex);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Shift') {
         setShifting(true);
@@ -153,7 +148,7 @@ export default function Organizations() {
     };
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (userOrgs) {
       userOrgs.map((org: any) => {
         setOrganizationsList((prevOrganizations) => [
@@ -274,26 +269,26 @@ export default function Organizations() {
               </Tr>
             </Thead>
             <Tbody>
-              {organizationsList.map((ns, rowIndex) => (
-                <Tr key={ns.name}>
+              {organizationsList.map((org, rowIndex) => (
+                <Tr key={org.name}>
                   <Td
                     select={{
                       rowIndex,
                       onSelect: (_event, isSelecting) =>
-                        onSelectOrganization(ns, rowIndex, isSelecting),
-                      isSelected: isOrganizationSelected(ns),
+                        onSelectOrganization(org, rowIndex, isSelecting),
+                      isSelected: isOrganizationSelected(org),
                     }}
                   />
                   <Td dataLabel={columnNames.name}>
-                    <Link to={ns.name}>{ns.name}</Link>
+                    <Link to={org.name}>{org.name}</Link>
                   </Td>
-                  <Td dataLabel={columnNames.repoCount}>{ns.repoCount}</Td>
-                  <Td dataLabel={columnNames.tagCount}>{ns.tagCount}</Td>
-                  <Td dataLabel={columnNames.size}>{ns.size}</Td>
-                  <Td dataLabel={columnNames.pulls}>{ns.pulls}</Td>
-                  <Td dataLabel={columnNames.lastPull}>{ns.lastPull}</Td>
+                  <Td dataLabel={columnNames.repoCount}>{org.repoCount}</Td>
+                  <Td dataLabel={columnNames.tagCount}>{org.tagCount}</Td>
+                  <Td dataLabel={columnNames.size}>{org.size}</Td>
+                  <Td dataLabel={columnNames.pulls}>{org.pulls}</Td>
+                  <Td dataLabel={columnNames.lastPull}>{org.lastPull}</Td>
                   <Td dataLabel={columnNames.lastModified}>
-                    {ns.lastModified}
+                    {org.lastModified}
                   </Td>
                 </Tr>
               ))}

@@ -1,6 +1,6 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import {RecoilRoot} from 'recoil';
-import Repository from './Repository';
+import TagsList from './TagsList';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {mocked} from 'ts-jest/utils';
 
@@ -21,7 +21,7 @@ test('Org and repo names should show in Title and Breadcrumb', () => {
   ]);
   render(
     <RecoilRoot>
-      <Repository />
+      <TagsList />
     </RecoilRoot>,
   );
   expect(screen.getByTestId('namespace-breadcrumb')).toHaveTextContent(
