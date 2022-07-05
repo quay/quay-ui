@@ -35,7 +35,6 @@ export const CreateRepositoryModalTemplate = (
     props;
 
   const userOrgs = useRecoilValue(UserOrgs);
-  const loggedInUser = useRecoilValue(UserState);
 
   const [newRepository, setNewRepository] = useState({
     name: '',
@@ -59,19 +58,11 @@ export const CreateRepositoryModalTemplate = (
     setNewRepository({...newRepository, description: value});
   };
 
-  // const orgsDropdown = () => {
-  //   const children = userOrgs.map((orgs, idx) => (
-  //     <SelectOption key={idx} value={orgs.name} />
-  //   ));
-  //   return [
-  //     ...children,
-  //     <Divider component="li" />,
-  //     <SelectOption>{loggedInUser} </SelectOption>,
-  //   ];
-  // };
+  // TODO (harish): Show user and list of orgs in the Namespace dropdown
+  // see PROJQUAY-3900 comment for details
 
   const createRepositoryHandler = async () => {
-    handleModalToggle(); // check if this is needed
+    handleModalToggle();
     let visibility;
     repoVisibility === visibilityType.PUBLIC
       ? (visibility = 'public')
@@ -105,7 +96,6 @@ export const CreateRepositoryModalTemplate = (
   };
 
   const handleNamespaceSelection = (e, value) => {
-    console.log('value', value);
     setCurrentOrganization((prevState) => ({
       name: value,
       isDropdownOpen: !prevState.isDropdownOpen,
@@ -150,29 +140,6 @@ export const CreateRepositoryModalTemplate = (
             label="Namespace"
             fieldId="modal-with-form-form-name"
           >
-            {/* <Select
-              variant={SelectVariant.single}
-              aria-label="Select Input"
-              onToggle={() =>
-                setCurrentOrganization((prevState) => ({
-                  ...prevState,
-                  isDropdownOpen: !prevState.isDropdownOpen,
-                }))
-              }
-              onSelect={handleNamespaceSelection}
-              isOpen={currentOrganization.isDropdownOpen}
-              width="200px"
-              isDisabled={currentOrganization.name !== null}
-            >
-              {currentOrganization.name !== null ? (
-                orgsDropdown
-              ) : (
-                <SelectOption
-                  key={0}
-                  value={orgNameProp}
-                ></SelectOption>
-              )}
-            </Select> */}
             <Select
               variant={SelectVariant.single}
               aria-label="Select Input"
@@ -191,9 +158,6 @@ export const CreateRepositoryModalTemplate = (
               {userOrgs.map((orgs, idx) => (
                 <SelectOption key={idx} value={orgs.name}></SelectOption>
               ))}
-
-              {/* <Divider component="li" />,{' '}
-                  <SelectOption>{loggedInUser} </SelectOption> */}
             </Select>
           </FormGroup>
           <FormGroup

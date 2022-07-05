@@ -34,7 +34,7 @@ export default function Tags(props: TagsProps) {
       tag.manifest_list = JSON.parse(manifestResp.manifest_data);
     };
     let page = 1;
-    let hasAdditional = true;
+    let hasAdditional = false;
     do {
       try {
         const resp: TagsResponse = await getTags(

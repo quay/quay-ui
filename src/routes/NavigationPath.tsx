@@ -6,11 +6,11 @@ export enum NavigationPath {
 
   // Organization detail
   organizationDetail = '/organizations/:organizationName',
-  repositoryListForOrg = '/organizations/:organizationName/repotab',
-  tagListForRepository = '/organizations/:organizationName/:repositoryName',
+  orgDetailRepositoryTab = '/organizations/:organizationName/repotab',
+  orgDetailUsageLogsTab = '/organizations/:reponame/logs',
+  repositoryDetailForOrg = '/organizations/:organizationName/:repositoryName',
 
   // Repository detail
   repositoryDetail = '/repositories/:repositoryName',
-  usagelogs = '/organizations/:reponame/logs',
   settings = '/organizations/:reponame/settings',
 }

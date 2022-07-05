@@ -12,7 +12,7 @@ import {UserState} from 'src/atoms/UserState';
 import Organization from './OrganizationsList/Organization/Organization';
 import {NavigationPath} from './NavigationPath';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
-import TagsList from './Repository/TagsList';
+import TagsList from '../components/shared/Repository/TagsList';
 
 export function StandaloneMain() {
   const [, setUserState] = useRecoilState(UserState);
@@ -43,7 +43,7 @@ export function StandaloneMain() {
         <Route path={NavigationPath.repositoryDetail} element={<TagsList />} />
 
         <Route
-          path={NavigationPath.tagListForRepository}
+          path={NavigationPath.repositoryDetailForOrg}
           element={<TagsList />}
         />
         <Route
