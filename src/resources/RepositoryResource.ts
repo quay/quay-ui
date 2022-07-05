@@ -73,6 +73,7 @@ export async function setRepositoryVisibility(
     const response = await axios.post(repositoryVisibilityUrl, {
       visibility,
     });
+    return response;
   } catch (e) {
     // TODO: Find a better way to propagate errors
     console.error(e);
