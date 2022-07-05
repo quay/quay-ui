@@ -2,20 +2,28 @@ import {setRepositoryVisibility} from 'src/resources/RepositoryResource';
 import {Modal, ModalVariant, Button} from '@patternfly/react-core';
 
 export function ConfirmationModal(props: ConfirmationModalProps) {
-  const handleModalConfirm = () => {
+  async function changeVisibility() {
     if (props.selectedItems.length > 0) {
-      const visbility = props.makePublic ? 'public' : 'private';
-      // TODO(sunanda): Handle repositories state change
+      const visibility = props.makePublic ? 'public' : 'private';
       try {
-        const response = props.selectedItems.map((item) => {
-          const ls = item.split('/', 2);
-          setRepositoryVisibility(ls[0], ls[1], visbility);
-        });
+        const response = await Promise.all(
+          props.selectedItems.map((item) => {
+            const ls = item.split('/', 2);
+            setRepositoryVisibility(ls[0], ls[1], visibility);
+          }),
+        );
       } catch (error) {
         console.log(error);
       }
     }
-    props.toggleModal();
+  }
+
+  const handleModalConfirm = async () => {
+    await changeVisibility().then(() => {
+      props.fetchRepos(true);
+      props.toggleModal();
+      props.selectAllRepos(false);
+    });
   };
 
   return (
@@ -46,4 +54,6 @@ type ConfirmationModalProps = {
   selectedItems: string[];
   makePublic: boolean;
   toggleModal: () => void;
+  fetchRepos: (refresh) => void;
+  selectAllRepos: (isSelecting) => void;
 };

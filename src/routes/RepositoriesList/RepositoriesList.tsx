@@ -22,8 +22,9 @@ import {
   Tbody,
   Td,
 } from '@patternfly/react-table';
-import {useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
+import {repositoryListState} from 'src/atoms/RepositoryState';
 import {fetchAllRepos} from 'src/resources/RepositoryResource';
 import {DeleteRepositoryModal} from './DeleteRepositoryModal';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
@@ -41,9 +42,8 @@ export default function RepositoriesList() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
-  const [repositoryList, setRepositoryList] = useState<RepositoryListProps[]>(
-    [],
-  );
+  const [repositoryList, setRepositoryList] =
+    useRecoilState(repositoryListState);
 
   const isRepoSelectable = (repo: Repository) => repo.name !== ''; // Arbitrary logic for this example
   const selectableRepos = repositoryList.filter(isRepoSelectable);
@@ -125,13 +125,20 @@ export default function RepositoriesList() {
     // TODO: ADD API calls for bulk/ selected repo deletion
   };
 
+  const fetchConfirmationModalText = () => {
+    if (selectedRepoNames.length == 1) {
+      return selectedRepoNames[0];
+    }
+    return selectedRepoNames.length;
+  };
+
   const fetchMakePublicDescription = () => {
     if (selectedRepoNames.length == 0) {
       return 'Please select one/more repositories to change visibility.';
     }
     return (
       'Update ' +
-      selectedRepoNames.length +
+      fetchConfirmationModalText() +
       ' repositories visibility to be public so they are visible to all user, and may be pulled by all users.'
     );
   };
@@ -142,7 +149,7 @@ export default function RepositoriesList() {
     }
     return (
       'Update ' +
-      selectedRepoNames.length +
+      fetchConfirmationModalText() +
       ' repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.'
     );
   };
@@ -190,45 +197,48 @@ export default function RepositoriesList() {
     setRepositorySearchInput(value);
   };
 
-  useEffect(() => {
-    async function fetchRepos() {
-      const listOfOrgNames = [];
-      if (userOrgs) {
-        // check if view is global vs scoped to a organization
-        if (currentOrg === null) {
-          userOrgs.map((org) => listOfOrgNames.push(org.name));
-          // add user to fetch user specific repositories
-          listOfOrgNames.push(currentUser.username);
-        } else {
-          listOfOrgNames.push(currentOrg);
+  async function fetchRepos(refresh = false) {
+    const listOfOrgNames = [];
+    if (userOrgs) {
+      // check if view is global vs scoped to a organization
+      if (currentOrg === null) {
+        userOrgs.map((org) => listOfOrgNames.push(org.name));
+        // add user to fetch user specific repositories
+        listOfOrgNames.push(currentUser.username);
+      } else {
+        listOfOrgNames.push(currentOrg);
+      }
+      try {
+        if (refresh) {
+          setRepositoryList([]);
         }
-        try {
-          await fetchAllRepos(listOfOrgNames).then((response) => {
-            response.map((eachResponse) =>
-              eachResponse?.data.repositories.map((repo) => {
-                setRepositoryList((prevRepos) => [
-                  ...prevRepos,
-                  {
-                    name: repo.name,
-                    namespace: repo.namespace,
-                    path: repo.namespace + '/' + repo.name,
-                    isPublic: repo.is_public,
-                    tags: 1,
-                    size: '1.1GB',
-                    pulls: 108,
-                    lastPull: 'TBA',
-                    lastModified: 'TBA',
-                  },
-                ]);
-              }),
-            );
-          });
-        } catch (e) {
-          console.error(e);
-        }
+        await fetchAllRepos(listOfOrgNames).then((response) => {
+          response.map((eachResponse) =>
+            eachResponse?.data.repositories.map((repo) => {
+              setRepositoryList((prevRepos) => [
+                ...prevRepos,
+                {
+                  name: repo.name,
+                  namespace: repo.namespace,
+                  path: repo.namespace + '/' + repo.name,
+                  isPublic: repo.is_public,
+                  tags: 1,
+                  size: '1.1GB',
+                  pulls: 108,
+                  lastPull: 'TBA',
+                  lastModified: 'TBA',
+                },
+              ]);
+            }),
+          );
+        });
+      } catch (e) {
+        console.error(e);
       }
     }
+  }
 
+  useEffect(() => {
     fetchRepos();
   }, [userOrgs]);
 
@@ -329,6 +339,8 @@ export default function RepositoriesList() {
             toggleModal={toggleMakePublicClick}
             buttonText="Make public"
             makePublic={true}
+            fetchRepos={fetchRepos}
+            selectAllRepos={selectAllRepos}
           />
           <ConfirmationModal
             title="Make repositories private"
@@ -338,6 +350,8 @@ export default function RepositoriesList() {
             buttonText="Make private"
             selectedItems={selectedRepoNames}
             makePublic={false}
+            fetchRepos={fetchRepos}
+            selectAllRepos={selectAllRepos}
           />
         </Toolbar>
         <TableComposable aria-label="Selectable table">
