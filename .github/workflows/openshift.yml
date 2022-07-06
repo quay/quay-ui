@@ -143,6 +143,9 @@ jobs:
     - name: Build from Dockerfile
       id: build-image
       uses: redhat-actions/buildah-build@v2
+      env:
+        QUAY_APP_API_URL: "https://quay-app.quay-ui-quay"
+
       with:
         image: ${{ env.APP_NAME }}
         tags: ${{ env.IMAGE_TAGS }}
@@ -152,9 +155,6 @@ jobs:
         # Otherwise, point this to your Dockerfile/Containerfile relative to the repository root.
         dockerfiles: |
           ./Dockerfile
-
-        envs: |
-          QUAY_APP_API_URL: https://quay-app.quay-ui-quay
 
     # https://github.com/redhat-actions/push-to-registry#readme
     - name: Push to registry
