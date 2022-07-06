@@ -52,8 +52,6 @@ env:
   # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
   IMAGE_TAGS: ""
  
-  # Backend Quay for the UI to connect to
-  QUAY_APP_API_URL: "https://quay-app.quay-ui-quay"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -143,8 +141,6 @@ jobs:
     - name: Build from Dockerfile
       id: build-image
       uses: redhat-actions/buildah-build@v2
-      env:
-        QUAY_APP_API_URL: "https://quay-app.quay-ui-quay"
 
       with:
         image: ${{ env.APP_NAME }}
@@ -155,6 +151,9 @@ jobs:
         # Otherwise, point this to your Dockerfile/Containerfile relative to the repository root.
         dockerfiles: |
           ./Dockerfile
+    
+        build-args: |
+          quay_app_api_url=https://quay-app.quay-ui-quay
 
     # https://github.com/redhat-actions/push-to-registry#readme
     - name: Push to registry
