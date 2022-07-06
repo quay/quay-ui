@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/nodejs-14:latest as build
+FROM registry.access.redhat.com/ubi8/nodejs-16:latest as build
 
 WORKDIR /app
 COPY package.json /app
@@ -7,7 +7,7 @@ RUN npm install
 COPY . /app/
 RUN npm run build
 
-FROM registry.access.redhat.com/ubi8/nodejs-14:latest
+FROM registry.access.redhat.com/ubi8/nodejs-16:latest
 
 WORKDIR /app
 RUN npm install node-static
