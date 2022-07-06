@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8/nodejs-16:latest as build
 
-WORKDIR /opt/app-root/app
+WORKDIR /opt/app-root
 COPY package.json .
 RUN npm install
 
@@ -9,12 +9,11 @@ RUN npm run build
 
 FROM registry.access.redhat.com/ubi8/nodejs-16:latest
 
-WORKDIR /opt/app-root/app
+WORKDIR /opt/app-root
 RUN npm install node-static
-COPY --from=build  /opt/app-root/app/dist /opt/app-root/app/dist
-COPY --from=build  /opt/app-root/app//server.js /opt/app-root/app/server.js
+COPY --from=build  /opt/app-root/dist /opt/app-root/dist
+COPY --from=build  /opt/app-root/server.js /opt/app-root/server.js
 EXPOSE 9000
 
-WORKDIR /opt/app-root/app
 CMD ["node", "server.js"]
 
