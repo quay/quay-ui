@@ -153,6 +153,9 @@ jobs:
         dockerfiles: |
           ./Dockerfile
 
+        envs: |
+          QUAY_APP_API_URL: https://quay-app.quay-ui-quay
+
     # https://github.com/redhat-actions/push-to-registry#readme
     - name: Push to registry
       id: push-image
