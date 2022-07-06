@@ -1,4 +1,5 @@
 const path = require('path');
+const Dotenv = require('dotenv-webpack');
 const { merge } = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -21,6 +22,10 @@ module.exports = merge(common('production'), {
     ],
   },
   plugins: [
+    new Dotenv({
+      systemvars: true,
+      silent: true,
+    }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[name].bundle.css',
