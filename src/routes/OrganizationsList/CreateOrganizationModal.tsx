@@ -138,7 +138,6 @@ export const CreateOrganizationModal = (
       method: 'POST',
       headers: {
         Authorization: `Bearer ${quayAuth.QUAY_OAUTH_TOKEN}`,
-        'X-Requested-With': 'XMLHttpRequest',
       },
       body: JSON.stringify({name: organizationName, email: organizationEmail}),
     }).then;
