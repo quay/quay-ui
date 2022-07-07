@@ -10,6 +10,13 @@ http.createServer(function (request, response) {
             if (err) { // There was an error serving the file
                 console.error("Error serving " + request.url + " - " + err.message);
 
+                if (err.status === 404) { // If the file wasn't found, serve index.html
+                    console.error("serving index.html instead");
+                    fileServer.serveFile('./dist/index.html', 200, {}, request, response);
+                    return;
+                }
+
+
                 // Respond to the client
                 response.writeHead(err.status, err.headers);
                 response.end();
