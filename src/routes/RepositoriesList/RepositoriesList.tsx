@@ -386,7 +386,9 @@ export default function RepositoriesList() {
                   }}
                 />
                 <Td dataLabel={columnNames.repoName}>
-                  <Link to={repo.name}>{repo.name}</Link>
+                  <Link to={{pathname: '/organizations/' + repo.path}}>
+                    {repo.name}
+                  </Link>
                 </Td>
                 <Td dataLabel={columnNames.visibility}>
                   {' '}

@@ -1,6 +1,4 @@
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Page,
   PageSection,
   PageSectionVariants,
@@ -8,9 +6,9 @@ import {
   Tabs,
   Tab,
   TabTitleText,
-  PageBreadcrumb,
 } from '@patternfly/react-core';
 import Tags from './Tabs/Tags/Tags';
+import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {useLocation, useSearchParams, useNavigate} from 'react-router-dom';
 import {useState} from 'react';
 
@@ -39,6 +37,24 @@ export default function TagsList(props) {
   // TODO: refactor
   const [organization, ...repo] = location.pathname.split('/').slice(2);
   const repository = repo.join('/');
+  const PageBreadcrumbs = [
+    {
+      title: 'organizations',
+      id: 'namespace-breadcrumb',
+      to: '#',
+    },
+    {
+      title: organization,
+      id: 'org-breadcrumb',
+      to: '#',
+    },
+  ];
+
+  const PageActiveBreadcrumb = {
+    title: repo.join('/'),
+    id: 'repo-breadcrumb',
+    to: '#',
+  };
 
   const requestedTabIndex = getTabIndex(searchParams.get('tab'));
   if (requestedTabIndex && requestedTabIndex !== activeTabKey) {
@@ -51,19 +67,10 @@ export default function TagsList(props) {
 
   return (
     <Page>
-      <PageBreadcrumb>
-        <Breadcrumb>
-          <BreadcrumbItem data-testid="namespace-breadcrumb" to="#">
-            organizations
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="org-breadcrumb" to="#">
-            {organization}
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="repo-breadcrumb" to="#" isActive>
-            {repository}
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </PageBreadcrumb>
+      <QuayBreadcrumb
+        data={PageBreadcrumbs}
+        activeItem={PageActiveBreadcrumb}
+      />
       <PageSection variant={PageSectionVariants.light}>
         <Title data-testid="repo-title" headingLevel="h1">
           {repository}

@@ -1,8 +1,5 @@
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Page,
-  PageBreadcrumb,
   PageSection,
   PageSectionVariants,
   Tab,
@@ -15,6 +12,7 @@ import {NavigationPath} from '../../NavigationPath';
 import UsageLogsTab from './Tabs/UsageLogs/UsageLogsTab';
 import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
+import {QuayBreadcrumb} from '../../../components/breadcrumb/Breadcrumb';
 
 export default function Organization() {
   const location = useLocation();
@@ -43,21 +41,26 @@ export default function Organization() {
     },
   ];
 
+  const PageBreadcrumbs = [
+    {
+      title: 'Organizations',
+      id: 'organization-breadcrumb',
+      to: '#',
+    },
+  ];
+
+  const PageActiveBreadcrumb = {
+    title: repositoryName,
+    id: 'repo-breadcrumb',
+    to: '#',
+  };
+
   return (
     <Page>
-      <PageBreadcrumb>
-        <Breadcrumb>
-          <BreadcrumbItem
-            data-testid="organization-breadcrumb"
-            to={NavigationPath.organizationsList}
-          >
-            Organizations
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="repo-breadcrumb" to="#" isActive>
-            {repositoryName}
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </PageBreadcrumb>
+      <QuayBreadcrumb
+        data={PageBreadcrumbs}
+        activeItem={PageActiveBreadcrumb}
+      />
       <PageSection variant={PageSectionVariants.light}>
         <Title data-testid="repo-title" headingLevel="h1">
           {repositoryName}
