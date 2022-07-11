@@ -41,20 +41,22 @@ export default function TagsList(props) {
     {
       title: 'organizations',
       id: 'namespace-breadcrumb',
-      to: '#',
+      to: '/organizations',
+      active: false,
     },
     {
       title: organization,
       id: 'org-breadcrumb',
-      to: '#',
+      to: '/organizations/' + organization,
+      active: false,
+    },
+    {
+      title: repo.join('/'),
+      id: 'repo-breadcrumb',
+      to: window.location.pathname,
+      active: true,
     },
   ];
-
-  const PageActiveBreadcrumb = {
-    title: repo.join('/'),
-    id: 'repo-breadcrumb',
-    to: '#',
-  };
 
   const requestedTabIndex = getTabIndex(searchParams.get('tab'));
   if (requestedTabIndex && requestedTabIndex !== activeTabKey) {
@@ -67,10 +69,7 @@ export default function TagsList(props) {
 
   return (
     <Page>
-      <QuayBreadcrumb
-        data={PageBreadcrumbs}
-        activeItem={PageActiveBreadcrumb}
-      />
+      <QuayBreadcrumb breadcrumbItems={PageBreadcrumbs} />
       <PageSection variant={PageSectionVariants.light}>
         <Title data-testid="repo-title" headingLevel="h1">
           {repository}

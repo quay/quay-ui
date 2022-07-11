@@ -12,7 +12,7 @@ import {NavigationPath} from '../../NavigationPath';
 import UsageLogsTab from './Tabs/UsageLogs/UsageLogsTab';
 import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
-import {QuayBreadcrumb} from '../../../components/breadcrumb/Breadcrumb';
+import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 
 export default function Organization() {
   const location = useLocation();
@@ -45,22 +45,20 @@ export default function Organization() {
     {
       title: 'Organizations',
       id: 'organization-breadcrumb',
-      to: '#',
+      to: '/organizations',
+      active: false,
+    },
+    {
+      title: repositoryName,
+      id: 'repo-breadcrumb',
+      to: window.location.pathname,
+      active: true,
     },
   ];
 
-  const PageActiveBreadcrumb = {
-    title: repositoryName,
-    id: 'repo-breadcrumb',
-    to: '#',
-  };
-
   return (
     <Page>
-      <QuayBreadcrumb
-        data={PageBreadcrumbs}
-        activeItem={PageActiveBreadcrumb}
-      />
+      <QuayBreadcrumb breadcrumbItems={PageBreadcrumbs} />
       <PageSection variant={PageSectionVariants.light}>
         <Title data-testid="repo-title" headingLevel="h1">
           {repositoryName}
