@@ -12,7 +12,7 @@ http.createServer(function (request, response) {
 
                 if (err.status === 404) { // If the file wasn't found, serve index.html
                     console.error("serving index.html instead");
-                    fileServer.serveFile('./dist/index.html', 200, {}, request, response);
+                    fileServer.serveFile('index.html', 200, {}, request, response);
                     return;
                 }
 
