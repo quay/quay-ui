@@ -2,6 +2,8 @@ import React from 'react';
 import {Text, TextContent, TextVariants} from '@patternfly/react-core';
 import {TableComposable, Tbody, Th, Thead, Tr} from '@patternfly/react-table';
 import {VulnerabilityListItem} from 'src/atoms/VulnerabilityReportState';
+import {ExclamationTriangleIcon} from '@patternfly/react-icons';
+import {MinusCircleIcon} from '@patternfly/react-icons';
 
 const getDistro = function (vuln: VulnerabilityListItem) {
   if (vuln.Metadata.DistroName) {
@@ -29,6 +31,17 @@ const getSeverityTooltip = function (vuln: VulnerabilityListItem) {
   return result;
 };
 
+const getSeverityIcon = (severity: string) => {
+  switch (severity) {
+    case 'high':
+      return <ExclamationTriangleIcon color={'#C9190B'} />;
+    case 'medium':
+      return <ExclamationTriangleIcon color={'#EC7A08'} />;
+    case 'low':
+      return <MinusCircleIcon color={'#3E8635'} />;
+  }
+};
+
 export function SecurityReportMetadataTable(
   props: SecurityDetailsMetadataProps,
 ) {
@@ -47,7 +60,9 @@ export function SecurityReportMetadataTable(
               .slice(1)
               .map((vector, i) => {
                 return (
-                  <Th key={i}>{NVD_VECTORS[vector.split(':')[0]]?.title}</Th>
+                  <Th key={i} modifier="nowrap">
+                    {NVD_VECTORS[vector.split(':')[0]]?.title}
+                  </Th>
                 );
               })}
           </Tr>
@@ -59,15 +74,15 @@ export function SecurityReportMetadataTable(
               .map((vector, i) => {
                 const vectorType = vector.split(':')[0];
                 const vectorValue = vector.split(':')[1];
-
+                const title = NVD_VECTORS[vectorType].values.filter(
+                  (value) => value.id == vectorValue,
+                )[0].title;
+                const severity = NVD_VECTORS[vectorType].values.filter(
+                  (value) => value.id == vectorValue,
+                )[0].severity;
                 return (
-                  <Th key={i}>
-                    <i className="fa fa-exclamation-circle"></i>{' '}
-                    {
-                      NVD_VECTORS[vectorType].values.filter(
-                        (value) => value.id == vectorValue,
-                      )[0].title
-                    }
+                  <Th key={i} modifier="nowrap">
+                    {getSeverityIcon(severity)} {title}
                   </Th>
                 );
               })}
