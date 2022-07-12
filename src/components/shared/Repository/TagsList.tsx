@@ -9,6 +9,7 @@ import {
 } from '@patternfly/react-core';
 import Tags from './Tabs/Tags/Tags';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
+import {NavigationPath} from 'src/routes/NavigationPath';
 import {useLocation, useSearchParams, useNavigate} from 'react-router-dom';
 import {useState} from 'react';
 
@@ -41,13 +42,13 @@ export default function TagsList(props) {
     {
       title: 'organizations',
       id: 'namespace-breadcrumb',
-      to: '/organizations',
+      to: NavigationPath.organizationsList,
       active: false,
     },
     {
       title: organization,
       id: 'org-breadcrumb',
-      to: '/organizations/' + organization,
+      to: NavigationPath.organizationsList + '/' + organization,
       active: false,
     },
     {

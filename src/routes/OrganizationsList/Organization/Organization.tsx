@@ -8,7 +8,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 import {useLocation} from 'react-router-dom';
-import {NavigationPath} from '../../NavigationPath';
+import {NavigationPath} from 'src/routes/NavigationPath';
 import UsageLogsTab from './Tabs/UsageLogs/UsageLogsTab';
 import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
@@ -45,7 +45,7 @@ export default function Organization() {
     {
       title: 'Organizations',
       id: 'organization-breadcrumb',
-      to: '/organizations',
+      to: NavigationPath.organizationsList,
       active: false,
     },
     {

@@ -4,6 +4,7 @@ import {
   PageBreadcrumb,
 } from '@patternfly/react-core';
 import {IBreadcrumb} from 'src/resources/BreadcrumbResource';
+import {Link} from 'react-router-dom';
 
 export function QuayBreadcrumb(props: BreadcrumbProps) {
   return (
@@ -11,13 +12,14 @@ export function QuayBreadcrumb(props: BreadcrumbProps) {
       <Breadcrumb>
         {props.breadcrumbItems.map((object, i) => (
           <BreadcrumbItem
-            to={object.to}
-            data-testid={object.id}
+            render={(props) => (
+              <Link to={object.to} data-testid={object.id}>
+                {object.title}
+              </Link>
+            )}
             key={i}
             isActive={object.active}
-          >
-            {object.title}
-          </BreadcrumbItem>
+          />
         ))}
       </Breadcrumb>
     </PageBreadcrumb>
