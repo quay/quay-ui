@@ -107,6 +107,16 @@ export async function getTags(
   }
 }
 
+export async function deleteTag(org: string, repo: string, tag: string) {
+  try {
+    const response: AxiosResponse = await axios.delete(
+      `/api/v1/repository/${org}/${repo}/tag/${tag}`,
+    );
+  } catch (error: any) {
+    throw new Error(`API error getting tags ${error.message}`);
+  }
+}
+
 export async function getManifestByDigest(
   org: string,
   repo: string,

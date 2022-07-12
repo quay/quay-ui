@@ -12,3 +12,8 @@ export const paginationState = atom({
     perPage: 25,
   },
 });
+
+export const selectedTagsState = atom({
+  key: 'selectedTagsState',
+  default: [],
+});

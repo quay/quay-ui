@@ -35,10 +35,7 @@ In order for you to use this with a Quay backend, you need to configure CORS on 
 Add the following to your `config.yaml` in Quay
 
 ```yaml
-CORS_CONFIG:
-  origin: "http://localhost:9000"
-  credentials: True
-  headers: ["Authorization", "Content-Type", "X-Requested-With", "X-CSRF-Token", "Cookie"]
+CORS_ORIGIN: "http://localhost:9000"
 ```
 
 If you are using `docker-compose` for local development, you can add this to `local-dev/stack/config.yaml` 

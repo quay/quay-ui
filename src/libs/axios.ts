@@ -9,6 +9,7 @@ if (process.env.MOCK_API === 'true') {
 axios.defaults.baseURL =
   process.env.QUAY_APP_API_URL || 'http://localhost:8080';
 axios.defaults.withCredentials = true;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 export async function getCsrfToken() {
   try {
