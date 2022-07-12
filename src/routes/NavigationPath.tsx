@@ -13,4 +13,19 @@ export enum NavigationPath {
   // Repository detail
   repositoryDetail = '/repositories/:repositoryName',
   settings = '/organizations/:reponame/settings',
+
+  // Tag Detail
+  tagDetail = '/organizations/:organizationName/:repoName/:tagName',
+}
+
+export function getTagDetailPath(org: string, repo: string, tag: string) {
+  let tagPath = NavigationPath.tagDetail.toString();
+  tagPath = tagPath.replace(':organizationName', org);
+  tagPath = tagPath.replace(':repoName', repo);
+  tagPath = tagPath.replace(':tagName', tag);
+  return tagPath;
+}
+
+export function getDomain() {
+  return process.env.REACT_APP_QUAY_DOMAIN || 'quay.io';
 }

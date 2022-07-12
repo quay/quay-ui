@@ -19,6 +19,8 @@ import {Tag} from 'src/resources/TagResource';
 import SecurityDetails from './SecurityDetails';
 import {selectedTagsState} from 'src/atoms/TagListState';
 import {useRecoilState} from 'recoil';
+import {Link} from 'react-router-dom';
+import {getTagDetailPath, getDomain} from 'src/routes/NavigationPath';
 
 const columnNames = {
   Tag: 'Tag',
@@ -32,7 +34,6 @@ const columnNames = {
 };
 
 export default function Table(props: TableProps) {
-  const quayDomain = process.env.REACT_APP_QUAY_DOMAIN || 'quay.io';
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalImageTag, setModalImageTag] = useState<string>('');
   const [modalImageDigest, setModalImageDigest] = useState<string>('');
@@ -113,7 +114,7 @@ export default function Table(props: TableProps) {
           hoverTip="Copy"
           clickTip="Copied"
         >
-          docker pull {quayDomain}/{props.organization}/{props.repository}:
+          docker pull {getDomain()}/{props.organization}/{props.repository}:
           {modalImageTag}
         </ClipboardCopy>
         <br></br>
@@ -125,7 +126,7 @@ export default function Table(props: TableProps) {
           hoverTip="Copy"
           clickTip="Copied"
         >
-          docker pull {quayDomain}/{props.organization}/{props.repository}@
+          docker pull {getDomain()}/{props.organization}/{props.repository}@
           {modalImageDigest}
         </ClipboardCopy>
       </Modal>
@@ -184,7 +185,17 @@ export default function Table(props: TableProps) {
                     isSelected: selectedTags.includes(tag.name),
                   }}
                 />
-                <Td dataLabel={columnNames.Tag}>{tag.name}</Td>
+                <Td dataLabel={columnNames.Tag}>
+                  <Link
+                    to={getTagDetailPath(
+                      props.organization,
+                      props.repository,
+                      tag.name,
+                    )}
+                  >
+                    {tag.name}
+                  </Link>
+                </Td>
                 <Td dataLabel={columnNames.OS}>os-mock</Td>
                 <Td dataLabel={columnNames.Security}>
                   {typeof tag.manifest_list != 'undefined' ? (

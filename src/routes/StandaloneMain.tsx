@@ -13,6 +13,7 @@ import Organization from './OrganizationsList/Organization/Organization';
 import {NavigationPath} from './NavigationPath';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
 import TagsList from '../components/shared/Repository/TagsList';
+import TagDetails from './TagDetails/TagDetails';
 
 export function StandaloneMain() {
   const [, setUserState] = useRecoilState(UserState);
@@ -41,6 +42,7 @@ export function StandaloneMain() {
           element={<Organization />}
         />
         <Route path={NavigationPath.repositoryDetail} element={<TagsList />} />
+        <Route path={NavigationPath.tagDetail} element={<TagDetails />} />
 
         <Route
           path={NavigationPath.repositoryDetailForOrg}
