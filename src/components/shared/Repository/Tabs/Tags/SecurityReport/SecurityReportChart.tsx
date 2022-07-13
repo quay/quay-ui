@@ -2,24 +2,18 @@ import React from 'react';
 
 import {ChartDonut} from '@patternfly/react-charts';
 import {
-  Split,
-  SplitItem,
   PageSection,
   PageSectionVariants,
+  Split,
+  SplitItem,
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
-import {ExclamationTriangleIcon} from '@patternfly/react-icons';
-import {Feature} from 'src/resources/TagResource';
+import {BugIcon, ExclamationTriangleIcon} from '@patternfly/react-icons';
+import {Feature, VulnerabilitySeverity} from 'src/resources/TagResource';
+import {getSeverityColor} from 'src/libs/utils';
 
-function VulnerabilitySummary(props: vulnerabilityStatsProps) {
-  const colorMap = {
-    Critical: 'red',
-    High: 'orange',
-    Medium: 'gold',
-    Unknown: 'grey',
-  };
-
+function VulnerabilitySummary(props: VulnerabilityStatsProps) {
   return (
     <div>
       <div className="pf-u-mt-xl pf-u-ml-2xl">
@@ -39,7 +33,7 @@ function VulnerabilitySummary(props: vulnerabilityStatsProps) {
             return (
               <div className="pf-u-mb-sm" key={vulnLevel}>
                 <ExclamationTriangleIcon
-                  color={colorMap[vulnLevel]}
+                  color={getSeverityColor(vulnLevel as VulnerabilitySeverity)}
                   className="pf-u-mr-md"
                 />
                 <b>{props.stats[vulnLevel]}</b> {vulnLevel}-level
@@ -53,7 +47,7 @@ function VulnerabilitySummary(props: vulnerabilityStatsProps) {
   );
 }
 
-function VulnerabilityChart(props: vulnerabilityStatsProps) {
+function VulnerabilityChart(props: VulnerabilityStatsProps) {
   return (
     <div style={{height: '20em', width: '20em'}}>
       <ChartDonut
@@ -61,12 +55,17 @@ function VulnerabilityChart(props: vulnerabilityStatsProps) {
         ariaTitle="vulnerability chart"
         constrainToVisibleArea={true}
         data={[
-          {x: 'Critical', y: props.stats.Critical},
-          {x: 'High', y: props.stats.High},
-          {x: 'Medium', y: props.stats.Medium},
-          {x: 'Unknown', y: props.stats.Unknown},
+          {x: VulnerabilitySeverity.Critical, y: props.stats.Critical},
+          {x: VulnerabilitySeverity.High, y: props.stats.High},
+          {x: VulnerabilitySeverity.Medium, y: props.stats.Medium},
+          {x: VulnerabilitySeverity.Unknown, y: props.stats.Unknown},
         ]}
-        colorScale={['red', 'orange', 'gold', 'grey']}
+        colorScale={[
+          getSeverityColor(VulnerabilitySeverity.Critical),
+          getSeverityColor(VulnerabilitySeverity.High),
+          getSeverityColor(VulnerabilitySeverity.Medium),
+          getSeverityColor(VulnerabilitySeverity.Unknown),
+        ]}
         labels={({datum}) => `${datum.x}: ${datum.y}`}
         title={`${props.total}`}
       />
@@ -116,15 +115,15 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
   );
 }
 
-interface vulnerabilityStats {
+interface VulnerabilityStats {
   Critical: number;
   High: number;
   Medium: number;
   Unknown: number;
 }
 
-interface vulnerabilityStatsProps {
-  stats: vulnerabilityStats;
+interface VulnerabilityStatsProps {
+  stats: VulnerabilityStats;
   total: number;
   patchesAvailable: number;
 }

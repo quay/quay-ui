@@ -68,7 +68,7 @@ export interface Feature {
 }
 
 export interface Vulnerability {
-  Severity: string;
+  Severity: VulnerabilitySeverity;
   NamespaceName: string;
   Link: string;
   FixedBy: string;
@@ -89,6 +89,15 @@ export interface VulnerabilityMetadata {
       Score: number;
     };
   };
+}
+
+export enum VulnerabilitySeverity {
+  Critical = 'Critical',
+  High = 'High',
+  Medium = 'Medium',
+  Low = 'Low',
+  Negligible = 'Negligible',
+  Unknown = 'Unknown',
 }
 
 export async function getTags(

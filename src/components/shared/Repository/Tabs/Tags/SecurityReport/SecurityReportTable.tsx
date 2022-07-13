@@ -20,7 +20,14 @@ import {
 } from 'src/atoms/VulnerabilityReportState';
 import {SecurityReportFilter} from './SecurityReportFilter';
 import sha1 from 'js-sha1';
-import {ExclamationTriangleIcon} from '@patternfly/react-icons';
+import {
+  ArrowRightIcon,
+  ExclamationTriangleIcon,
+  ExternalLinkAltIcon,
+} from '@patternfly/react-icons';
+import {getSeverityColor} from 'src/libs/utils';
+
+import './SecurityReportTable.css';
 
 const columnNames = {
   advisory: 'Advisory',
@@ -77,23 +84,6 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
 
   const isRepoExpanded = (key: string) => expandedVulnKeys.includes(key);
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'Defcon1':
-        return '#470000';
-      case 'Critical':
-        return '#7D1007';
-      case 'High':
-        return '#C9190B';
-      case 'Medium':
-        return '#EC7A08';
-      case 'Low':
-        return '#F0AB00';
-      default:
-        return '#8A8D90';
-    }
-  };
-
   useEffect(() => {
     const vulnList: VulnerabilityListItem[] = [];
     features.map((feature: Feature) => {
@@ -126,7 +116,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
               const uniqueKey = generateUniqueKey(vulnerability);
               return (
                 <Tbody key={uniqueKey} isExpanded={isRepoExpanded(uniqueKey)}>
-                  <Tr>
+                  <Tr className="security-table-row">
                     <Td
                       expand={{
                         rowIndex,
@@ -140,13 +130,22 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
                     />
 
                     <Td dataLabel={columnNames.advisory}>
-                      {vulnerability.Advisory}
+                      <>
+                        {vulnerability.Advisory}
+                        <ExternalLinkAltIcon
+                          color={'blue'}
+                          style={{marginLeft: '5px'}}
+                        />
+                      </>
                     </Td>
                     <Td dataLabel={columnNames.severity}>
                       <ExclamationTriangleIcon
                         color={getSeverityColor(vulnerability.Severity)}
-                      />{' '}
-                      {vulnerability.Severity}
+                        style={{
+                          marginRight: '5px',
+                        }}
+                      />
+                      <span>{vulnerability.Severity}</span>
                     </Td>
                     <Td dataLabel={columnNames.package}>
                       {vulnerability.PackageName}
@@ -155,13 +154,23 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
                       {vulnerability.CurrentVersion}
                     </Td>
                     <Td dataLabel={columnNames.fixedInVersion}>
-                      {vulnerability.FixedInVersion || '(None)'}
+                      {vulnerability.FixedInVersion ? (
+                        <>
+                          <ArrowRightIcon
+                            color={'green'}
+                            style={{marginRight: '5px'}}
+                          />
+                          {vulnerability.FixedInVersion}
+                        </>
+                      ) : (
+                        '(None)'
+                      )}
                     </Td>
                   </Tr>
 
                   <Tr isExpanded={isRepoExpanded(uniqueKey)}>
                     <Td
-                      dataLabel="Repo detail 1"
+                      dataLabel="Security Metadata"
                       colSpan={5}
                       cellPadding="span"
                     >
