@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {
   Modal,
   ModalVariant,
@@ -20,20 +19,22 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import {useRecoilValue} from 'recoil';
-import {AuthState} from 'src/atoms/AuthState';
 import {createOrg} from 'src/resources/OrganisationResource';
+import {useRecoilState} from 'recoil';
+import {UserState} from 'src/atoms/UserState';
+import {getUser} from 'src/resources/UserResource';
+import {isValidEmail} from 'src/libs/utils';
+import {useState} from 'react';
 
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
 ): JSX.Element => {
-  const {isModalOpen, handleModalToggle} = props;
-  const quayAuth = useRecoilValue(AuthState);
-
-  const [organizationName, setOrganizationName] = React.useState('');
-  const [organizationEmail, setOrganizationEmail] = React.useState('');
-  const [repoCount, setRepoCount] = React.useState(0);
-  const [repoCost, setRepoCost] = React.useState(0);
+  const [organizationName, setOrganizationName] = useState('');
+  const [organizationEmail, setOrganizationEmail] = useState('');
+  const [repoCount, setRepoCount] = useState(0);
+  const [repoCost, setRepoCost] = useState(0);
+  const [, setUserState] = useRecoilState(UserState);
+  const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
 
   const reposWithCost = [
     {value: 0, label: '0', cost: 0},
@@ -64,7 +65,7 @@ export const CreateOrganizationModal = (
     {
       PLAN: 'Open Source',
       'PRIVATE REPOSITORIES': 5,
-      PRICE: '$0',
+      PRICE: '$15',
     },
     {
       PLAN: 'Micro',
@@ -74,37 +75,42 @@ export const CreateOrganizationModal = (
     {
       PLAN: 'Small',
       'PRIVATE REPOSITORIES': 20,
-      PRICE: '$50',
+      PRICE: '$60',
     },
     {
       PLAN: 'Medium',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$100',
+      'PRIVATE REPOSITORIES': 50,
+      PRICE: '$125',
     },
     {
       PLAN: 'Large',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$0',
+      'PRIVATE REPOSITORIES': 125,
+      PRICE: '$250',
     },
     {
       PLAN: 'Extra Large',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$0',
+      'PRIVATE REPOSITORIES': 250,
+      PRICE: '$450',
     },
     {
       PLAN: 'XXL',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$0',
+      'PRIVATE REPOSITORIES': 500,
+      PRICE: '$850',
     },
     {
       PLAN: 'XXXL',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$0',
+      'PRIVATE REPOSITORIES': 1000,
+      PRICE: '$1600',
     },
     {
       PLAN: 'XXXXL',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$0',
+      'PRIVATE REPOSITORIES': 2000,
+      PRICE: '$3100',
+    },
+    {
+      PLAN: 'XXXXXL',
+      'PRIVATE REPOSITORIES': 15000,
+      PRICE: '$217000',
     },
   ];
 
@@ -136,27 +142,42 @@ export const CreateOrganizationModal = (
   };
 
   const createOrganizationHandler = async () => {
-    try {
-      return await createOrg(organizationName, organizationEmail);
-    } catch (e) {
-      console.error('error creating org', e);
+    const response = await createOrg(organizationName, organizationEmail);
+    props.handleModalToggle();
+    if (response === 'Created') {
+      const user = await getUser();
+      setUserState(user);
+    }
+  };
+
+  const onInputBlur = () => {
+    if (organizationEmail.length !== 0) {
+      isValidEmail(organizationEmail)
+        ? setInvalidEmailFlag(false)
+        : setInvalidEmailFlag(true);
+    } else {
+      return;
     }
   };
 
   return (
     <Modal
       title="Create Organization"
-      variant={ModalVariant.medium}
-      isOpen={isModalOpen}
-      onClose={handleModalToggle}
+      variant={ModalVariant.large}
+      isOpen={props.isModalOpen}
+      onClose={props.handleModalToggle}
       actions={[
         <Button
           key="confirm"
           variant="primary"
           onClick={createOrganizationHandler}
           form="modal-with-form-form"
+          isDisabled={invalidEmailFlag || !organizationName}
         >
-          Create Organization
+          Create
+        </Button>,
+        <Button key="cancel" variant="link" onClick={props.handleModalToggle}>
+          Cancel
         </Button>,
       ]}
     >
@@ -167,7 +188,6 @@ export const CreateOrganizationModal = (
           isRequired
           fieldId="modal-with-form-form-name"
           helperText="This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long"
-          // className='text-input-width'
         >
           <TextInput
             isRequired
@@ -175,23 +195,23 @@ export const CreateOrganizationModal = (
             id="modal-with-form-form-name"
             value={organizationName}
             onChange={handleNameInputChange}
-            // ref={nameInputRef}
           />
         </FormGroup>
         <FormGroup
           label="Organization Email"
-          isRequired
           fieldId="modal-with-form-form-email"
           helperText="This address must be different from your account's email"
-          // className='text-input-width'
+          helperTextInvalid={'Enter a valid email: email@provider.com'}
+          validated={invalidEmailFlag ? 'error' : 'default'}
         >
           <TextInput
-            isRequired
             type="email"
             id="modal-with-form-form-name"
             name="modal-with-form-form-name"
             value={organizationEmail}
             onChange={handleEmailInputChange}
+            validated={invalidEmailFlag ? 'error' : 'default'}
+            onBlur={onInputBlur}
           />
         </FormGroup>
         <br />
@@ -209,7 +229,7 @@ export const CreateOrganizationModal = (
             headerContent={<div>Organization Plans</div>}
             bodyContent={orgPlansPopOver}
           >
-            <i className="fas fa-info-circle"></i>
+            <i className="fas fa-question-circle"></i>
           </Popover>
         </Text>
         <Slider
@@ -218,6 +238,7 @@ export const CreateOrganizationModal = (
           customSteps={reposWithCost}
           max={reposWithCost.length - 1}
           onChange={handleRepoCountChange}
+          min={0}
         />
       </FormGroup>
     </Modal>

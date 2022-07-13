@@ -24,3 +24,8 @@ export function formatDate(date: string | number) {
     dateStyle: 'medium',
   });
 }
+
+export function isValidEmail(email: string): boolean {
+  const regex = /\S+@\S+\.\S+/;
+  return regex.test(email);
+}

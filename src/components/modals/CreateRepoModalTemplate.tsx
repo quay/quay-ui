@@ -13,7 +13,7 @@ import {
   Alert,
   Divider,
 } from '@patternfly/react-core';
-import {useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
 import {
   createNewRepository,
@@ -21,7 +21,7 @@ import {
 } from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
 import {AxiosResponse} from 'axios';
-import {RepositoryListProps} from 'src/routes/RepositoriesList/RepositoriesList';
+import {getUser} from 'src/resources/UserResource';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -31,19 +31,19 @@ enum visibilityType {
 export const CreateRepositoryModalTemplate = (
   props: CreateRepositoryModalTemplateProps,
 ): JSX.Element => {
-  const {isModalOpen, handleModalToggle, orgNameProp, updateListHandler} =
-    props;
-
   const userOrgs = useRecoilValue(UserOrgs);
+  const [, setUserState] = useRecoilState(UserState);
+
+  const [currentOrganization, setCurrentOrganization] = useState({
+    // For org scoped view, the name is set current org and for Repository list view,
+    // the name is set to 1st value from the Namespace dropdown
+    name: props.orgName !== null ? props.orgName : userOrgs[0].name,
+    isDropdownOpen: false,
+  });
 
   const [newRepository, setNewRepository] = useState({
     name: '',
     description: '',
-  });
-
-  const [currentOrganization, setCurrentOrganization] = useState({
-    name: orgNameProp !== null ? orgNameProp : null,
-    isDropdownOpen: false,
   });
 
   const [repoVisibility, setrepoVisibility] = useState(visibilityType.PUBLIC);
@@ -62,7 +62,7 @@ export const CreateRepositoryModalTemplate = (
   // see PROJQUAY-3900 comment for details
 
   const createRepositoryHandler = async () => {
-    handleModalToggle();
+    props.handleModalToggle();
     let visibility;
     repoVisibility === visibilityType.PUBLIC
       ? (visibility = 'public')
@@ -78,20 +78,8 @@ export const CreateRepositoryModalTemplate = (
       );
     // update the repository list once the creation is succesful
     if (repoCreationResponse.status === 201) {
-      updateListHandler({
-        name: repoCreationResponse.data.name,
-        namespace: repoCreationResponse.data.namespace,
-        path:
-          repoCreationResponse.data.namespace +
-          '/' +
-          repoCreationResponse.data.name,
-        isPublic: visibility,
-        tags: 1,
-        size: '1.1GB',
-        pulls: 108,
-        lastPull: 'TBA',
-        lastModified: 'TBA',
-      });
+      const user = await getUser();
+      setUserState(user);
     }
   };
 
@@ -117,8 +105,8 @@ export const CreateRepositoryModalTemplate = (
     <Modal
       title="Create repository"
       variant={ModalVariant.large}
-      isOpen={isModalOpen}
-      onClose={handleModalToggle}
+      isOpen={props.isModalOpen}
+      onClose={props.handleModalToggle}
       actions={[
         <Button
           key="confirm"
@@ -128,7 +116,7 @@ export const CreateRepositoryModalTemplate = (
         >
           Create
         </Button>,
-        <Button key="cancel" variant="link" onClick={handleModalToggle}>
+        <Button key="cancel" variant="link" onClick={props.handleModalToggle}>
           Cancel
         </Button>,
       ]}
@@ -152,7 +140,7 @@ export const CreateRepositoryModalTemplate = (
               onSelect={handleNamespaceSelection}
               isOpen={currentOrganization.isDropdownOpen}
               width="200px"
-              isDisabled={orgNameProp !== null}
+              isDisabled={props.orgName !== null}
               selections={currentOrganization.name}
             >
               {userOrgs.map((orgs, idx) => (
@@ -224,6 +212,5 @@ export const CreateRepositoryModalTemplate = (
 type CreateRepositoryModalTemplateProps = {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
-  orgNameProp?: string;
-  updateListHandler: (value: RepositoryListProps) => void;
+  orgName?: string;
 };
