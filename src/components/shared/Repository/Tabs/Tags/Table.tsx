@@ -198,7 +198,7 @@ export default function Table(props: TableProps) {
                 </Td>
                 <Td dataLabel={columnNames.OS}>os-mock</Td>
                 <Td dataLabel={columnNames.Security}>
-                  {typeof tag.manifest_list != 'undefined' ? (
+                  {tag.is_manifest_list ? (
                     'See Child Manifest'
                   ) : (
                     <SecurityDetails
@@ -209,7 +209,7 @@ export default function Table(props: TableProps) {
                   )}
                 </Td>
                 <Td dataLabel={columnNames.Size}>
-                  {typeof tag.manifest_list != 'undefined' ? 'N/A' : tag.size}
+                  {tag.is_manifest_list ? 'N/A' : tag.size}
                 </Td>
                 <Td dataLabel={columnNames.LastModified}>
                   {tag.last_modified}
@@ -240,7 +240,18 @@ export default function Table(props: TableProps) {
                             noPadding={childHasNoPadding}
                             colSpan={archColspan}
                           >
-                            <ExpandableRowContent>{`${manifest.platform.os} on ${manifest.platform.architecture}`}</ExpandableRowContent>
+                            <ExpandableRowContent>
+                              <Link
+                                to={getTagDetailPath(
+                                  props.organization,
+                                  props.repository,
+                                  tag.name,
+                                  manifest.platform.architecture,
+                                )}
+                              >
+                                {`${manifest.platform.os} on ${manifest.platform.architecture}`}
+                              </Link>
+                            </ExpandableRowContent>
                           </Td>
                         ) : (
                           <Td />

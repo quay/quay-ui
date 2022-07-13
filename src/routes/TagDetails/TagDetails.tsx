@@ -7,7 +7,7 @@ import {
   Title,
   PageBreadcrumb,
 } from '@patternfly/react-core';
-import {useLocation} from 'react-router-dom';
+import {useSearchParams, useLocation} from 'react-router-dom';
 import {useState, useEffect} from 'react';
 import TagArchSelect from './TagDetailsArchSelect';
 import TagTabs from './TagDetailsTabs';
@@ -21,6 +21,7 @@ import {
 } from 'src/resources/TagResource';
 
 export default function TagDetails() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [architecture, setArchitecture] = useState<string>();
   const [tagDetails, setTagDetails] = useState<Tag>({
     name: '',
@@ -71,7 +72,9 @@ export default function TagDetails() {
 
         setTagDetails(tagResp);
         if (archs.length > 0) {
-          setArchitecture(archs[0]);
+          setArchitecture(
+            searchParams.get('arch') ? searchParams.get('arch') : archs[0],
+          );
         }
       } catch (error: any) {
         // TODO: provide sufficient error handling, will be resolved in a future PR

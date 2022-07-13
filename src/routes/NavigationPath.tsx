@@ -18,11 +18,19 @@ export enum NavigationPath {
   tagDetail = '/organizations/:organizationName/:repoName/:tagName',
 }
 
-export function getTagDetailPath(org: string, repo: string, tag: string) {
+export function getTagDetailPath(
+  org: string,
+  repo: string,
+  tag: string,
+  arch = null,
+) {
   let tagPath = NavigationPath.tagDetail.toString();
   tagPath = tagPath.replace(':organizationName', org);
   tagPath = tagPath.replace(':repoName', repo);
   tagPath = tagPath.replace(':tagName', tag);
+  if (arch) {
+    tagPath = tagPath + `?arch=${arch}`;
+  }
   return tagPath;
 }
 
