@@ -168,13 +168,14 @@ export default function OrganizationsList() {
   }, [userOrgs]);
 
   const onDelete = async () => {
-    console.log('Delete clicked');
-    const x = selectedOrganization?.forEach(async (nsToBeDeleted) => {
+    selectedOrganization?.forEach(async (nsToBeDeleted) => {
       try {
-        await deleteOrg(nsToBeDeleted);
-        setOrganizationsList((prev) =>
-          prev.filter((ns) => ns.name !== nsToBeDeleted),
-        );
+        const responseCode = await deleteOrg(nsToBeDeleted);
+        if (responseCode === 204) {
+          setOrganizationsList((prev) =>
+            prev.filter((ns) => ns.name !== nsToBeDeleted),
+          );
+        }
       } catch (e) {
         console.error(e);
       }

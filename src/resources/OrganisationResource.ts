@@ -20,6 +20,7 @@ export async function deleteOrg(orgname: string) {
   const deleteApiUrl = `/api/v1/organization/${orgname}`;
   try {
     const response = await axios.delete(deleteApiUrl);
+    return response.status;
   } catch (e) {
     console.error(e);
   }
