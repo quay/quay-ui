@@ -43,7 +43,7 @@ export function SecurityReportFilter() {
           placeholder="Filter Vulnerabilities..."
           value={searchTerm}
           onChange={onSearchTermChanged}
-          onClear={(evt) => console.log(evt)}
+          onClear={(evt) => onSearchTermChanged('')}
         />
       </FlexItem>
       <FlexItem>
