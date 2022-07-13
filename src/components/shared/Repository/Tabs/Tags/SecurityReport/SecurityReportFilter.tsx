@@ -20,7 +20,7 @@ export function SecurityReportFilter() {
     return vulnList.filter((item: VulnerabilityListItem) => {
       const searchStr = item.PackageName + item.Advisory;
       return (
-        searchStr.includes(searchTerm) &&
+        searchStr.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (!fixedOnlyChecked || item.FixedInVersion)
       );
     });

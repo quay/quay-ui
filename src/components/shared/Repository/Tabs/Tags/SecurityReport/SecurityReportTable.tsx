@@ -37,6 +37,15 @@ const columnNames = {
   fixedInVersion: 'Fixed in Version',
 };
 
+function getVulnerabilityLink(vulnerability: VulnerabilityListItem) {
+  if (!vulnerability.Link) {
+    return '';
+  }
+
+  // by default return the first link
+  return vulnerability.Link.split(' ')[0];
+}
+
 function TableTitle() {
   return <Title headingLevel={'h1'}> Vulnerabilities </Title>;
 }
@@ -97,6 +106,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
           Severity: vulnerability.Severity,
           FixedInVersion: vulnerability.FixedBy,
           Metadata: vulnerability.Metadata,
+          Link: vulnerability.Link,
         } as VulnerabilityListItem);
       });
     });
@@ -132,10 +142,15 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
                     <Td dataLabel={columnNames.advisory}>
                       <>
                         {vulnerability.Advisory}
-                        <ExternalLinkAltIcon
-                          color={'blue'}
-                          style={{marginLeft: '5px'}}
-                        />
+                        {vulnerability.Link ? (
+                          <a
+                            href={getVulnerabilityLink(vulnerability)}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <ExternalLinkAltIcon style={{marginLeft: '5px'}} />
+                          </a>
+                        ) : null}
                       </>
                     </Td>
                     <Td dataLabel={columnNames.severity}>
@@ -160,7 +175,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
                             color={'green'}
                             style={{marginRight: '5px'}}
                           />
-                          {vulnerability.FixedInVersion}
+                          <span>{vulnerability.FixedInVersion}</span>
                         </>
                       ) : (
                         '(None)'
