@@ -95,7 +95,9 @@ test('Render simple tag', async () => {
     {
       testId: 'creation',
       name: 'Creation',
-      value: mockTag.start_ts,
+      value: new Date(mockTag.start_ts).toLocaleString('en-US', {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }),
     },
     {
       testId: 'repository',
@@ -213,7 +215,9 @@ test('Render manifest list tag', async () => {
     {
       testId: 'creation',
       name: 'Creation',
-      value: mockTag.start_ts,
+      value: new Date(mockTag.start_ts).toLocaleString('en-US', {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      }),
     },
     {
       testId: 'repository',

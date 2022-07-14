@@ -29,7 +29,9 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="creation">
             <DescriptionListTerm>Creation</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.tag.start_ts}
+              {new Date(props.tag.start_ts).toLocaleString('en-US', {
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              })}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="repository">
