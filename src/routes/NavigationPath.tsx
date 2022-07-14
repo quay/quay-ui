@@ -22,9 +22,6 @@ export enum NavigationPath {
 
   // Tag Detail
   tagDetail = '/organizations/:organizationName/:repoName/:tagName',
-
-  // security Detail
-  securityDetail = '/security_details',
 }
 
 export function getTagDetailPath(
@@ -69,7 +66,7 @@ const NavigationRoutes = [
     Component: <RepositoriesList />,
   },
   {
-    path: NavigationPath.securityDetail,
+    path: '/security_details',
     Component: <SecurityReport />,
   },
 ];

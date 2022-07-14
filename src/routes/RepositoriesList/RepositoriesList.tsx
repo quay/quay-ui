@@ -36,7 +36,7 @@ function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
 }
 
-export default function RepositoriesList(props) {
+export default function RepositoriesList() {
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = useState(false);
   const [isSelectDropDownOpen, setSelectDropDownOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
