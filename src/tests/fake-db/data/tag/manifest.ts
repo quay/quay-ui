@@ -27,16 +27,15 @@ const manifest = {
   ],
 };
 
-mock
-  .onGet(/api\/v1\/repository\/testorg\/testrepo\/manifest\/.+/)
-  .reply((request: AxiosRequestConfig) => {
-    const manifestResponse: ManifestByDigestResponse = {
-      digest: '',
-      manifest_data: '',
-      is_manifest_list: true,
-    };
-    const digest = request.baseURL.split('/').pop();
-    manifestResponse.digest = digest;
-    manifestResponse.manifest_data = JSON.stringify(manifest);
-    return [200, manifestResponse];
-  });
+const manifestPathRegex = new RegExp('/api/v1/repository/.+/.+/manifest/.+');
+mock.onGet(manifestPathRegex).reply((request: AxiosRequestConfig) => {
+  const manifestResponse: ManifestByDigestResponse = {
+    digest: '',
+    manifest_data: '',
+    is_manifest_list: true,
+  };
+  const digest = request.baseURL.split('/').pop();
+  manifestResponse.digest = digest;
+  manifestResponse.manifest_data = JSON.stringify(manifest);
+  return [200, manifestResponse];
+});

@@ -30,38 +30,36 @@ const manifestListTag: Tag = {
   },
 };
 
-mock
-  .onGet(
-    /api\/v1\/repository\/testorg\/testrepo\/tag\/\?limit=100&page=1&onlyActiveTags=true&specificTag=.+/,
-  )
-  .reply((request: AxiosRequestConfig) => {
-    const tagResponse: TagsResponse = {
-      page: 1,
-      has_additional: false,
-      tags: [],
-    };
-    const searchParams = new URLSearchParams(request.url);
-    switch (searchParams.get('specificTag')) {
-      case 'testtag':
-        tagResponse.tags.push(testTag);
-        break;
-      case 'manifestlist':
-        tagResponse.tags.push(manifestListTag);
-    }
-    return [200, tagResponse];
-  });
+const specificTagPathRegex = new RegExp(
+  `/api/v1/repository/.+/.+/tag/?.+&specificTag=.+`,
+);
+mock.onGet(specificTagPathRegex).reply((request: AxiosRequestConfig) => {
+  const tagResponse: TagsResponse = {
+    page: 1,
+    has_additional: false,
+    tags: [],
+  };
+  const searchParams = new URLSearchParams(request.url);
+  switch (searchParams.get('specificTag')) {
+    case 'testtag':
+      tagResponse.tags.push(testTag);
+      break;
+    case 'manifestlist':
+      tagResponse.tags.push(manifestListTag);
+  }
+  return [200, tagResponse];
+});
 
-mock
-  .onGet(
-    '/api/v1/repository/testorg/testrepo/tag/?limit=100&page=1&onlyActiveTags=true',
-  )
-  .reply(() => {
-    const tagResponse: TagsResponse = {
-      page: 1,
-      has_additional: false,
-      tags: [],
-    };
-    tagResponse.tags.push(testTag);
-    tagResponse.tags.push(manifestListTag);
-    return [200, tagResponse];
-  });
+const tagPathRegex = new RegExp(
+  `/api/v1/repository/.+/.+/tag/?.+onlyActiveTags=true$`,
+);
+mock.onGet(tagPathRegex).reply(() => {
+  const tagResponse: TagsResponse = {
+    page: 1,
+    has_additional: false,
+    tags: [],
+  };
+  tagResponse.tags.push(testTag);
+  tagResponse.tags.push(manifestListTag);
+  return [200, tagResponse];
+});
