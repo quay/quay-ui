@@ -3,6 +3,7 @@ import {render, screen, fireEvent} from '@testing-library/react';
 import {RecoilRoot} from 'recoil';
 import {mocked} from 'ts-jest/utils';
 import {Tag, TagsResponse, getTags, deleteTag} from 'src/resources/TagResource';
+import {MemoryRouter} from 'react-router-dom';
 
 jest.mock('src/resources/TagResource', () => ({
   getTags: jest.fn(),
@@ -39,6 +40,7 @@ test('Tags should render', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   const message = await screen.findByText('This repository is empty.');
   expect(message).toBeTruthy();
@@ -52,6 +54,7 @@ test('Tags should appear in list', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   const message = await screen.findByText('latest');
   expect(message).toBeTruthy();
@@ -68,6 +71,7 @@ test('Filter search should return matching list', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   expect(await screen.findByText('latest')).toBeTruthy();
   expect(await screen.findByText('slim')).toBeTruthy();
@@ -89,6 +93,7 @@ test('Updating per page should update table content', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   const initialRows = await screen.findAllByTestId('table-entry');
   expect(initialRows.length).toBe(25);
@@ -117,6 +122,7 @@ test('Updating page should update table content', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   const initialRows = await screen.findAllByTestId('table-entry');
   expect(initialRows.length).toBe(25);
@@ -137,6 +143,7 @@ test('Copy modal should show org and repo', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   expect(await screen.findByText(tag.name)).toBeTruthy();
   fireEvent(
@@ -163,6 +170,7 @@ test('Delete a single tag', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   expect(await screen.findByText(tag.name)).toBeTruthy();
   const rowSelect = screen.getByLabelText('Select row 0', {selector: 'input'});
@@ -204,6 +212,7 @@ test('Delete a multiple tags', async () => {
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   expect(await screen.findByText('latest')).toBeTruthy();
   expect(await screen.findByText('slim')).toBeTruthy();

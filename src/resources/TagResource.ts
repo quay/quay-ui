@@ -105,11 +105,14 @@ export async function getTags(
   repo: string,
   page: number,
   limit = 100,
+  specificTag = null,
 ) {
   try {
-    const response: AxiosResponse<TagsResponse> = await axios.get(
-      `/api/v1/repository/${org}/${repo}/tag/?limit=${limit}&page=${page}&onlyActiveTags=true`,
-    );
+    let path = `/api/v1/repository/${org}/${repo}/tag/?limit=${limit}&page=${page}&onlyActiveTags=true`;
+    if (specificTag) {
+      path = path.concat(`&specificTag=${specificTag}`);
+    }
+    const response: AxiosResponse<TagsResponse> = await axios.get(path);
     return response.data;
   } catch (error: any) {
     throw new Error(`API error getting tags ${error.message}`);
