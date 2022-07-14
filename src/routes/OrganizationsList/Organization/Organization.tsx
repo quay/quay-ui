@@ -41,24 +41,9 @@ export default function Organization() {
     },
   ];
 
-  const PageBreadcrumbs = [
-    {
-      title: 'Organizations',
-      id: 'organization-breadcrumb',
-      to: NavigationPath.organizationsList,
-      active: false,
-    },
-    {
-      title: repositoryName,
-      id: 'repo-breadcrumb',
-      to: window.location.pathname,
-      active: true,
-    },
-  ];
-
   return (
     <Page>
-      <QuayBreadcrumb breadcrumbItems={PageBreadcrumbs} />
+      <QuayBreadcrumb />
       <PageSection variant={PageSectionVariants.light}>
         <Title data-testid="repo-title" headingLevel="h1">
           {repositoryName}
