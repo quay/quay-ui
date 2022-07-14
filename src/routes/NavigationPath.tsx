@@ -1,3 +1,4 @@
+import {SecurityReport} from 'src/components/shared/Repository/Tabs/Tags/SecurityReport/SecurityReport';
 import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
 import Organization from './OrganizationsList/Organization/Organization';
 import TagsList from 'src/components/shared/Repository/TagsList';
@@ -21,6 +22,9 @@ export enum NavigationPath {
 
   // Tag Detail
   tagDetail = '/organizations/:organizationName/:repoName/:tagName',
+
+  // security Detail
+  securityDetail = '/security_details',
 }
 
 export function getTagDetailPath(
@@ -63,6 +67,10 @@ const NavigationRoutes = [
   {
     path: NavigationPath.repositoriesList,
     Component: <RepositoriesList />,
+  },
+  {
+    path: NavigationPath.securityDetail,
+    Component: <SecurityReport />,
   },
 ];
 export {NavigationRoutes};
