@@ -9,6 +9,7 @@ import {QuaySidebar} from 'src/components/sidebar/QuaySidebar';
 import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
+import {SecurityReport} from 'src/components/shared/Repository/Tabs/Tags/SecurityReport/SecurityReport';
 import Organization from './OrganizationsList/Organization/Organization';
 import {NavigationPath} from './NavigationPath';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
@@ -50,6 +51,7 @@ export function StandaloneMain() {
           path={NavigationPath.repositoriesList}
           element={<RepositoriesList />}
         />
+        <Route path={'/security_details'} element={<SecurityReport />} />
       </Routes>
       <Outlet />
     </Page>

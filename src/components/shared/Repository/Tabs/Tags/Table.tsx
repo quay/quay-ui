@@ -16,7 +16,7 @@ import {
 } from '@patternfly/react-core';
 import {useState} from 'react';
 import {Tag} from 'src/resources/TagResource';
-import SecurityDetails from './SecurityDetails';
+import SecurityReportTable from './SecurityReport/SecurityReportTable';
 import {selectedTagsState} from 'src/atoms/TagListState';
 import {useRecoilState} from 'recoil';
 
@@ -190,11 +190,7 @@ export default function Table(props: TableProps) {
                   {typeof tag.manifest_list != 'undefined' ? (
                     'See Child Manifest'
                   ) : (
-                    <SecurityDetails
-                      org={props.organization}
-                      repo={props.repository}
-                      digest={tag.manifest_digest}
-                    />
+                    <SecurityReportTable features={[]} />
                   )}
                 </Td>
                 <Td dataLabel={columnNames.Size}>
@@ -240,10 +236,13 @@ export default function Table(props: TableProps) {
                           colSpan={securityColspan}
                         >
                           <ExpandableRowContent>
-                            <SecurityDetails
-                              org={props.organization}
-                              repo={props.repository}
-                              digest={manifest.digest}
+                            <SecurityReportTable
+                              features={tag.manifest_list.manifests
+                                .map(
+                                  (manifest) =>
+                                    manifest.security.data.Layer.Features,
+                                )
+                                .flat()}
                             />
                           </ExpandableRowContent>
                         </Td>

@@ -11,10 +11,6 @@ const csrfResponse = {
 
 mock.onPost('/api/v1/signin').reply((request: AxiosRequestConfig) => {
   const {username, password} = JSON.parse(request.data);
-
-  // eslint-disable-next-line no-console
-  console.log(`login request ${username}: ${password}`);
-
   return [200, response];
 });
 
