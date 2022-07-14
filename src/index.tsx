@@ -2,9 +2,9 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import '@patternfly/patternfly/patternfly.css';
 import {RecoilRoot} from 'recoil';
-// import { BrowserRouter } from "react-router-dom";
+import '@patternfly/patternfly/patternfly.css';
+import '@patternfly/patternfly/patternfly-addons.css';
 
 ReactDOM.render(
   <React.StrictMode>

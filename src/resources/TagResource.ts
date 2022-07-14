@@ -64,7 +64,40 @@ export interface Feature {
   NamespaceName: string;
   AddedBy: string;
   Version: string;
-  Vulnerabilities: any[];
+  Vulnerabilities?: Vulnerability[];
+}
+
+export interface Vulnerability {
+  Severity: VulnerabilitySeverity;
+  NamespaceName: string;
+  Link: string;
+  FixedBy: string;
+  Description: string;
+  Name: string;
+  Metadata: VulnerabilityMetadata;
+}
+
+export interface VulnerabilityMetadata {
+  UpdatedBy: string;
+  RepoName: string;
+  RepoLink: string;
+  DistroName: string;
+  DistroVersion: string;
+  NVD: {
+    CVSSv3: {
+      Vectors: string;
+      Score: number;
+    };
+  };
+}
+
+export enum VulnerabilitySeverity {
+  Critical = 'Critical',
+  High = 'High',
+  Medium = 'Medium',
+  Low = 'Low',
+  Negligible = 'Negligible',
+  Unknown = 'Unknown',
 }
 
 export async function getTags(
@@ -117,6 +150,7 @@ export async function getSecurityDetails(
     const response: AxiosResponse<SecurityDetailsResponse> = await axios.get(
       `/api/v1/repository/${org}/${repo}/manifest/${digest}/security?vulnerabilities=true`,
     );
+    console.log(response);
     return response.data;
   } catch (error: any) {
     throw new Error(`API error getting security details ${error.message}`);
