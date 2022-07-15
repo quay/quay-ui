@@ -9,9 +9,7 @@ import '@patternfly/patternfly/patternfly-addons.css';
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
-      {/* <BrowserRouter> */}
       <App />
-      {/* </BrowserRouter> */}
     </RecoilRoot>
   </React.StrictMode>,
   document.getElementById('root'),

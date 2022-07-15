@@ -9,6 +9,7 @@ import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
 import {NavigationRoutes} from './NavigationPath';
+import OrganizationsList from './OrganizationsList/OrganizationsList';
 
 export function StandaloneMain() {
   const [, setUserState] = useRecoilState(UserState);
@@ -26,6 +27,7 @@ export function StandaloneMain() {
       defaultManagedSidebarIsOpen={true}
     >
       <Routes>
+        <Route index element={<OrganizationsList />} />
         {NavigationRoutes.map(({path, Component}, key) => (
           <Route path={path} key={key} element={Component} />
         ))}
