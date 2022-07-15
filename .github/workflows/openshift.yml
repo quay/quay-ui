@@ -193,6 +193,10 @@ jobs:
         namespace: ${{ env.OPENSHIFT_NAMESPACE }}
         port: ${{ env.APP_PORT }}
 
+    - name: Create app route
+      id: create-route
+      run: oc apply -f ./deploy/quaydev-ui-route.yaml
+
     - name: Print application URL
       env:
         ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
