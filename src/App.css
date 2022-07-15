@@ -24,3 +24,8 @@ html, body, #root,  .App {
 .pf-c-page__sidebar-body {
     padding-top: 0;
 }
+
+.disabled-link {
+    pointer-events: none;
+    color: black;
+}

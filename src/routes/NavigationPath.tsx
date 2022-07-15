@@ -1,3 +1,9 @@
+import {SecurityReport} from 'src/components/shared/Repository/Tabs/Tags/SecurityReport/SecurityReport';
+import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
+import Organization from './OrganizationsList/Organization/Organization';
+import TagsList from 'src/components/shared/Repository/TagsList';
+import RepositoriesList from './RepositoriesList/RepositoriesList';
+
 export enum NavigationPath {
   // Side Nav
   home = '/',
@@ -37,3 +43,31 @@ export function getTagDetailPath(
 export function getDomain() {
   return process.env.REACT_APP_QUAY_DOMAIN || 'quay.io';
 }
+
+const NavigationRoutes = [
+  {
+    path: NavigationPath.organizationsList,
+    Component: <OrganizationsList />,
+  },
+  {
+    path: NavigationPath.organizationDetail,
+    Component: <Organization />,
+  },
+  {
+    path: NavigationPath.repositoryDetail,
+    Component: <TagsList />,
+  },
+  {
+    path: NavigationPath.repositoryDetailForOrg,
+    Component: <TagsList />,
+  },
+  {
+    path: NavigationPath.repositoriesList,
+    Component: <RepositoriesList />,
+  },
+  {
+    path: '/security_details',
+    Component: <SecurityReport />,
+  },
+];
+export {NavigationRoutes};

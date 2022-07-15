@@ -1,8 +1,5 @@
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Page,
-  PageBreadcrumb,
   PageSection,
   PageSectionVariants,
   Tab,
@@ -11,10 +8,11 @@ import {
   Title,
 } from '@patternfly/react-core';
 import {useLocation} from 'react-router-dom';
-import {NavigationPath} from '../../NavigationPath';
+import {NavigationPath} from 'src/routes/NavigationPath';
 import UsageLogsTab from './Tabs/UsageLogs/UsageLogsTab';
 import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
+import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 
 export default function Organization() {
   const location = useLocation();
@@ -45,19 +43,7 @@ export default function Organization() {
 
   return (
     <Page>
-      <PageBreadcrumb>
-        <Breadcrumb>
-          <BreadcrumbItem
-            data-testid="organization-breadcrumb"
-            to={NavigationPath.organizationsList}
-          >
-            Organizations
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="repo-breadcrumb" to="#" isActive>
-            {repositoryName}
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </PageBreadcrumb>
+      <QuayBreadcrumb />
       <PageSection variant={PageSectionVariants.light}>
         <Title data-testid="repo-title" headingLevel="h1">
           {repositoryName}
