@@ -1,0 +1,22 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    kubernetes.io/tls-acme: "true"
+  labels:
+    app: quay-ui
+  name: ui-quaydev-org
+  namespace: quay-ui
+spec:
+  host: ui.quaydev.org
+  port:
+    targetPort: 9000
+  to:
+    kind: Service
+    name: quay-ui
+    weight: 100
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
