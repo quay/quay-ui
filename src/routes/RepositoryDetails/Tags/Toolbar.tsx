@@ -7,7 +7,6 @@ import {
 } from '@patternfly/react-core';
 import {selectedTagsState} from 'src/atoms/TagListState';
 import {DeleteModal} from './DeleteModal';
-import {FilterByField} from './FilterByField';
 import {FilterByText} from './FilterByText';
 import {KebabDropdown} from './KebabDropdown';
 import {Pagination} from './Pagination';
@@ -28,20 +27,16 @@ export function Toolbar(props: ToolBarProps) {
       />
       <PatternFlyToolbar>
         <ToolbarContent>
-          <ToolbarItem spacer={{default: 'spacerNone'}}>
-            <FilterByField />
-          </ToolbarItem>
           <ToolbarItem>
             <FilterByText />
           </ToolbarItem>
-          {selectedTags.length > 0 ? (
-            <ToolbarItem>
-              <KebabDropdown
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-              />
-            </ToolbarItem>
-          ) : null}
+          <ToolbarItem>
+            <KebabDropdown
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+              isActive={selectedTags.length > 0}
+            />
+          </ToolbarItem>
           <ToolbarItem alignment={{default: 'alignRight'}}>
             <Pagination itemCount={props.tagCount} />
           </ToolbarItem>

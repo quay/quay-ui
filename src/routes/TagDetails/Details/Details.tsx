@@ -8,6 +8,7 @@ import {
   PageSectionVariants,
   ClipboardCopy,
 } from '@patternfly/react-core';
+import prettyBytes from 'pretty-bytes';
 import CopyTags from './DetailsCopyTags';
 import {Tag} from 'src/resources/TagResource';
 
@@ -43,7 +44,9 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="modified">
             <DescriptionListTerm>Modified</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.tag.last_modified}
+              {new Date(props.tag.last_modified).toLocaleString('en-US', {
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              })}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>
@@ -54,6 +57,7 @@ export default function Details(props: DetailsProps) {
                 isReadOnly
                 hoverTip="Copy"
                 clickTip="Copied"
+                variant="inline-compact"
               >
                 {props.digest}
               </ClipboardCopy>
@@ -62,7 +66,7 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="size">
             <DescriptionListTerm>Size</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.size}
+              {prettyBytes(props.size)}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="vulnerabilities">

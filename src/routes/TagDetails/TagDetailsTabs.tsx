@@ -1,10 +1,11 @@
 import {Tabs, Tab, TabTitleText} from '@patternfly/react-core';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import {useState} from 'react';
-import Details from './Details';
+import Details from './Details/Details';
+import SecurityReport from './SecurityReport/SecurityReport';
 import {Tag} from 'src/resources/TagResource';
 
-enum TabIndex {
+export enum TabIndex {
   Details = 'details',
   Layers = 'layers',
   SecurityReport = 'securityreport',
@@ -28,7 +29,6 @@ export default function TagTabs(props: TagTabsProps) {
   if (requestedTabIndex && requestedTabIndex !== activeTabKey) {
     setActiveTabKey(requestedTabIndex);
   }
-
   return (
     <Tabs
       activeKey={activeTabKey}
@@ -46,7 +46,17 @@ export default function TagTabs(props: TagTabsProps) {
           tag={props.tag}
           size={props.size}
           digest={props.digest}
-        ></Details>
+        />
+      </Tab>
+      <Tab
+        eventKey={TabIndex.SecurityReport}
+        title={<TabTitleText>Security Report</TabTitleText>}
+      >
+        <SecurityReport
+          org={props.org}
+          repo={props.repo}
+          digest={props.digest}
+        />
       </Tab>
     </Tabs>
   );

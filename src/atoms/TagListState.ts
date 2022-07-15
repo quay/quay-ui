@@ -17,3 +17,8 @@ export const selectedTagsState = atom({
   key: 'selectedTagsState',
   default: [],
 });
+
+export const currentOpenPopoverState = atom({
+  key: 'currentOpenPopoverState',
+  default: '',
+});

@@ -1,7 +1,7 @@
 import {mock} from '../../MockAxios';
 
 const securityUrl =
-  /\/api\/v1\/repository\/\w+\/\w+\/manifest\/\w+\/security.*/;
+  /api\/v1\/repository\/.+\/.+\/manifest\/.+\/security\?vulnerabilities=true/;
 
 const mockSecurityResponse = {
   status: 'scanned',

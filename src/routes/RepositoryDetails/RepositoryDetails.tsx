@@ -7,8 +7,8 @@ import {
   Tab,
   TabTitleText,
 } from '@patternfly/react-core';
-import Tags from './Tabs/Tags/Tags';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
+import Tags from './Tags/Tags';
 import {useLocation, useSearchParams, useNavigate} from 'react-router-dom';
 import {useState} from 'react';
 
@@ -28,7 +28,7 @@ function getTabIndex(tab: string) {
   }
 }
 
-export default function TagsList() {
+export default function RepositoryDetails(props) {
   const [activeTabKey, setActiveTabKey] = useState(TabIndex.Tags);
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,6 +63,10 @@ export default function TagsList() {
           >
             <Tags organization={organization} repository={repository} />
           </Tab>
+          {/* 
+          
+          TODO: Implement future tabs
+          
           <Tab
             eventKey={TabIndex.Information}
             title={<TabTitleText>Information</TabTitleText>}
@@ -92,7 +96,7 @@ export default function TagsList() {
             title={<TabTitleText>Settings</TabTitleText>}
           >
             <div>Settings tab work in progress</div>
-          </Tab>
+          </Tab> */}
         </Tabs>
       </PageSection>
     </Page>

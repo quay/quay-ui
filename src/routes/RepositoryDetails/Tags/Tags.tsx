@@ -11,14 +11,14 @@ import {
   ManifestByDigestResponse,
 } from 'src/resources/TagResource';
 
-const mockTags: Tag[] = [];
-
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const filter = useRecoilValue(filterState);
   const pagination = useRecoilValue(paginationState);
+
   const filteredTags: Tag[] =
     filter !== '' ? tags.filter((tag) => tag.name.includes(filter)) : tags;
+
   const paginatedTags: Tag[] = filteredTags.slice(
     (pagination.page - 1) * pagination.perPage,
     pagination.page * pagination.perPage,
@@ -62,23 +62,6 @@ export default function Tags(props: TagsProps) {
   };
 
   useEffect(() => {
-    // TESTING: Automatically populates list with mock tags to test filter and pagination
-    // let tagNames = ["latest","slim","alpine"]
-    // for(let i=1;i<=40;i++){
-    //     let tag = {
-    //         name: tagNames[i % 3]+`${i}`,
-    //         is_manifest_list: true,
-    //         last_modified: "Thu, 02 Jun 2022 19:12:32 -0000",
-    //         size: i,
-    //         manifest_digest: 'sha256:fd0922d',
-    //         reversion: false,
-    //         start_ts: 1654197152,
-    //         security: "Passed",
-    //         manifest_list: null
-    //     }
-    //     mockTags.push(tag)
-    // }
-    // setTags(mockTags);
     loadTags();
   }, []);
 

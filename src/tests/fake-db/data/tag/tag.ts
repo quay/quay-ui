@@ -11,7 +11,7 @@ const testTag: Tag = {
     'sha256:ad6562704f3759fb50f0d3de5f80a38f65a85e709b77fd24491253990f30b6be',
   reversion: false,
   start_ts: 1654197152,
-  manifest_list: null,
+  manifest_list: undefined,
 };
 
 const manifestListTag: Tag = {

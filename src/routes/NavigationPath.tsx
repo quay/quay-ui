@@ -1,8 +1,8 @@
-import {SecurityReport} from 'src/components/shared/Repository/Tabs/Tags/SecurityReport/SecurityReport';
 import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
 import Organization from './OrganizationsList/Organization/Organization';
-import TagsList from 'src/components/shared/Repository/TagsList';
+import RepositoryDetails from 'src/routes/RepositoryDetails/RepositoryDetails';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
+import TagDetails from 'src/routes/TagDetails/TagDetails';
 
 export enum NavigationPath {
   // Side Nav
@@ -28,14 +28,18 @@ export function getTagDetailPath(
   org: string,
   repo: string,
   tag: string,
-  arch = null,
+  queryParams: Map<string, string> = null,
 ) {
   let tagPath = NavigationPath.tagDetail.toString();
   tagPath = tagPath.replace(':organizationName', org);
   tagPath = tagPath.replace(':repoName', repo);
   tagPath = tagPath.replace(':tagName', tag);
-  if (arch) {
-    tagPath = tagPath + `?arch=${arch}`;
+  if (queryParams) {
+    const params = [];
+    for (const entry of Array.from(queryParams.entries())) {
+      params.push(entry[0] + '=' + entry[1]);
+    }
+    tagPath = tagPath + '?' + params.join('&');
   }
   return tagPath;
 }
@@ -55,19 +59,19 @@ const NavigationRoutes = [
   },
   {
     path: NavigationPath.repositoryDetail,
-    Component: <TagsList />,
+    Component: <RepositoryDetails />,
   },
   {
     path: NavigationPath.repositoryDetailForOrg,
-    Component: <TagsList />,
+    Component: <RepositoryDetails />,
   },
   {
     path: NavigationPath.repositoriesList,
     Component: <RepositoriesList />,
   },
   {
-    path: '/security_details',
-    Component: <SecurityReport />,
+    path: NavigationPath.tagDetail,
+    Component: <TagDetails />,
   },
 ];
 export {NavigationRoutes};
