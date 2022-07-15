@@ -1,7 +1,7 @@
 import {useEffect} from 'react';
 import {Page} from '@patternfly/react-core';
 
-import {Outlet, Route, Routes} from 'react-router-dom';
+import {Navigate, Outlet, Route, Routes} from 'react-router-dom';
 
 import {QuayHeader} from 'src/components/header/QuayHeader';
 import {QuaySidebar} from 'src/components/sidebar/QuaySidebar';
@@ -27,7 +27,7 @@ export function StandaloneMain() {
       defaultManagedSidebarIsOpen={true}
     >
       <Routes>
-        <Route index element={<OrganizationsList />} />
+        <Route index element={<Navigate to="/organizations" replace />} />
         {NavigationRoutes.map(({path, Component}, key) => (
           <Route path={path} key={key} element={Component} />
         ))}
