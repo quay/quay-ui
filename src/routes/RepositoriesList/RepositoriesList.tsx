@@ -386,7 +386,15 @@ export default function RepositoriesList() {
                   }}
                 />
                 <Td dataLabel={columnNames.repoName}>
-                  <Link to={repo.name}>{repo.name}</Link>
+                  {currentOrg == null ? (
+                    <Link to={`${repo.namespace}/${repo.name}`}>
+                      {repo.namespace}/{repo.name}
+                    </Link>
+                  ) : (
+                    <Link to={`${repo.namespace}/${repo.name}`}>
+                      {repo.name}
+                    </Link>
+                  )}
                 </Td>
                 <Td dataLabel={columnNames.visibility}>
                   {' '}
