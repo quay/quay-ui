@@ -24,13 +24,18 @@ import {
 } from '@patternfly/react-table';
 import {useRecoilState, useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
-import {repositoryListState} from 'src/atoms/RepositoryState';
-import {fetchAllRepos} from 'src/resources/RepositoryResource';
+import {
+  bulkDeleteRepositories,
+  fetchAllRepos,
+  IRepository,
+} from 'src/resources/RepositoryResource';
 import {DeleteRepositoryModal} from './DeleteRepositoryModal';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
+import {selectedReposState} from 'src/atoms/RepositoryState';
+import {AxiosResponse} from 'axios';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -42,38 +47,40 @@ export default function RepositoriesList() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
-  const [repositoryList, setRepositoryList] =
-    useRecoilState(repositoryListState);
+  const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
 
-  const isRepoSelectable = (repo: Repository) => repo.name !== ''; // Arbitrary logic for this example
+  const [selectedRepoNames, setSelectedRepoNames] =
+    useRecoilState(selectedReposState);
+  const isRepoSelectable = (repo: IRepository) => repo.name !== ''; // Arbitrary logic for this example
   const selectableRepos = repositoryList.filter(isRepoSelectable);
-  const [selectedRepoNames, setSelectedRepoNames] = useState<string[]>([]);
-
-  const setRepoSelected = (repo: Repository, isSelecting = true) =>
-    setSelectedRepoNames((prevSelected) => {
-      const otherSelectedRepoNames = prevSelected.filter(
-        (r) => r !== repo.path,
-      );
-      return isSelecting && isRepoSelectable(repo)
-        ? [...otherSelectedRepoNames, repo.path]
-        : otherSelectedRepoNames;
-    });
 
   const selectAllRepos = (isSelecting = true) =>
-    setSelectedRepoNames(isSelecting ? selectableRepos.map((r) => r.path) : []);
+    setSelectedRepoNames(
+      isSelecting ? selectableRepos.map((r) => r.namespace + '/' + r.name) : [],
+    );
+
+  const setRepoSelected = (repo: IRepository, isSelecting = true) =>
+    setSelectedRepoNames((prevSelected) => {
+      const otherSelectedRepoNames = prevSelected.filter(
+        (r) => r !== r.namespace + '/' + r.name,
+      );
+      return isSelecting && isRepoSelectable(repo)
+        ? [...otherSelectedRepoNames, repo.namespace + '/' + repo.name]
+        : otherSelectedRepoNames;
+    });
 
   const areAllReposSelected =
     selectedRepoNames.length === selectableRepos.length;
 
-  const isRepoSelected = (repo: Repository) =>
-    selectedRepoNames.includes(repo.path);
+  const isRepoSelected = (repo: IRepository) =>
+    selectedRepoNames.includes(repo.namespace + '/' + repo.name);
 
   const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
     number | null
   >(null);
 
   const onSelectRepo = (
-    repo: Repository,
+    repo: IRepository,
     rowIndex: number,
     isSelecting: boolean,
   ) => {
@@ -114,15 +121,19 @@ export default function RepositoriesList() {
   const currentOrg = getReponameFromURL(useLocation().pathname);
 
   const handleDeleteModalToggle = () => {
+    setKebabOpen(!isKebabOpen);
     setDeleteKebabOption((prevState) => ({
       isModalOpen: !prevState.isModalOpen,
     }));
   };
 
-  const handleRepoDeletion = () => {
-    setKebabOpen(!isKebabOpen);
-    handleDeleteModalToggle();
-    // TODO: ADD API calls for bulk/ selected repo deletion
+  const handleRepoDeletion = async (repos: IRepository[]) => {
+    setDeleteKebabOption((prevState) => ({
+      isModalOpen: !prevState.isModalOpen,
+    }));
+    const response = await bulkDeleteRepositories(repos);
+    console.log('deletion reponse', response);
+    fetchRepos(true);
   };
 
   const fetchConfirmationModalText = () => {
@@ -160,7 +171,7 @@ export default function RepositoriesList() {
   ];
 
   const kebabItems = [
-    <DropdownItem key="delete" onClick={handleRepoDeletion}>
+    <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
       Delete
     </DropdownItem>,
 
@@ -218,15 +229,10 @@ export default function RepositoriesList() {
               setRepositoryList((prevRepos) => [
                 ...prevRepos,
                 {
-                  name: repo.name,
                   namespace: repo.namespace,
-                  path: repo.namespace + '/' + repo.name,
-                  isPublic: repo.is_public,
-                  tags: 1,
-                  size: '1.1GB',
-                  pulls: 108,
-                  lastPull: 'TBA',
-                  lastModified: 'TBA',
+                  name: repo.name,
+                  is_public: repo.is_public,
+                  lastModified: repo.last_modified,
                 },
               ]);
             }),
@@ -242,7 +248,7 @@ export default function RepositoriesList() {
     fetchRepos();
   }, [userOrgs]);
 
-  const updateListHandler = (value: RepositoryListProps) => {
+  const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);
   };
 
@@ -327,6 +333,8 @@ export default function RepositoriesList() {
                   handleModalToggle={handleDeleteModalToggle}
                   handleRepoDeletion={handleRepoDeletion}
                   isModalOpen={deleteKebabOption.isModalOpen}
+                  selectedItems={selectedRepoNames}
+                  repositoryList={repositoryList}
                 />
               ) : null}
             </ToolbarItem>
@@ -398,15 +406,15 @@ export default function RepositoriesList() {
                 </Td>
                 <Td dataLabel={columnNames.visibility}>
                   {' '}
-                  {repo.isPublic ? 'public' : 'private'}
+                  {repo.is_public ? 'public' : 'private'}
                 </Td>
-                <Td dataLabel={columnNames.tags}> {repo.tags} </Td>
-                <Td dataLabel={columnNames.size}> {repo.size} </Td>
-                <Td dataLabel={columnNames.pulls}> {repo.pulls} </Td>
-                <Td dataLabel={columnNames.lastPull}> {repo.lastPull} </Td>
+                <Td dataLabel={columnNames.tags}> dummy </Td>
+                <Td dataLabel={columnNames.size}> dummy</Td>
+                <Td dataLabel={columnNames.pulls}> dummy </Td>
+                <Td dataLabel={columnNames.lastPull}> dummy </Td>
                 <Td dataLabel={columnNames.lastModified}>
                   {' '}
-                  {repo.lastModified}{' '}
+                  {repo.last_modified}{' '}
                 </Td>
               </Tr>
             ))}
@@ -415,28 +423,4 @@ export default function RepositoriesList() {
       </PageSection>
     </Page>
   );
-}
-
-export type RepositoryListProps = {
-  name: string;
-  namespace: string;
-  path: string;
-  isPublic: boolean;
-  tags: number;
-  size: string;
-  pulls: number;
-  lastPull: string;
-  lastModified: string;
-};
-
-interface Repository {
-  name: string;
-  namespace: string;
-  path: string;
-  isPublic: boolean;
-  tags: number;
-  size: string;
-  pulls: number;
-  lastPull: string;
-  lastModified: string;
 }
