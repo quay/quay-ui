@@ -12,6 +12,7 @@ import {
   getManifestByDigest,
   Manifest,
 } from 'src/resources/TagResource';
+import {formatDate} from 'src/libs/utils';
 
 jest.mock('react-router-dom', () => ({
   useLocation: jest.fn(),
@@ -96,9 +97,7 @@ test('Render simple tag', async () => {
     {
       testId: 'creation',
       name: 'Creation',
-      value: new Date(mockTag.start_ts).toLocaleString('en-US', {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }),
+      value: formatDate(mockTag.start_ts),
     },
     {
       testId: 'repository',
@@ -108,9 +107,7 @@ test('Render simple tag', async () => {
     {
       testId: 'modified',
       name: 'Modified',
-      value: new Date(mockTag.last_modified).toLocaleString('en-US', {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }),
+      value: formatDate(mockTag.last_modified),
     },
     {
       testId: 'size',
@@ -219,9 +216,7 @@ test('Render manifest list tag', async () => {
     {
       testId: 'creation',
       name: 'Creation',
-      value: new Date(mockTag.start_ts).toLocaleString('en-US', {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }),
+      value: formatDate(mockTag.start_ts),
     },
     {
       testId: 'repository',
@@ -231,9 +226,7 @@ test('Render manifest list tag', async () => {
     {
       testId: 'modified',
       name: 'Modified',
-      value: new Date(mockTag.last_modified).toLocaleString('en-US', {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }),
+      value: formatDate(mockTag.last_modified),
     },
     {
       testId: 'size',

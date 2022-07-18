@@ -11,6 +11,7 @@ import {
 import prettyBytes from 'pretty-bytes';
 import CopyTags from './DetailsCopyTags';
 import {Tag} from 'src/resources/TagResource';
+import {formatDate} from 'src/libs/utils';
 
 export default function Details(props: DetailsProps) {
   return (
@@ -44,9 +45,7 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="modified">
             <DescriptionListTerm>Modified</DescriptionListTerm>
             <DescriptionListDescription>
-              {new Date(props.tag.last_modified).toLocaleString('en-US', {
-                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              })}
+              {formatDate(props.tag.last_modified)}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>

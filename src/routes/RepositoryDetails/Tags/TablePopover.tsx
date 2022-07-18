@@ -35,7 +35,6 @@ export default function TablePopover(props: TablePopoverProps) {
             isReadOnly
             hoverTip="Copy"
             clickTip="Copied"
-            onCopy={() => setCurrentOpenPopover('')}
           >
             podman pull {getDomain()}/{props.org}/{props.repo}:{props.tag}
           </ClipboardCopy>
@@ -46,7 +45,6 @@ export default function TablePopover(props: TablePopoverProps) {
             isReadOnly
             hoverTip="Copy"
             clickTip="Copied"
-            onCopy={() => setCurrentOpenPopover('')}
           >
             podman pull {getDomain()}/{props.org}/{props.repo}@{props.digest}
           </ClipboardCopy>
@@ -57,7 +55,6 @@ export default function TablePopover(props: TablePopoverProps) {
             isReadOnly
             hoverTip="Copy"
             clickTip="Copied"
-            onCopy={() => setCurrentOpenPopover('')}
           >
             docker pull {getDomain()}/{props.org}/{props.repo}:{props.tag}
           </ClipboardCopy>
@@ -68,7 +65,6 @@ export default function TablePopover(props: TablePopoverProps) {
             isReadOnly
             hoverTip="Copy"
             clickTip="Copied"
-            onCopy={() => setCurrentOpenPopover('')}
           >
             docker pull {getDomain()}/{props.org}/{props.repo}@{props.digest}
           </ClipboardCopy>

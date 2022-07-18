@@ -247,8 +247,6 @@ export default function RepositoriesList() {
     setRepositoryList((prev) => [...prev, value]);
   };
 
-  console.log(repositoryList);
-
   return (
     <Page>
       {currentOrg === null ? (

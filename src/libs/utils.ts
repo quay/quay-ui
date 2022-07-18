@@ -14,3 +14,11 @@ export function getSeverityColor(severity: VulnerabilitySeverity) {
       return '#8A8D90';
   }
 }
+
+export function formatDate(date: string | number) {
+  return new Date(date).toLocaleString('en-US', {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeStyle: 'short',
+    dateStyle: 'medium',
+  });
+}

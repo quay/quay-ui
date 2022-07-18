@@ -35,7 +35,7 @@ export default function RepositoryDetails(props) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // TODO: refactor
-  const [organization, ...repo] = location.pathname.split('/').slice(4);
+  const [organization, ...repo] = location.pathname.split('/').slice(2);
   const repository = repo.join('/');
 
   const requestedTabIndex = getTabIndex(searchParams.get('tab'));
@@ -63,40 +63,6 @@ export default function RepositoryDetails(props) {
           >
             <Tags organization={organization} repository={repository} />
           </Tab>
-          {/*
-
-          TODO: Implement future tabs
-
-          <Tab
-            eventKey={TabIndex.Information}
-            title={<TabTitleText>Information</TabTitleText>}
-          >
-            <div>Information tab work in progress</div>
-          </Tab>
-          <Tab
-            eventKey={TabIndex.TagHistory}
-            title={<TabTitleText>Tag History</TabTitleText>}
-          >
-            <div>Tag History tab work in progress</div>
-          </Tab>
-          <Tab
-            eventKey={TabIndex.Builds}
-            title={<TabTitleText>Builds</TabTitleText>}
-          >
-            <div>Builds tab work in progress</div>
-          </Tab>
-          <Tab
-            eventKey={TabIndex.Logs}
-            title={<TabTitleText>Logs</TabTitleText>}
-          >
-            <div>Logs tab work in progress</div>
-          </Tab>
-          <Tab
-            eventKey={TabIndex.Settings}
-            title={<TabTitleText>Settings</TabTitleText>}
-          >
-            <div>Settings tab work in progress</div>
-          </Tab> */}
         </Tabs>
       </PageSection>
     </Page>

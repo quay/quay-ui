@@ -16,6 +16,7 @@ import {Link} from 'react-router-dom';
 import {getTagDetailPath, getDomain} from 'src/routes/NavigationPath';
 import TablePopover from './TablePopover';
 import SecurityDetails from './SecurityDetails';
+import {formatDate} from 'src/libs/utils';
 
 const columnNames = {
   Tag: 'Tag',
@@ -147,9 +148,7 @@ export default function Table(props: TableProps) {
                     : prettyBytes(tag.size)}
                 </Td>
                 <Td dataLabel={columnNames.LastModified}>
-                  {new Date(tag.last_modified).toLocaleString('en-US', {
-                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                  })}
+                  {formatDate(tag.last_modified)}
                 </Td>
                 <Td dataLabel={columnNames.Expires}>
                   {tag.expiration ?? 'Never'}
