@@ -1,8 +1,8 @@
-import {SecurityReport} from 'src/components/shared/Repository/Tabs/Tags/SecurityReport/SecurityReport';
 import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
 import Organization from './OrganizationsList/Organization/Organization';
-import TagsList from 'src/components/shared/Repository/TagsList';
+import RepositoryDetails from 'src/routes/RepositoryDetails/RepositoryDetails';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
+import TagDetails from 'src/routes/TagDetails/TagDetails';
 
 export enum NavigationPath {
   // Side Nav
@@ -12,30 +12,37 @@ export enum NavigationPath {
 
   // Organization detail
   organizationDetail = '/organizations/:organizationName',
-  orgDetailRepositoryTab = '/organizations/:organizationName/repotab',
-  orgDetailUsageLogsTab = '/organizations/:reponame/logs',
-  repositoryDetailForOrg = '/organizations/:organizationName/:repositoryName',
 
   // Repository detail
-  repositoryDetail = '/repositories/:repositoryName',
-  settings = '/organizations/:reponame/settings',
+  repositoryDetail = '/repositories/:organizationName/:repositoryName',
 
   // Tag Detail
-  tagDetail = '/organizations/:organizationName/:repoName/:tagName',
+  tagDetail = '/repositories/:organizationName/:repositoryName/:tagName',
+}
+
+export function getRepoDetailPath(org: string, repo: string) {
+  let repoPath = NavigationPath.repositoryDetail.toString();
+  repoPath = repoPath.replace(':organizationName', org);
+  repoPath = repoPath.replace(':repositoryName', repo);
+  return repoPath;
 }
 
 export function getTagDetailPath(
   org: string,
   repo: string,
   tag: string,
-  arch = null,
+  queryParams: Map<string, string> = null,
 ) {
   let tagPath = NavigationPath.tagDetail.toString();
   tagPath = tagPath.replace(':organizationName', org);
-  tagPath = tagPath.replace(':repoName', repo);
+  tagPath = tagPath.replace(':repositoryName', repo);
   tagPath = tagPath.replace(':tagName', tag);
-  if (arch) {
-    tagPath = tagPath + `?arch=${arch}`;
+  if (queryParams) {
+    const params = [];
+    for (const entry of Array.from(queryParams.entries())) {
+      params.push(entry[0] + '=' + entry[1]);
+    }
+    tagPath = tagPath + '?' + params.join('&');
   }
   return tagPath;
 }
@@ -54,20 +61,16 @@ const NavigationRoutes = [
     Component: <Organization />,
   },
   {
-    path: NavigationPath.repositoryDetail,
-    Component: <TagsList />,
-  },
-  {
-    path: NavigationPath.repositoryDetailForOrg,
-    Component: <TagsList />,
-  },
-  {
     path: NavigationPath.repositoriesList,
     Component: <RepositoriesList />,
   },
   {
-    path: '/security_details',
-    Component: <SecurityReport />,
+    path: NavigationPath.repositoryDetail,
+    Component: <RepositoryDetails />,
+  },
+  {
+    path: NavigationPath.tagDetail,
+    Component: <TagDetails />,
   },
 ];
 export {NavigationRoutes};

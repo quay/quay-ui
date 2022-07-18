@@ -16,6 +16,7 @@ export interface Tag {
   size: number;
   start_ts: number;
   manifest_list: ManifestList;
+  expiration?: string;
 }
 
 export interface ManifestList {
@@ -153,7 +154,6 @@ export async function getSecurityDetails(
     const response: AxiosResponse<SecurityDetailsResponse> = await axios.get(
       `/api/v1/repository/${org}/${repo}/manifest/${digest}/security?vulnerabilities=true`,
     );
-    console.log(response);
     return response.data;
   } catch (error: any) {
     throw new Error(`API error getting security details ${error.message}`);

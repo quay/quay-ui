@@ -3,9 +3,13 @@ import {
   SecurityDetailsResponse,
   getSecurityDetails,
 } from 'src/resources/TagResource';
+import {Link} from 'react-router-dom';
+import {getTagDetailPath} from 'src/routes/NavigationPath';
+import {TabIndex} from 'src/routes/TagDetails/TagDetailsTabs';
 
-export default function SecurityDetails(props: SecurityDetails) {
+export default function SecurityDetails(props: SecurityDetailsProps) {
   const [status, setStatus] = useState<string>('');
+
   useEffect(() => {
     (async () => {
       try {
@@ -17,11 +21,23 @@ export default function SecurityDetails(props: SecurityDetails) {
       }
     })();
   }, []);
-  return <>{status}</>;
+  const queryParams = new Map<string, string>([
+    ['tab', TabIndex.SecurityReport],
+  ]);
+  if (props.arch) {
+    queryParams.set('arch', props.arch);
+  }
+  return (
+    <Link to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}>
+      {status}
+    </Link>
+  );
 }
 
-export interface SecurityDetails {
+export interface SecurityDetailsProps {
   org: string;
   repo: string;
+  tag: string;
   digest: string;
+  arch?: string;
 }

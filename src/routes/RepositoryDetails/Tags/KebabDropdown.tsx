@@ -20,6 +20,7 @@ export function KebabDropdown(props: KebabDropdownProps) {
           onClick={() => {
             props.setIsModalOpen(!props.isModalOpen);
           }}
+          isDisabled={!props.isActive}
         >
           Delete
         </DropdownItem>,
@@ -30,5 +31,6 @@ export function KebabDropdown(props: KebabDropdownProps) {
 
 type KebabDropdownProps = {
   isModalOpen: boolean;
+  isActive: boolean;
   setIsModalOpen: (isModalOpen: boolean) => void;
 };

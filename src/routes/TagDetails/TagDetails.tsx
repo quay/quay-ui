@@ -6,6 +6,7 @@ import {
   PageSectionVariants,
   Title,
   PageBreadcrumb,
+  Spinner,
 } from '@patternfly/react-core';
 import {useSearchParams, useLocation} from 'react-router-dom';
 import {useState, useEffect} from 'react';
@@ -23,6 +24,7 @@ import {
 export default function TagDetails() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [architecture, setArchitecture] = useState<string>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [tagDetails, setTagDetails] = useState<Tag>({
     name: '',
     is_manifest_list: false,
@@ -76,6 +78,7 @@ export default function TagDetails() {
             searchParams.get('arch') ? searchParams.get('arch') : archs[0],
           );
         }
+        setIsLoading(false);
       } catch (error: any) {
         // TODO: provide sufficient error handling, will be resolved in a future PR
         console.log('error');
@@ -93,6 +96,10 @@ export default function TagDetails() {
     )[0];
     size = manifest.size;
     digest = manifest.digest;
+  }
+
+  if (isLoading) {
+    return <Spinner isSVG />;
   }
 
   return (

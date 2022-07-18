@@ -7,14 +7,13 @@ import {
 } from 'src/resources/TagResource';
 import {SecurityReportChart} from './SecurityReportChart';
 
-export function SecurityReport() {
+export default function SecurityReport(props: SecurityReportProps) {
   const [data, setData] = useState<Data>(null);
-
   useEffect(() => {
     (async () => {
       try {
         const securityDetails: SecurityDetailsResponse =
-          await getSecurityDetails('testorg', 'testrepo', 'testdigest');
+          await getSecurityDetails(props.org, props.repo, props.digest);
         setData(securityDetails.data);
       } catch (error) {
         console.log('Unable to get security details: ', error);
@@ -34,3 +33,9 @@ export function SecurityReport() {
 
   return <div>Loading</div>;
 }
+
+type SecurityReportProps = {
+  org: string;
+  repo: string;
+  digest: string;
+};

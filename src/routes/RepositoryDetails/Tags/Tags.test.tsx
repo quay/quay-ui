@@ -2,7 +2,14 @@ import Tags from './Tags';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {RecoilRoot} from 'recoil';
 import {mocked} from 'ts-jest/utils';
-import {Tag, TagsResponse, getTags, deleteTag} from 'src/resources/TagResource';
+import {
+  Tag,
+  TagsResponse,
+  getTags,
+  deleteTag,
+  getSecurityDetails,
+  SecurityDetailsResponse,
+} from 'src/resources/TagResource';
 import {MemoryRouter} from 'react-router-dom';
 
 jest.mock('src/resources/TagResource', () => ({
@@ -33,9 +40,26 @@ const createTag = (name = 'latest'): Tag => {
     manifest_list: null,
   };
 };
+const createSecurityDetailsResponse = (): SecurityDetailsResponse => {
+  return {
+    status: 'scanned',
+    data: {
+      Layer: {
+        Name: '',
+        ParentName: '',
+        NamespaceName: '',
+        IndexedByVersion: 1,
+        Features: [],
+      },
+    },
+  };
+};
 
 test('Tags should render', async () => {
   mocked(getTags, true).mockResolvedValue(createTagResponse());
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -50,6 +74,9 @@ test('Tags should appear in list', async () => {
   const mockResponse = createTagResponse();
   mockResponse.tags.push(createTag());
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -67,6 +94,9 @@ test('Filter search should return matching list', async () => {
     mockResponse.tags.push(createTag(tag));
   }
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -89,6 +119,9 @@ test('Updating per page should update table content', async () => {
     mockResponse.tags.push(createTag(`tag${i}`));
   }
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   const {container} = render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -118,6 +151,9 @@ test('Updating page should update table content', async () => {
     mockResponse.tags.push(createTag(`tag${i}`));
   }
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   const {container} = render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -139,6 +175,9 @@ test('Copy modal should show org and repo', async () => {
   const tag = createTag();
   mockResponse.tags.push(tag);
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -146,16 +185,19 @@ test('Copy modal should show org and repo', async () => {
     {wrapper: MemoryRouter},
   );
   expect(await screen.findByText(tag.name)).toBeTruthy();
-  fireEvent(
-    screen.getByTestId('pull'),
-    new MouseEvent('click', {bubbles: true, cancelable: true}),
-  );
-  expect(screen.getByTestId(`copy-tag`).querySelector('input').value).toBe(
-    `docker pull quay.io/${testOrg}/${testRepo}:${tag.name}`,
-  );
-  expect(screen.getByTestId(`copy-digest`).querySelector('input').value).toBe(
-    `docker pull quay.io/${testOrg}/${testRepo}@${tag.manifest_digest}`,
-  );
+  fireEvent.mouseOver(screen.getByTestId('pull'));
+  expect(
+    (await screen.findByTestId(`copy-tag-podman`)).querySelector('input').value,
+  ).toBe(`podman pull quay.io/${testOrg}/${testRepo}:${tag.name}`);
+  expect(
+    screen.getByTestId(`copy-digest-podman`).querySelector('input').value,
+  ).toBe(`podman pull quay.io/${testOrg}/${testRepo}@${tag.manifest_digest}`);
+  expect(
+    screen.getByTestId(`copy-tag-docker`).querySelector('input').value,
+  ).toBe(`docker pull quay.io/${testOrg}/${testRepo}:${tag.name}`);
+  expect(
+    screen.getByTestId(`copy-digest-docker`).querySelector('input').value,
+  ).toBe(`docker pull quay.io/${testOrg}/${testRepo}@${tag.manifest_digest}`);
 });
 
 test('Delete a single tag', async () => {
@@ -166,6 +208,9 @@ test('Delete a single tag', async () => {
     .mockResolvedValueOnce(mockResponse)
     .mockResolvedValueOnce(createTagResponse());
   mocked(deleteTag, true).mockResolvedValue();
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />
@@ -208,6 +253,9 @@ test('Delete a multiple tags', async () => {
     .mockResolvedValueOnce(mockResponse)
     .mockResolvedValueOnce(createTagResponse());
   mocked(deleteTag, true).mockResolvedValue();
+  mocked(getSecurityDetails, true).mockResolvedValue(
+    createSecurityDetailsResponse(),
+  );
   render(
     <RecoilRoot>
       <Tags organization={testOrg} repository={testRepo} />

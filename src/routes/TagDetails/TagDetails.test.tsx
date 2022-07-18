@@ -3,6 +3,7 @@ import {within} from '@testing-library/dom';
 import {RecoilRoot} from 'recoil';
 import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 import {mocked} from 'ts-jest/utils';
+import prettyBytes from 'pretty-bytes';
 import TagDetails from './TagDetails';
 import {
   Tag,
@@ -11,6 +12,7 @@ import {
   getManifestByDigest,
   Manifest,
 } from 'src/resources/TagResource';
+import {formatDate} from 'src/libs/utils';
 
 jest.mock('react-router-dom', () => ({
   useLocation: jest.fn(),
@@ -53,7 +55,7 @@ type Test = {
 
 const checkFieldValues = async (tests: Test[]) => {
   for (const test of tests) {
-    const field = screen.getByTestId(test.testId);
+    const field = await screen.findByTestId(test.testId);
     expect(within(field).getByText(test.name)).toBeTruthy();
     expect(await within(field).findByText(test.value)).toBeTruthy();
   }
@@ -95,9 +97,7 @@ test('Render simple tag', async () => {
     {
       testId: 'creation',
       name: 'Creation',
-      value: new Date(mockTag.start_ts).toLocaleString('en-US', {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }),
+      value: formatDate(mockTag.start_ts),
     },
     {
       testId: 'repository',
@@ -107,12 +107,12 @@ test('Render simple tag', async () => {
     {
       testId: 'modified',
       name: 'Modified',
-      value: mockTag.last_modified,
+      value: formatDate(mockTag.last_modified),
     },
     {
       testId: 'size',
       name: 'Size',
-      value: mockTag.size,
+      value: prettyBytes(mockTag.size),
     },
     {
       testId: 'vulnerabilities',
@@ -127,10 +127,6 @@ test('Render simple tag', async () => {
   ];
   await checkFieldValues(tests);
   const clipboardCopyTests: Test[] = [
-    {
-      testId: 'digest-clipboardcopy',
-      value: mockTag.manifest_digest,
-    },
     {
       testId: 'podman-tag-clipboardcopy',
       value: 'podman pull quay.io/testorg/testrepo:latest',
@@ -148,6 +144,11 @@ test('Render simple tag', async () => {
       value: 'docker pull quay.io/testorg/testrepo@' + mockTag.manifest_digest,
     },
   ];
+  expect(
+    within(await screen.findByTestId('digest-clipboardcopy')).getByText(
+      mockTag.manifest_digest,
+    ),
+  ).toBeTruthy();
   await checkClipboardValues(clipboardCopyTests);
 });
 
@@ -215,9 +216,7 @@ test('Render manifest list tag', async () => {
     {
       testId: 'creation',
       name: 'Creation',
-      value: new Date(mockTag.start_ts).toLocaleString('en-US', {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      }),
+      value: formatDate(mockTag.start_ts),
     },
     {
       testId: 'repository',
@@ -227,12 +226,12 @@ test('Render manifest list tag', async () => {
     {
       testId: 'modified',
       name: 'Modified',
-      value: mockTag.last_modified,
+      value: formatDate(mockTag.last_modified),
     },
     {
       testId: 'size',
       name: 'Size',
-      value: mockManifest.manifests[FIRST_MANIFEST].size,
+      value: prettyBytes(mockManifest.manifests[FIRST_MANIFEST].size),
     },
     {
       testId: 'vulnerabilities',
@@ -249,10 +248,6 @@ test('Render manifest list tag', async () => {
 
   let clipboardCopyTests: Test[] = [
     {
-      testId: 'digest-clipboardcopy',
-      value: mockManifest.manifests[FIRST_MANIFEST].digest,
-    },
-    {
       testId: 'podman-tag-clipboardcopy',
       value: 'podman pull quay.io/testorg/testrepo:latest',
     },
@@ -273,6 +268,11 @@ test('Render manifest list tag', async () => {
         mockManifest.manifests[FIRST_MANIFEST].digest,
     },
   ];
+  expect(
+    within(await screen.findByTestId('digest-clipboardcopy')).getByText(
+      mockManifest.manifests[FIRST_MANIFEST].digest,
+    ),
+  ).toBeTruthy();
   await checkClipboardValues(clipboardCopyTests);
 
   // Select the other architecture
@@ -288,14 +288,10 @@ test('Render manifest list tag', async () => {
     new MouseEvent('click', {bubbles: true, cancelable: true}),
   );
 
-  tests[4].value = mockManifest.manifests[SECOND_MANIFEST].size;
+  tests[4].value = prettyBytes(mockManifest.manifests[SECOND_MANIFEST].size);
   await checkFieldValues(tests);
 
   clipboardCopyTests = [
-    {
-      testId: 'digest-clipboardcopy',
-      value: mockManifest.manifests[SECOND_MANIFEST].digest,
-    },
     {
       testId: 'podman-tag-clipboardcopy',
       value: 'podman pull quay.io/testorg/testrepo:latest',
@@ -317,5 +313,10 @@ test('Render manifest list tag', async () => {
         mockManifest.manifests[SECOND_MANIFEST].digest,
     },
   ];
+  expect(
+    within(await screen.findByTestId('digest-clipboardcopy')).getByText(
+      mockManifest.manifests[SECOND_MANIFEST].digest,
+    ),
+  ).toBeTruthy();
   await checkClipboardValues(clipboardCopyTests);
 });
