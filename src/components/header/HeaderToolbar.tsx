@@ -67,12 +67,6 @@ export function HeaderToolbar() {
 
   const userDropdownItems = [
     <DropdownGroup key="group 2">
-      <DropdownItem value="profile" key="profile" component="button">
-        My profile
-      </DropdownItem>
-      <DropdownItem value="settings" key="settings" component="button">
-        User management
-      </DropdownItem>
       <DropdownItem value="logout" key="group 2 logout" component="button">
         Logout
       </DropdownItem>
@@ -103,21 +97,6 @@ export function HeaderToolbar() {
           alignment={{default: 'alignRight'}}
           spacer={{default: 'spacerNone', md: 'spacerMd'}}
         >
-          <ToolbarItem>
-            <Button aria-label="Notifications" variant={ButtonVariant.plain}>
-              <AttentionBellIcon />
-            </Button>
-          </ToolbarItem>
-          <ToolbarItem>
-            <Button aria-label="Settings actions" variant={ButtonVariant.plain}>
-              <CogIcon />
-            </Button>
-          </ToolbarItem>
-          <ToolbarItem>
-            <Button aria-label="Help actions" variant={ButtonVariant.plain}>
-              <QuestionCircleIcon />
-            </Button>
-          </ToolbarItem>
           <ToolbarItem>{user ? userDropdown : signInButton}</ToolbarItem>
         </ToolbarGroup>
       </ToolbarContent>
