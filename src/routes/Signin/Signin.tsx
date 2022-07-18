@@ -6,12 +6,12 @@ import {
 } from '@patternfly/react-core';
 import logo from 'src/assets/RH_QuayIO2.svg';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
-import {GlobalAuthState, loginUser} from '../../resources/AuthResource';
+import {GlobalAuthState, loginUser} from 'src/resources/AuthResource';
 import {useNavigate} from 'react-router-dom';
-import {getUser} from '../../resources/UserResource';
+import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
-import {UserState} from '../../atoms/UserState';
-import {AuthState} from '../../atoms/AuthState';
+import {UserState} from 'src/atoms/UserState';
+import {AuthState} from 'src/atoms/AuthState';
 
 export function Signin() {
   const [username, setUsername] = useState('');
@@ -47,18 +47,6 @@ export function Signin() {
     }
   };
 
-  const signUpForAccountMessage = (
-    <LoginMainFooterBandItem>
-      Need an account? <a href="src/routes/Login/Signin#">Sign up.</a>
-    </LoginMainFooterBandItem>
-  );
-
-  const forgotCredentials = (
-    <LoginMainFooterBandItem>
-      <a href="src/routes/Login/Signin#">Forgot username or password?</a>
-    </LoginMainFooterBandItem>
-  );
-
   const helperText = (
     <React.Fragment>
       <ExclamationCircleIcon />
@@ -79,7 +67,6 @@ export function Signin() {
       passwordValue={password}
       onChangePassword={(v) => setPassword(v)}
       isValidPassword={true}
-      rememberMeLabel="Keep me logged in for 30 days."
       isRememberMeChecked={rememberMe}
       onChangeRememberMe={(v) => setRememberMe(v)}
       onLoginButtonClick={(e) => onLoginButtonClick(e)}
@@ -96,8 +83,6 @@ export function Signin() {
       backgroundImgAlt="Red Hat Quay"
       textContent="Quay.io builds, analyzes and distributes your container images. Store your containers with added security. Easily build and deploy new containers. Scan containers to provide security."
       loginTitle="Log in to your account"
-      signUpForAccountMessage={signUpForAccountMessage}
-      forgotCredentials={forgotCredentials}
     >
       {loginForm}
     </LoginPage>
