@@ -40,12 +40,10 @@ mock.onGet(specificTagPathRegex).reply((request: AxiosRequestConfig) => {
     tags: [],
   };
   const searchParams = new URLSearchParams(request.url);
-  switch (searchParams.get('specificTag')) {
-    case 'testtag':
-      tagResponse.tags.push(testTag);
-      break;
-    case 'manifestlist':
-      tagResponse.tags.push(manifestListTag);
+  if (searchParams.get('specificTag') === 'manifestlist') {
+    tagResponse.tags.push(manifestListTag);
+  } else {
+    tagResponse.tags.push(testTag);
   }
   return [200, tagResponse];
 });

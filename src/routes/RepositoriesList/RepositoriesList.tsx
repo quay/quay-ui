@@ -31,6 +31,7 @@ import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
+import {getRepoDetailPath} from 'src/routes/NavigationPath';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -246,6 +247,8 @@ export default function RepositoriesList() {
     setRepositoryList((prev) => [...prev, value]);
   };
 
+  console.log(repositoryList);
+
   return (
     <Page>
       {currentOrg === null ? (
@@ -387,11 +390,11 @@ export default function RepositoriesList() {
                 />
                 <Td dataLabel={columnNames.repoName}>
                   {currentOrg == null ? (
-                    <Link to={`${repo.namespace}/${repo.name}`}>
+                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
                       {repo.namespace}/{repo.name}
                     </Link>
                   ) : (
-                    <Link to={`${repo.namespace}/${repo.name}`}>
+                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
                       {repo.name}
                     </Link>
                   )}

@@ -4,7 +4,7 @@ import {mock} from 'src/tests/fake-db/MockAxios';
 const syahmedResponse = {
   repositories: [
     {
-      namespace: 'test7',
+      namespace: 'syahmed',
       name: 'postgres',
       description: null,
       is_public: false,
@@ -24,7 +24,7 @@ const syahmedResponse = {
 const quayResponse = {
   repositories: [
     {
-      namespace: 'test5',
+      namespace: 'quay',
       name: 'postgres',
       description: null,
       is_public: false,
@@ -48,7 +48,7 @@ const projectquayResponse = {
 const redhatemp1Response = {
   repositories: [
     {
-      namespace: 'admin',
+      namespace: 'redhatemp1',
       name: 'redis',
       description: null,
       is_public: false,
@@ -68,7 +68,7 @@ const redhatemp1Response = {
 const syedorgResponse = {
   repositories: [
     {
-      namespace: 'test11',
+      namespace: 'syedorg',
       name: 'nginx',
       description: null,
       is_public: false,
@@ -83,7 +83,7 @@ const syedorgResponse = {
       is_starred: false,
     },
     {
-      namespace: 'test11',
+      namespace: 'syedorg',
       name: 'python',
       description: null,
       is_public: false,
@@ -103,7 +103,7 @@ const syedorgResponse = {
 const syedorg3Response = {
   repositories: [
     {
-      namespace: 'test9',
+      namespace: 'syedorg3',
       name: 'postgres',
       description: null,
       is_public: false,
@@ -123,7 +123,7 @@ const syedorg3Response = {
 const testorg1234Response = {
   repositories: [
     {
-      namespace: 'temp',
+      namespace: 'testorg1234',
       name: 'redis',
       description: null,
       is_public: false,
@@ -138,7 +138,7 @@ const testorg1234Response = {
       is_starred: false,
     },
     {
-      namespace: 'temp',
+      namespace: 'testorg1234',
       name: 'postgres',
       description: null,
       is_public: false,
@@ -153,7 +153,7 @@ const testorg1234Response = {
       is_starred: false,
     },
     {
-      namespace: 'temp',
+      namespace: 'testorg1234',
       name: 'blah-blah12',
       description: 'blah-blah',
       is_public: true,

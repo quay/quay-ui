@@ -24,6 +24,13 @@ export enum NavigationPath {
   tagDetail = '/organizations/:organizationName/:repoName/:tagName',
 }
 
+export function getRepoDetailPath(org: string, repo: string) {
+  let repoPath = NavigationPath.repositoryDetailForOrg.toString();
+  repoPath = repoPath.replace(':organizationName', org);
+  repoPath = repoPath.replace(':repositoryName', repo);
+  return repoPath;
+}
+
 export function getTagDetailPath(
   org: string,
   repo: string,
