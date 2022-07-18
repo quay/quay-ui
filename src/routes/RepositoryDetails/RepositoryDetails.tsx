@@ -35,7 +35,7 @@ export default function RepositoryDetails(props) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // TODO: refactor
-  const [organization, ...repo] = location.pathname.split('/').slice(2);
+  const [organization, ...repo] = location.pathname.split('/').slice(4);
   const repository = repo.join('/');
 
   const requestedTabIndex = getTabIndex(searchParams.get('tab'));
@@ -63,10 +63,10 @@ export default function RepositoryDetails(props) {
           >
             <Tags organization={organization} repository={repository} />
           </Tab>
-          {/* 
-          
+          {/*
+
           TODO: Implement future tabs
-          
+
           <Tab
             eventKey={TabIndex.Information}
             title={<TabTitleText>Information</TabTitleText>}

@@ -12,20 +12,16 @@ export enum NavigationPath {
 
   // Organization detail
   organizationDetail = '/organizations/:organizationName',
-  orgDetailRepositoryTab = '/organizations/:organizationName/repotab',
-  orgDetailUsageLogsTab = '/organizations/:reponame/logs',
-  repositoryDetailForOrg = '/organizations/:organizationName/:repositoryName',
 
   // Repository detail
-  repositoryDetail = '/repositories/:repositoryName',
-  settings = '/organizations/:reponame/settings',
+  repositoryDetail = '/repositories/:organizationName/:repositoryName',
 
   // Tag Detail
-  tagDetail = '/organizations/:organizationName/:repoName/:tagName',
+  tagDetail = '/repositories/:organizationName/:repositoryName/:tagName',
 }
 
 export function getRepoDetailPath(org: string, repo: string) {
-  let repoPath = NavigationPath.repositoryDetailForOrg.toString();
+  let repoPath = NavigationPath.repositoryDetail.toString();
   repoPath = repoPath.replace(':organizationName', org);
   repoPath = repoPath.replace(':repositoryName', repo);
   return repoPath;
@@ -39,7 +35,7 @@ export function getTagDetailPath(
 ) {
   let tagPath = NavigationPath.tagDetail.toString();
   tagPath = tagPath.replace(':organizationName', org);
-  tagPath = tagPath.replace(':repoName', repo);
+  tagPath = tagPath.replace(':repositoryName', repo);
   tagPath = tagPath.replace(':tagName', tag);
   if (queryParams) {
     const params = [];
@@ -65,16 +61,12 @@ const NavigationRoutes = [
     Component: <Organization />,
   },
   {
-    path: NavigationPath.repositoryDetail,
-    Component: <RepositoryDetails />,
-  },
-  {
-    path: NavigationPath.repositoryDetailForOrg,
-    Component: <RepositoryDetails />,
-  },
-  {
     path: NavigationPath.repositoriesList,
     Component: <RepositoriesList />,
+  },
+  {
+    path: NavigationPath.repositoryDetail,
+    Component: <RepositoryDetails />,
   },
   {
     path: NavigationPath.tagDetail,
