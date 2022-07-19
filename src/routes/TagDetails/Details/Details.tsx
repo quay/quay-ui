@@ -12,6 +12,7 @@ import prettyBytes from 'pretty-bytes';
 import CopyTags from './DetailsCopyTags';
 import {Tag} from 'src/resources/TagResource';
 import {formatDate} from 'src/libs/utils';
+import Labels from 'src/components/labels/Labels';
 
 export default function Details(props: DetailsProps) {
   return (
@@ -74,7 +75,9 @@ export default function Details(props: DetailsProps) {
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="labels">
             <DescriptionListTerm>Labels</DescriptionListTerm>
-            <DescriptionListDescription>TODO-labels</DescriptionListDescription>
+            <DescriptionListDescription>
+              <Labels org={props.org} repo={props.repo} digest={props.digest} />
+            </DescriptionListDescription>
           </DescriptionListGroup>
         </DescriptionList>
       </PageSection>

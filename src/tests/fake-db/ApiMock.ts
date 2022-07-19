@@ -5,6 +5,7 @@ import './data/user/user';
 import './data/repository/security';
 import './data/repository/repository';
 import './data/tag/tag';
+import './data/tag/labels';
 import './data/tag/manifest';
 
 mock.onAny().passThrough();
