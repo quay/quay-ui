@@ -6,7 +6,9 @@ import {
 import {NavigationRoutes} from 'src/routes/NavigationPath';
 import {Link} from 'react-router-dom';
 import React, {useEffect, useState} from 'react';
-import useBreadcrumbs from 'use-react-router-breadcrumbs';
+import useBreadcrumbs, {
+  BreadcrumbComponentType,
+} from 'use-react-router-breadcrumbs';
 import {useLocation} from 'react-router';
 
 export function QuayBreadcrumb() {
@@ -20,15 +22,12 @@ export function QuayBreadcrumb() {
 
   useEffect(() => {
     const result = [];
-    console.log('routerBreadcrumbs', routerBreadcrumbs);
     routerBreadcrumbs.map((object, i) => {
       const newObj = {};
       newObj['pathname'] = object.match.pathname;
       if (object.breadcrumb.props.children) {
         newObj['title'] = object.breadcrumb.props.children;
       } else {
-        console.log('object.match', object.match);
-        console.log('object.match.route', object.match.route);
         newObj['title'] = object.match.route.breadcrumb(object.match);
       }
       newObj['active'] =
@@ -76,6 +75,11 @@ type BreadcrumbData = {
 
 type BreadcrumbMatch = {
   pathname: string;
+  route?: BreadcrumbsRoute;
+};
+
+type BreadcrumbsRoute = {
+  breadcrumb?: BreadcrumbComponentType | any | null;
 };
 
 type RouterBreadcrumbDetail = {
