@@ -98,12 +98,27 @@ export function PackagesChart(props: PackageChartProps) {
   let totalPackages = 0;
   props.features.map((feature) => {
     totalPackages += 1;
+    const perPackageVulnStats = {
+      Critical: 0,
+      High: 0,
+      Medium: 0,
+      Low: 0,
+      Negligible: 0,
+      Unknown: 0,
+    };
+
     feature.Vulnerabilities.map((vulnerability) => {
-      stats[vulnerability.Severity] += 1;
+      perPackageVulnStats[vulnerability.Severity] = 1;
       if (vulnerability.FixedBy.length > 0) {
         patchesAvailable += 1;
       }
     });
+
+    // add perPackageStats to totals
+    Object.keys(perPackageVulnStats).map((severity) => {
+      stats[severity] += perPackageVulnStats[severity];
+    });
+
     if (feature.Vulnerabilities.length == 0) {
       stats[VulnerabilitySeverity.None] += 1;
     }
