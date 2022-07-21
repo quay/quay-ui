@@ -1,14 +1,15 @@
-import {useEffect, useState} from 'react';
-import SecurityReportTable from './SecurityReportTable';
 import {
   Data,
   getSecurityDetails,
   SecurityDetailsResponse,
 } from 'src/resources/TagResource';
-import {SecurityReportChart} from './SecurityReportChart';
+import {PackagesChart} from './PackagesChart';
+import {useEffect, useState} from 'react';
+import PackagesTable from './PackagesTable';
 
-export default function SecurityReport(props: SecurityReportProps) {
+export function Packages(props: PackagesProps) {
   const [data, setData] = useState<Data>(null);
+
   useEffect(() => {
     (async () => {
       try {
@@ -24,9 +25,9 @@ export default function SecurityReport(props: SecurityReportProps) {
   if (data) {
     return (
       <>
-        <SecurityReportChart features={data.Layer.Features} />
+        <PackagesChart features={data.Layer.Features} />
         <hr />
-        <SecurityReportTable features={data.Layer.Features} />
+        <PackagesTable features={data.Layer.Features} />
       </>
     );
   }
@@ -34,7 +35,7 @@ export default function SecurityReport(props: SecurityReportProps) {
   return <div>Loading</div>;
 }
 
-interface SecurityReportProps {
+interface PackagesProps {
   org: string;
   repo: string;
   digest: string;

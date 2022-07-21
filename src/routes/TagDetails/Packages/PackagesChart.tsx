@@ -9,11 +9,19 @@ import {
   Title,
   TitleSizes,
 } from '@patternfly/react-core';
-import {ExclamationTriangleIcon} from '@patternfly/react-icons';
+import {BundleIcon} from '@patternfly/react-icons';
 import {Feature, VulnerabilitySeverity} from 'src/resources/TagResource';
 import {getSeverityColor} from 'src/libs/utils';
+import {VulnerabilityStats} from '../SecurityReport/SecurityReportChart';
 
-function VulnerabilitySummary(props: VulnerabilityStatsProps) {
+function PackageMessage(props: PackageMessageProps) {
+  if (props.vulnLevel === 'None') {
+    return <> Packages with no vulnerabilities</>;
+  }
+  return <> Packages with {props.vulnLevel}-level vulnerabilities</>;
+}
+
+function PackagesSummary(props: PackageStatsProps) {
   return (
     <div>
       <div className="pf-u-mt-xl pf-u-ml-2xl">
@@ -22,7 +30,7 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
           size={TitleSizes['3xl']}
           className="pf-u-mb-sm"
         >
-          Quay Security Reporting has detected {props.total} vulnerabilities
+          Quay Security Reporting has recognized {props.total} packages
         </Title>
         <Title headingLevel="h3" className="pf-u-mb-lg">
           Patches are available for {props.patchesAvailable} vulnerabilities
@@ -32,12 +40,12 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
           if (props.stats[vulnLevel] > 0) {
             return (
               <div className="pf-u-mb-sm" key={vulnLevel}>
-                <ExclamationTriangleIcon
+                <BundleIcon
                   color={getSeverityColor(vulnLevel as VulnerabilitySeverity)}
                   className="pf-u-mr-md"
                 />
-                <b>{props.stats[vulnLevel]}</b> {vulnLevel}-level
-                vulnerabilities
+                <b>{props.stats[vulnLevel]}</b>
+                <PackageMessage vulnLevel={vulnLevel} />
               </div>
             );
           }
@@ -47,28 +55,26 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
   );
 }
 
-function VulnerabilityChart(props: VulnerabilityStatsProps) {
+function PackagesDonutChart(props: PackageStatsProps) {
   return (
     <div style={{height: '20em', width: '20em'}}>
       <ChartDonut
-        ariaDesc="vulnerability chart"
-        ariaTitle="vulnerability chart"
+        ariaDesc="packages chart"
+        ariaTitle="packages chart"
         constrainToVisibleArea={true}
         data={[
           {x: VulnerabilitySeverity.Critical, y: props.stats.Critical},
           {x: VulnerabilitySeverity.High, y: props.stats.High},
           {x: VulnerabilitySeverity.Medium, y: props.stats.Medium},
-          {x: VulnerabilitySeverity.Low, y: props.stats.Low},
-          {x: VulnerabilitySeverity.Negligible, y: props.stats.Negligible},
           {x: VulnerabilitySeverity.Unknown, y: props.stats.Unknown},
+          {x: VulnerabilitySeverity.None, y: props.stats.None},
         ]}
         colorScale={[
           getSeverityColor(VulnerabilitySeverity.Critical),
           getSeverityColor(VulnerabilitySeverity.High),
           getSeverityColor(VulnerabilitySeverity.Medium),
-          getSeverityColor(VulnerabilitySeverity.Low),
-          getSeverityColor(VulnerabilitySeverity.Negligible),
           getSeverityColor(VulnerabilitySeverity.Unknown),
+          getSeverityColor(VulnerabilitySeverity.None),
         ]}
         labels={({datum}) => `${datum.x}: ${datum.y}`}
         title={`${props.total}`}
@@ -77,8 +83,8 @@ function VulnerabilityChart(props: VulnerabilityStatsProps) {
   );
 }
 
-export function SecurityReportChart(props: SecurityDetailsChartProps) {
-  const stats: VulnerabilityStats = {
+export function PackagesChart(props: PackageChartProps) {
+  const stats = {
     Critical: 0,
     High: 0,
     Medium: 0,
@@ -89,31 +95,34 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
   };
 
   let patchesAvailable = 0;
-  let total = 0;
+  let totalPackages = 0;
   props.features.map((feature) => {
+    totalPackages += 1;
     feature.Vulnerabilities.map((vulnerability) => {
       stats[vulnerability.Severity] += 1;
-      total += 1;
       if (vulnerability.FixedBy.length > 0) {
         patchesAvailable += 1;
       }
     });
+    if (feature.Vulnerabilities.length == 0) {
+      stats[VulnerabilitySeverity.None] += 1;
+    }
   });
 
   return (
     <PageSection variant={PageSectionVariants.light}>
       <Split>
         <SplitItem>
-          <VulnerabilityChart
+          <PackagesDonutChart
             stats={stats}
-            total={total}
+            total={totalPackages}
             patchesAvailable={patchesAvailable}
           />
         </SplitItem>
         <SplitItem>
-          <VulnerabilitySummary
+          <PackagesSummary
             stats={stats}
-            total={total}
+            total={totalPackages}
             patchesAvailable={patchesAvailable}
           />
         </SplitItem>
@@ -122,22 +131,16 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
   );
 }
 
-export interface VulnerabilityStats {
-  Critical: number;
-  High: number;
-  Medium: number;
-  Low: number;
-  Negligible: number;
-  Unknown: number;
-  None: number;
-}
-
-interface VulnerabilityStatsProps {
+interface PackageStatsProps {
   stats: VulnerabilityStats;
   total: number;
   patchesAvailable: number;
 }
 
-interface SecurityDetailsChartProps {
+interface PackageChartProps {
   features: Feature[];
+}
+
+interface PackageMessageProps {
+  vulnLevel: string;
 }

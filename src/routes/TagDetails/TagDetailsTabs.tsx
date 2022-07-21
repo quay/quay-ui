@@ -4,6 +4,7 @@ import {useState} from 'react';
 import Details from './Details/Details';
 import SecurityReport from './SecurityReport/SecurityReport';
 import {Tag} from 'src/resources/TagResource';
+import {Packages} from './Packages/Packages';
 
 export enum TabIndex {
   Details = 'details',
@@ -24,7 +25,7 @@ export default function TagTabs(props: TagTabsProps) {
   const navigate = useNavigate();
 
   // Navigate to the correct tab
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const requestedTabIndex = getTabIndex(searchParams.get('tab'));
   if (requestedTabIndex && requestedTabIndex !== activeTabKey) {
     setActiveTabKey(requestedTabIndex);
@@ -57,6 +58,12 @@ export default function TagTabs(props: TagTabsProps) {
           repo={props.repo}
           digest={props.digest}
         />
+      </Tab>
+      <Tab
+        eventKey={TabIndex.Packages}
+        title={<TabTitleText>Packages</TabTitleText>}
+      >
+        <Packages org={props.org} repo={props.repo} digest={props.digest} />
       </Tab>
     </Tabs>
   );
