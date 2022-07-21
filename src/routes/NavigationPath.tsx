@@ -73,9 +73,5 @@ const NavigationRoutes = [
     path: NavigationPath.tagDetail,
     Component: <TagDetails />,
   },
-  {
-    path: '/packages',
-    Component: <Packages />,
-  },
 ];
 export {NavigationRoutes};

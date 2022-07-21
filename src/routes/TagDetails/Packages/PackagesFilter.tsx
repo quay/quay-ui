@@ -29,7 +29,7 @@ export function PackagesFilter() {
     <Flex className="pf-u-mt-md">
       <FlexItem>
         <SearchInput
-          placeholder="Filter Vulnerabilities..."
+          placeholder="Filter Packages..."
           value={searchTerm}
           onChange={onSearchTermChanged}
           onClear={() => onSearchTermChanged('')}
