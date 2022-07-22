@@ -13,7 +13,13 @@ module.exports = merge(common('production'), {
   devtool: 'source-map',
   optimization: {
     minimizer: [
-      new TerserJSPlugin({}),
+      new TerserJSPlugin({
+        terserOptions: {
+          compress: {
+            pure_funcs: ['console.log', 'console.debug'],
+          },
+        },
+      }),
       new CssMinimizerPlugin({
         minimizerOptions: {
           preset: ['default', { mergeLonghand: false }],
