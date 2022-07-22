@@ -74,8 +74,8 @@ export default function Tags(props: TagsProps) {
         loadTags={loadTags}
       ></Toolbar>
       <Table
-        organization={props.organization}
-        repository={props.repository}
+        org={props.organization}
+        repo={props.repository}
         tags={paginatedTags}
       ></Table>
     </>

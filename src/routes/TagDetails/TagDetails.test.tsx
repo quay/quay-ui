@@ -10,7 +10,7 @@ import {
   TagsResponse,
   getTags,
   getManifestByDigest,
-  Manifest,
+  getLabels,
 } from 'src/resources/TagResource';
 import {formatDate} from 'src/libs/utils';
 
@@ -25,6 +25,7 @@ jest.mock('src/resources/TagResource', () => ({
   getManifestByDigest: jest.fn(),
   getSecurityDetails: jest.fn(),
   deleteTag: jest.fn(),
+  getLabels: jest.fn(),
 }));
 
 const createTagResponse = (): TagsResponse => {
@@ -44,6 +45,19 @@ const createTag = (name = 'latest'): Tag => {
     reversion: false,
     start_ts: 1654197152,
     manifest_list: null,
+  };
+};
+const createLabelsResponse = () => {
+  return {
+    labels: [
+      {
+        id: '1',
+        key: 'description',
+        value: 'This is an example description label',
+        source_type: 'manifest',
+        media_type: 'text/plain',
+      },
+    ],
   };
 };
 
@@ -75,6 +89,7 @@ test('Render simple tag', async () => {
   const mockTag = createTag();
   mockResponse.tags.push(mockTag);
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getLabels, true).mockResolvedValue(createLabelsResponse());
   mocked(useLocation, true).mockImplementation(() => ({
     ...jest.requireActual('react-router-dom').useLocation,
     pathname: '/organizations/testorg/testrepo/latest',
@@ -122,7 +137,7 @@ test('Render simple tag', async () => {
     {
       testId: 'labels',
       name: 'Labels',
-      value: 'TODO-labels',
+      value: 'description = This is an example description label',
     },
   ];
   await checkFieldValues(tests);
@@ -184,6 +199,7 @@ test('Render manifest list tag', async () => {
   };
 
   mocked(getTags, true).mockResolvedValue(mockResponse);
+  mocked(getLabels, true).mockResolvedValue(createLabelsResponse());
   mocked(getManifestByDigest, true).mockResolvedValue({
     digest: mockTag.manifest_digest,
     is_manifest_list: true,
@@ -241,7 +257,7 @@ test('Render manifest list tag', async () => {
     {
       testId: 'labels',
       name: 'Labels',
-      value: 'TODO-labels',
+      value: 'description = This is an example description label',
     },
   ];
   await checkFieldValues(tests);

@@ -37,6 +37,17 @@ export interface Platform {
   features: string[];
 }
 
+export interface LabelsResponse {
+  labels: Label[];
+}
+
+export interface Label {
+  id: string;
+  key: string;
+  media_type: string;
+  source_type: string;
+  value: string;
+}
 export interface ManifestByDigestResponse {
   digest: string;
   is_manifest_list: boolean;
@@ -120,13 +131,24 @@ export async function getTags(
   }
 }
 
+export async function getLabels(org: string, repo: string, digest: string) {
+  try {
+    const response: AxiosResponse<LabelsResponse> = await axios.get(
+      `/api/v1/repository/${org}/${repo}/manifest/${digest}/labels`,
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(`API error getting labels ${error.message}`);
+  }
+}
+
 export async function deleteTag(org: string, repo: string, tag: string) {
   try {
     const response: AxiosResponse = await axios.delete(
       `/api/v1/repository/${org}/${repo}/tag/${tag}`,
     );
   } catch (error: any) {
-    throw new Error(`API error getting tags ${error.message}`);
+    throw new Error(`API error deleting tags ${error.message}`);
   }
 }
 
