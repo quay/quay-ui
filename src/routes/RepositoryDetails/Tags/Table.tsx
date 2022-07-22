@@ -237,13 +237,13 @@ export default function Table(props: TableProps) {
   );
 }
 
-type TableProps = {
+interface TableProps {
   org: string;
   repo: string;
   tags: Tag[];
-};
+}
 
-type RowProps = {
+interface RowProps {
   org: string;
   repo: string;
   tag: Tag;
@@ -252,13 +252,13 @@ type RowProps = {
   isTagExpanded: (tag: Tag) => boolean;
   setTagExpanded: (tag: Tag, isExpanding?: boolean) => void;
   selectTag: (tag: Tag, isSelecting?: boolean) => void;
-};
+}
 
-type SubRowProps = {
+interface SubRowProps {
   org: string;
   repo: string;
   tag: Tag;
   rowIndex: number;
   manifest: Manifest;
   isTagExpanded: (tag: Tag) => boolean;
-};
+}

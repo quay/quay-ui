@@ -18,7 +18,7 @@ export default function Labels(props: LabelsProps) {
         );
         setLabels(labelsResp.labels);
       } catch (error: any) {
-        console.log('Unable to get labels: ', error);
+        console.error('Unable to get labels: ', error);
       }
     })();
   }, []);
@@ -34,8 +34,8 @@ export default function Labels(props: LabelsProps) {
   );
 }
 
-type LabelsProps = {
+interface LabelsProps {
   org: string;
   repo: string;
   digest: string;
-};
+}
