@@ -7,6 +7,7 @@ import {
   PageSection,
   PageSectionVariants,
   ClipboardCopy,
+  Skeleton,
 } from '@patternfly/react-core';
 import prettyBytes from 'pretty-bytes';
 import CopyTags from './DetailsCopyTags';
@@ -26,57 +27,85 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="name">
             <DescriptionListTerm>Name</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.tag.name}
+              {props.tag.name ? (
+                props.tag.name
+              ) : (
+                <Skeleton width="100%"></Skeleton>
+              )}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="creation">
             <DescriptionListTerm>Creation</DescriptionListTerm>
             <DescriptionListDescription>
-              {formatDate(props.tag.start_ts)}
+              {props.tag.start_ts ? (
+                formatDate(props.tag.start_ts)
+              ) : (
+                <Skeleton width="100%"></Skeleton>
+              )}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="repository">
             <DescriptionListTerm>Repository</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.repo}
+              {props.repo ? props.repo : <Skeleton width="100%"></Skeleton>}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="modified">
             <DescriptionListTerm>Modified</DescriptionListTerm>
             <DescriptionListDescription>
-              {formatDate(props.tag.last_modified)}
+              {props.tag.last_modified ? (
+                formatDate(props.tag.last_modified)
+              ) : (
+                <Skeleton width="100%"></Skeleton>
+              )}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup>
             <DescriptionListTerm>Digest</DescriptionListTerm>
             <DescriptionListDescription>
-              <ClipboardCopy
-                data-testid="digest-clipboardcopy"
-                isReadOnly
-                hoverTip="Copy"
-                clickTip="Copied"
-                variant="inline-compact"
-              >
-                {props.digest}
-              </ClipboardCopy>
+              {props.digest ? (
+                <ClipboardCopy
+                  data-testid="digest-clipboardcopy"
+                  isReadOnly
+                  hoverTip="Copy"
+                  clickTip="Copied"
+                  variant="inline-compact"
+                >
+                  {props.digest}
+                </ClipboardCopy>
+              ) : (
+                <Skeleton width="100%"></Skeleton>
+              )}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="size">
             <DescriptionListTerm>Size</DescriptionListTerm>
             <DescriptionListDescription>
-              {prettyBytes(props.size)}
+              {props.size ? (
+                prettyBytes(props.size)
+              ) : (
+                <Skeleton width="100%"></Skeleton>
+              )}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="vulnerabilities">
             <DescriptionListTerm>Vulnerabilities</DescriptionListTerm>
             <DescriptionListDescription>
-              TODO-vulernabilities
+              {/* TODO - vulernabilities */}
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="labels">
             <DescriptionListTerm>Labels</DescriptionListTerm>
             <DescriptionListDescription>
-              <Labels org={props.org} repo={props.repo} digest={props.digest} />
+              {props.digest !== '' ? (
+                <Labels
+                  org={props.org}
+                  repo={props.repo}
+                  digest={props.digest}
+                />
+              ) : (
+                <Skeleton width="100%"></Skeleton>
+              )}
             </DescriptionListDescription>
           </DescriptionListGroup>
         </DescriptionList>
