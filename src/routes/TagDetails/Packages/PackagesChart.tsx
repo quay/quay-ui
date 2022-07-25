@@ -96,6 +96,7 @@ export function PackagesChart(props: PackageChartProps) {
 
   let patchesAvailable = 0;
   let totalPackages = 0;
+  let totalPackagesPerSeverity = 0;
   props.features.map((feature) => {
     totalPackages += 1;
     const perPackageVulnStats = {
@@ -117,10 +118,14 @@ export function PackagesChart(props: PackageChartProps) {
     // add perPackageStats to totals
     Object.keys(perPackageVulnStats).map((severity) => {
       stats[severity] += perPackageVulnStats[severity];
+      if (perPackageVulnStats[severity] > 0) {
+        totalPackagesPerSeverity += 1;
+      }
     });
 
     if (feature.Vulnerabilities.length == 0) {
       stats[VulnerabilitySeverity.None] += 1;
+      totalPackagesPerSeverity += 1;
     }
   });
 
@@ -130,7 +135,7 @@ export function PackagesChart(props: PackageChartProps) {
         <SplitItem>
           <PackagesDonutChart
             stats={stats}
-            total={totalPackages}
+            total={totalPackagesPerSeverity}
             patchesAvailable={patchesAvailable}
           />
         </SplitItem>
