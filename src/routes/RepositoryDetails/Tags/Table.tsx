@@ -58,6 +58,7 @@ function SubRow(props: SubRowProps) {
             digest={props.tag.manifest_digest}
             tag={props.tag.name}
             arch={props.manifest.platform.architecture}
+            variant="condensed"
           />
         </ExpandableRowContent>
       </Td>
@@ -127,6 +128,7 @@ function Row(props: RowProps) {
               repo={props.repo}
               digest={tag.manifest_digest}
               tag={tag.name}
+              variant="condensed"
             />
           )}
         </Td>
