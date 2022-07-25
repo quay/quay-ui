@@ -1,7 +1,7 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 import {within} from '@testing-library/dom';
 import {RecoilRoot} from 'recoil';
-import {useLocation, useNavigate, useSearchParams} from 'react-router-dom';
+import {useLocation, MemoryRouter, useSearchParams} from 'react-router-dom';
 import {mocked} from 'ts-jest/utils';
 import prettyBytes from 'pretty-bytes';
 import TagDetails from './TagDetails';
@@ -9,18 +9,23 @@ import {
   Tag,
   TagsResponse,
   getTags,
+  getSecurityDetails,
   getManifestByDigest,
   getLabels,
+  SecurityDetailsResponse,
+  VulnerabilitySeverity,
 } from 'src/resources/TagResource';
 import {formatDate} from 'src/libs/utils';
 
 jest.mock('react-router-dom', () => ({
+  ...(jest.requireActual('react-router-dom') as any),
   useLocation: jest.fn(),
   useNavigate: jest.fn(),
   useSearchParams: jest.fn(),
 }));
 
 jest.mock('src/resources/TagResource', () => ({
+  ...(jest.requireActual('src/resources/TagResource') as any),
   getTags: jest.fn(),
   getManifestByDigest: jest.fn(),
   getSecurityDetails: jest.fn(),
@@ -60,18 +65,87 @@ const createLabelsResponse = () => {
     ],
   };
 };
+const createSecurityResponse = (): SecurityDetailsResponse => {
+  return {
+    status: 'scanned',
+    data: {
+      Layer: {
+        Name: 'sha256:a86508918ea51da557037edb30cef2a2768fe3982448a23b969a5066bf888940',
+        ParentName: '',
+        NamespaceName: '',
+        IndexedByVersion: 4,
+        Features: [
+          {
+            Name: 'rsync',
+            VersionFormat: '',
+            NamespaceName: '',
+            AddedBy:
+              'sha256:f606edb6a32a7c5bce00ab71be5f987ba16eb6bc68bd6c5cefe48bc8199552ca',
+            Version: '3.1.3-12.el8',
+            Vulnerabilities: [
+              {
+                Severity: VulnerabilitySeverity.High,
+                NamespaceName: 'RHEL8-rhel-8.4-eus',
+                Link: 'https://access.redhat.com/errata/RHSA-2022:2198 https://access.redhat.com/security/cve/CVE-2018-25032',
+                FixedBy: '0:3.1.3-12.el8_4.1',
+                Description:
+                  'The rsync utility enables the users to copy and synchronize files locally or across a network. Synchronization with rsync is fast because rsync only sends the differences in files over the network instead of sending whole files. The rsync utility is also used as a mirroring tool.\n\nSecurity Fix(es):\n\n* zlib: A flaw found in zlib when compressing (not decompressing) certain inputs (CVE-2018-25032)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+                Name: 'RHSA-2022:2198: rsync security update (Important)',
+                Metadata: {
+                  UpdatedBy: 'RHEL8-rhel-8.4-eus',
+                  RepoName: 'cpe:/a:redhat:rhel_eus:8.4::appstream',
+                  RepoLink: null,
+                  DistroName: 'Red Hat Enterprise Linux Server',
+                  DistroVersion: '8',
+                  NVD: {
+                    CVSSv3: {
+                      Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+                      Score: 7.5,
+                    },
+                  },
+                },
+              },
+              {
+                Severity: VulnerabilitySeverity.High,
+                NamespaceName: 'RHEL8-rhel-8.4-eus',
+                Link: 'https://access.redhat.com/errata/RHSA-2022:2198 https://access.redhat.com/security/cve/CVE-2018-25032',
+                FixedBy: '0:3.1.3-12.el8_4.1',
+                Description:
+                  'The rsync utility enables the users to copy and synchronize files locally or across a network. Synchronization with rsync is fast because rsync only sends the differences in files over the network instead of sending whole files. The rsync utility is also used as a mirroring tool.\n\nSecurity Fix(es):\n\n* zlib: A flaw found in zlib when compressing (not decompressing) certain inputs (CVE-2018-25032)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+                Name: 'RHSA-2022:2198: rsync security update (Important)',
+                Metadata: {
+                  UpdatedBy: 'RHEL8-rhel-8.4-eus',
+                  RepoName: 'cpe:/o:redhat:rhel_eus:8.4::baseos',
+                  RepoLink: null,
+                  DistroName: 'Red Hat Enterprise Linux Server',
+                  DistroVersion: '8',
+                  NVD: {
+                    CVSSv3: {
+                      Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+                      Score: 7.5,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  };
+};
 
 type Test = {
   testId: string;
   name?: string;
-  value: string | number;
+  value: string;
 };
 
 const checkFieldValues = async (tests: Test[]) => {
   for (const test of tests) {
     const field = await screen.findByTestId(test.testId);
     expect(within(field).getByText(test.name)).toBeTruthy();
-    expect(await within(field).findByText(test.value)).toBeTruthy();
+    expect(field).toHaveTextContent(test.value);
   }
 };
 
@@ -90,6 +164,7 @@ test('Render simple tag', async () => {
   mockResponse.tags.push(mockTag);
   mocked(getTags, true).mockResolvedValue(mockResponse);
   mocked(getLabels, true).mockResolvedValue(createLabelsResponse());
+  mocked(getSecurityDetails, true).mockResolvedValue(createSecurityResponse());
   mocked(useLocation, true).mockImplementation(() => ({
     ...jest.requireActual('react-router-dom').useLocation,
     pathname: '/organizations/testorg/testrepo/latest',
@@ -102,6 +177,7 @@ test('Render simple tag', async () => {
     <RecoilRoot>
       <TagDetails />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
   const tests: Test[] = [
     {
@@ -132,7 +208,7 @@ test('Render simple tag', async () => {
     {
       testId: 'vulnerabilities',
       name: 'Vulnerabilities',
-      value: 'TODO-vulernabilities',
+      value: '2 High',
     },
     {
       testId: 'labels',
@@ -200,6 +276,7 @@ test('Render manifest list tag', async () => {
 
   mocked(getTags, true).mockResolvedValue(mockResponse);
   mocked(getLabels, true).mockResolvedValue(createLabelsResponse());
+  mocked(getSecurityDetails, true).mockResolvedValue(createSecurityResponse());
   mocked(getManifestByDigest, true).mockResolvedValue({
     digest: mockTag.manifest_digest,
     is_manifest_list: true,
@@ -218,6 +295,7 @@ test('Render manifest list tag', async () => {
     <RecoilRoot>
       <TagDetails />
     </RecoilRoot>,
+    {wrapper: MemoryRouter},
   );
 
   const archSelect = await screen.findByText('ppc64le');
@@ -252,7 +330,7 @@ test('Render manifest list tag', async () => {
     {
       testId: 'vulnerabilities',
       name: 'Vulnerabilities',
-      value: 'TODO-vulernabilities',
+      value: '2 High',
     },
     {
       testId: 'labels',

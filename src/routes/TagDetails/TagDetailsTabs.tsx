@@ -4,14 +4,8 @@ import {useState} from 'react';
 import Details from './Details/Details';
 import SecurityReport from './SecurityReport/SecurityReport';
 import {Tag} from 'src/resources/TagResource';
+import {TabIndex} from './Types';
 import {Packages} from './Packages/Packages';
-
-export enum TabIndex {
-  Details = 'details',
-  Layers = 'layers',
-  SecurityReport = 'securityreport',
-  Packages = 'packages',
-}
 
 // Return the tab as an enum or null if it does not exist
 function getTabIndex(tab: string) {
