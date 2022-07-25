@@ -5,10 +5,31 @@ import RepositoriesList from './RepositoriesList/RepositoriesList';
 import TagDetails from 'src/routes/TagDetails/TagDetails';
 import {Packages} from './TagDetails/Packages/Packages';
 
+const organizationNameBreadcrumb = (match) => {
+  return <span>{match.params.organizationName}</span>;
+};
+
+const repositoryNameBreadcrumb = (match) => {
+  return <span>{match.params.repositoryName}</span>;
+};
+
+const tagNameBreadcrumb = (match) => {
+  return <span>{match.params.tagName}</span>;
+};
+
+const Breadcrumb = {
+  organizationsListBreadcrumb: 'Organizations',
+  repositoriesListBreadcrumb: 'Repositories',
+  organizationDetailBreadcrumb: organizationNameBreadcrumb,
+  repositoryDetailBreadcrumb: repositoryNameBreadcrumb,
+  tagDetailBreadcrumb: tagNameBreadcrumb,
+};
+
 export enum NavigationPath {
   // Side Nav
   home = '/',
   organizationsList = '/organizations',
+
   repositoriesList = '/repositories',
 
   // Organization detail
@@ -56,22 +77,27 @@ const NavigationRoutes = [
   {
     path: NavigationPath.organizationsList,
     Component: <OrganizationsList />,
+    breadcrumb: 'organizations',
   },
   {
     path: NavigationPath.organizationDetail,
     Component: <Organization />,
+    breadcrumb: Breadcrumb.organizationDetailBreadcrumb,
   },
   {
     path: NavigationPath.repositoriesList,
     Component: <RepositoriesList />,
+    breadcrumb: Breadcrumb.repositoriesListBreadcrumb,
   },
   {
     path: NavigationPath.repositoryDetail,
     Component: <RepositoryDetails />,
+    breadcrumb: Breadcrumb.repositoryDetailBreadcrumb,
   },
   {
     path: NavigationPath.tagDetail,
     Component: <TagDetails />,
+    breadcrumb: Breadcrumb.tagDetailBreadcrumb,
   },
 ];
 export {NavigationRoutes};

@@ -3,26 +3,33 @@ import {
   BreadcrumbItem,
   PageBreadcrumb,
 } from '@patternfly/react-core';
+import {NavigationRoutes} from 'src/routes/NavigationPath';
 import {Link} from 'react-router-dom';
 import React, {useEffect, useState} from 'react';
-import useBreadcrumbs from 'use-react-router-breadcrumbs';
+import useBreadcrumbs, {
+  BreadcrumbComponentType,
+} from 'use-react-router-breadcrumbs';
 import {useLocation} from 'react-router';
 
 export function QuayBreadcrumb() {
   const [breadcrumbItems, setBreadcrumbItems] = useState<QuayBreadcrumbItem[]>(
     [],
   );
-  const routerBreadcrumbs: BreadcrumbData[] = useBreadcrumbs();
+  const routerBreadcrumbs: BreadcrumbData[] = useBreadcrumbs(NavigationRoutes, {
+    disableDefaults: true,
+    excludePaths: ['/'],
+  });
 
   useEffect(() => {
     const result = [];
     routerBreadcrumbs.map((object, i) => {
-      if (object.match.pathname == '/') {
-        return;
-      }
       const newObj = {};
       newObj['pathname'] = object.match.pathname;
-      newObj['title'] = object.breadcrumb.props.children;
+      if (object.breadcrumb.props.children) {
+        newObj['title'] = object.breadcrumb.props.children;
+      } else {
+        newObj['title'] = object.match.route.breadcrumb(object.match);
+      }
       newObj['active'] =
         object.match.pathname.localeCompare(window.location.pathname) === 0;
       result.push(newObj);
@@ -68,6 +75,11 @@ type BreadcrumbData = {
 
 type BreadcrumbMatch = {
   pathname: string;
+  route?: BreadcrumbsRoute;
+};
+
+type BreadcrumbsRoute = {
+  breadcrumb?: BreadcrumbComponentType | any | null;
 };
 
 type RouterBreadcrumbDetail = {

@@ -9,7 +9,6 @@ import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
 import {NavigationRoutes} from './NavigationPath';
-import OrganizationsList from './OrganizationsList/OrganizationsList';
 
 export function StandaloneMain() {
   const [, setUserState] = useRecoilState(UserState);
