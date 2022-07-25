@@ -10,6 +10,8 @@ export function getSeverityColor(severity: VulnerabilitySeverity) {
       return '#EC7A08';
     case VulnerabilitySeverity.Low:
       return '#F0AB00';
+    case VulnerabilitySeverity.None:
+      return '#3E8635';
     default:
       return '#8A8D90';
   }

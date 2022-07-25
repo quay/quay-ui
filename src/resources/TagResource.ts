@@ -109,8 +109,18 @@ export enum VulnerabilitySeverity {
   Medium = 'Medium',
   Low = 'Low',
   Negligible = 'Negligible',
+  None = 'None',
   Unknown = 'Unknown',
 }
+
+export const VulnerabilityOrder = {
+  [VulnerabilitySeverity.Critical]: 0,
+  [VulnerabilitySeverity.High]: 1,
+  [VulnerabilitySeverity.Medium]: 2,
+  [VulnerabilitySeverity.Low]: 3,
+  [VulnerabilitySeverity.Negligible]: 4,
+  [VulnerabilitySeverity.Unknown]: 5,
+};
 
 export async function getTags(
   org: string,
