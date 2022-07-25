@@ -1,10 +1,3 @@
-import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
-import Organization from './OrganizationsList/Organization/Organization';
-import RepositoryDetails from 'src/routes/RepositoryDetails/RepositoryDetails';
-import RepositoriesList from './RepositoriesList/RepositoriesList';
-import TagDetails from 'src/routes/TagDetails/TagDetails';
-import {Packages} from './TagDetails/Packages/Packages';
-
 export enum NavigationPath {
   // Side Nav
   home = '/',
@@ -51,27 +44,3 @@ export function getTagDetailPath(
 export function getDomain() {
   return process.env.REACT_APP_QUAY_DOMAIN || 'quay.io';
 }
-
-const NavigationRoutes = [
-  {
-    path: NavigationPath.organizationsList,
-    Component: <OrganizationsList />,
-  },
-  {
-    path: NavigationPath.organizationDetail,
-    Component: <Organization />,
-  },
-  {
-    path: NavigationPath.repositoriesList,
-    Component: <RepositoriesList />,
-  },
-  {
-    path: NavigationPath.repositoryDetail,
-    Component: <RepositoryDetails />,
-  },
-  {
-    path: NavigationPath.tagDetail,
-    Component: <TagDetails />,
-  },
-];
-export {NavigationRoutes};

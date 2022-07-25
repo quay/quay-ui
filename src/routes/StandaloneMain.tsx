@@ -8,8 +8,35 @@ import {QuaySidebar} from 'src/components/sidebar/QuaySidebar';
 import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
-import {NavigationRoutes} from './NavigationPath';
+import {NavigationPath} from './NavigationPath';
 import OrganizationsList from './OrganizationsList/OrganizationsList';
+import Organization from './OrganizationsList/Organization/Organization';
+import RepositoryDetails from 'src/routes/RepositoryDetails/RepositoryDetails';
+import RepositoriesList from './RepositoriesList/RepositoriesList';
+import TagDetails from 'src/routes/TagDetails/TagDetails';
+
+const NavigationRoutes = [
+  {
+    path: NavigationPath.organizationsList,
+    Component: <OrganizationsList />,
+  },
+  {
+    path: NavigationPath.organizationDetail,
+    Component: <Organization />,
+  },
+  {
+    path: NavigationPath.repositoriesList,
+    Component: <RepositoriesList />,
+  },
+  {
+    path: NavigationPath.repositoryDetail,
+    Component: <RepositoryDetails />,
+  },
+  {
+    path: NavigationPath.tagDetail,
+    Component: <TagDetails />,
+  },
+];
 
 export function StandaloneMain() {
   const [, setUserState] = useRecoilState(UserState);

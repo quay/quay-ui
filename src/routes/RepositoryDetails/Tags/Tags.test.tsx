@@ -9,10 +9,12 @@ import {
   deleteTag,
   getSecurityDetails,
   SecurityDetailsResponse,
+  VulnerabilitySeverity,
 } from 'src/resources/TagResource';
 import {MemoryRouter} from 'react-router-dom';
 
 jest.mock('src/resources/TagResource', () => ({
+  ...(jest.requireActual('src/resources/TagResource') as any),
   getTags: jest.fn(),
   getManifestByDigest: jest.fn(),
   getSecurityDetails: jest.fn(),
@@ -45,11 +47,66 @@ const createSecurityDetailsResponse = (): SecurityDetailsResponse => {
     status: 'scanned',
     data: {
       Layer: {
-        Name: '',
+        Name: 'sha256:a86508918ea51da557037edb30cef2a2768fe3982448a23b969a5066bf888940',
         ParentName: '',
         NamespaceName: '',
         IndexedByVersion: 1,
-        Features: [],
+        Features: [
+          {
+            Name: 'rsync',
+            VersionFormat: '',
+            NamespaceName: '',
+            AddedBy:
+              'sha256:f606edb6a32a7c5bce00ab71be5f987ba16eb6bc68bd6c5cefe48bc8199552ca',
+            Version: '3.1.3-12.el8',
+            Vulnerabilities: [
+              {
+                Severity: VulnerabilitySeverity.High,
+                NamespaceName: 'RHEL8-rhel-8.4-eus',
+                Link: 'https://access.redhat.com/errata/RHSA-2022:2198 https://access.redhat.com/security/cve/CVE-2018-25032',
+                FixedBy: '0:3.1.3-12.el8_4.1',
+                Description:
+                  'The rsync utility enables the users to copy and synchronize files locally or across a network. Synchronization with rsync is fast because rsync only sends the differences in files over the network instead of sending whole files. The rsync utility is also used as a mirroring tool.\n\nSecurity Fix(es):\n\n* zlib: A flaw found in zlib when compressing (not decompressing) certain inputs (CVE-2018-25032)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+                Name: 'RHSA-2022:2198: rsync security update (Important)',
+                Metadata: {
+                  UpdatedBy: 'RHEL8-rhel-8.4-eus',
+                  RepoName: 'cpe:/a:redhat:rhel_eus:8.4::appstream',
+                  RepoLink: null,
+                  DistroName: 'Red Hat Enterprise Linux Server',
+                  DistroVersion: '8',
+                  NVD: {
+                    CVSSv3: {
+                      Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+                      Score: 7.5,
+                    },
+                  },
+                },
+              },
+              {
+                Severity: VulnerabilitySeverity.High,
+                NamespaceName: 'RHEL8-rhel-8.4-eus',
+                Link: 'https://access.redhat.com/errata/RHSA-2022:2198 https://access.redhat.com/security/cve/CVE-2018-25032',
+                FixedBy: '0:3.1.3-12.el8_4.1',
+                Description:
+                  'The rsync utility enables the users to copy and synchronize files locally or across a network. Synchronization with rsync is fast because rsync only sends the differences in files over the network instead of sending whole files. The rsync utility is also used as a mirroring tool.\n\nSecurity Fix(es):\n\n* zlib: A flaw found in zlib when compressing (not decompressing) certain inputs (CVE-2018-25032)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+                Name: 'RHSA-2022:2198: rsync security update (Important)',
+                Metadata: {
+                  UpdatedBy: 'RHEL8-rhel-8.4-eus',
+                  RepoName: 'cpe:/o:redhat:rhel_eus:8.4::baseos',
+                  RepoLink: null,
+                  DistroName: 'Red Hat Enterprise Linux Server',
+                  DistroVersion: '8',
+                  NVD: {
+                    CVSSv3: {
+                      Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+                      Score: 7.5,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        ],
       },
     },
   };
