@@ -8,6 +8,7 @@ import {
   Page,
   PageSection,
   PageSectionVariants,
+  Spinner,
   TextInput,
   Title,
   Toolbar,
@@ -375,42 +376,51 @@ export default function RepositoriesList() {
             </Tr>
           </Thead>
           <Tbody>
-            {repositoryList.map((repo, rowIndex) => (
-              <Tr key={rowIndex}>
-                <Td
-                  select={{
-                    rowIndex,
-                    onSelect: (_event, isSelecting) =>
-                      onSelectRepo(repo, rowIndex, isSelecting),
-                    isSelected: isRepoSelected(repo),
-                    disable: !isRepoSelectable(repo),
-                  }}
-                />
-                <Td dataLabel={columnNames.repoName}>
-                  {currentOrg == null ? (
-                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
-                      {repo.namespace}/{repo.name}
-                    </Link>
-                  ) : (
-                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
-                      {repo.name}
-                    </Link>
-                  )}
-                </Td>
-                <Td dataLabel={columnNames.visibility}>
-                  {' '}
-                  {repo.isPublic ? 'public' : 'private'}
-                </Td>
-                <Td dataLabel={columnNames.tags}> {repo.tags} </Td>
-                <Td dataLabel={columnNames.size}> {repo.size} </Td>
-                <Td dataLabel={columnNames.pulls}> {repo.pulls} </Td>
-                <Td dataLabel={columnNames.lastPull}> {repo.lastPull} </Td>
-                <Td dataLabel={columnNames.lastModified}>
-                  {' '}
-                  {repo.lastModified}{' '}
+            {repositoryList.length === 0 ? (
+              // Repo table loading icon
+              <Tr>
+                <Td>
+                  <Spinner size="lg" />
                 </Td>
               </Tr>
-            ))}
+            ) : (
+              repositoryList.map((repo, rowIndex) => (
+                <Tr key={rowIndex}>
+                  <Td
+                    select={{
+                      rowIndex,
+                      onSelect: (_event, isSelecting) =>
+                        onSelectRepo(repo, rowIndex, isSelecting),
+                      isSelected: isRepoSelected(repo),
+                      disable: !isRepoSelectable(repo),
+                    }}
+                  />
+                  <Td dataLabel={columnNames.repoName}>
+                    {currentOrg == null ? (
+                      <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
+                        {repo.namespace}/{repo.name}
+                      </Link>
+                    ) : (
+                      <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
+                        {repo.name}
+                      </Link>
+                    )}
+                  </Td>
+                  <Td dataLabel={columnNames.visibility}>
+                    {' '}
+                    {repo.isPublic ? 'public' : 'private'}
+                  </Td>
+                  <Td dataLabel={columnNames.tags}> {repo.tags} </Td>
+                  <Td dataLabel={columnNames.size}> {repo.size} </Td>
+                  <Td dataLabel={columnNames.pulls}> {repo.pulls} </Td>
+                  <Td dataLabel={columnNames.lastPull}> {repo.lastPull} </Td>
+                  <Td dataLabel={columnNames.lastModified}>
+                    {' '}
+                    {repo.lastModified}{' '}
+                  </Td>
+                </Tr>
+              ))
+            )}
           </Tbody>
         </TableComposable>
       </PageSection>

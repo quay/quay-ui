@@ -1,3 +1,4 @@
+import {Spinner} from '@patternfly/react-core';
 import {
   ExpandableRowContent,
   TableComposable,
@@ -232,7 +233,9 @@ export default function Table(props: TableProps) {
           />
         ))}
       </TableComposable>
-      {props.tags.length == 0 ? <div>This repository is empty.</div> : null}
+
+      {/* Loading icon for table without tag data */}
+      {props.tags.length == 0 ? <Spinner isSVG size="lg" /> : null}
     </>
   );
 }
