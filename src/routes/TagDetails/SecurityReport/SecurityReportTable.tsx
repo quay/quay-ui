@@ -11,7 +11,12 @@ import {
   ExpandableRowContent,
 } from '@patternfly/react-table';
 import {SecurityReportMetadataTable} from './SecurityReportMetadataTable';
-import {PageSection, PageSectionVariants, Title} from '@patternfly/react-core';
+import {
+  PageSection,
+  PageSectionVariants,
+  Spinner,
+  Title,
+} from '@patternfly/react-core';
 import {useRecoilState} from 'recoil';
 import {
   filteredVulnListState,
@@ -120,7 +125,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       <SecurityReportFilter />
       <TableComposable aria-label="Expandable table" variant={'compact'}>
         <TableHead />
-        {filteredVulnList ? (
+        {filteredVulnList.length !== 0 ? (
           filteredVulnList.map(
             (vulnerability: VulnerabilityListItem, rowIndex) => {
               const uniqueKey = generateUniqueKey(vulnerability);
@@ -201,11 +206,13 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
             },
           )
         ) : (
-          <tbody>
-            <tr>
-              <td> Loading </td>
-            </tr>
-          </tbody>
+          <Tbody>
+            <Tr>
+              <Td>
+                <Spinner size="lg" />
+              </Td>
+            </Tr>
+          </Tbody>
         )}
       </TableComposable>
     </PageSection>

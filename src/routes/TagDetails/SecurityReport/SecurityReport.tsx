@@ -6,32 +6,39 @@ import {
   SecurityDetailsResponse,
 } from 'src/resources/TagResource';
 import {SecurityReportChart} from './SecurityReportChart';
+import {LoadingPage} from 'src/components/LoadingPage';
 
 export default function SecurityReport(props: SecurityReportProps) {
   const [data, setData] = useState<Data>(null);
+
+  // Grab security details based on digest
   useEffect(() => {
-    (async () => {
-      try {
-        const securityDetails: SecurityDetailsResponse =
-          await getSecurityDetails(props.org, props.repo, props.digest);
-        setData(securityDetails.data);
-      } catch (error) {
-        console.error('Unable to get security details: ', error);
-      }
-    })();
-  }, []);
+    if (props.digest !== '') {
+      (async () => {
+        try {
+          const securityDetails: SecurityDetailsResponse =
+            await getSecurityDetails(props.org, props.repo, props.digest);
+          setData(securityDetails.data);
+        } catch (error) {
+          console.error('Unable to get security details: ', error);
+        }
+      })();
+    }
+  }, [props.digest]);
+
+  let features = [];
 
   if (data) {
-    return (
-      <>
-        <SecurityReportChart features={data.Layer.Features} />
-        <hr />
-        <SecurityReportTable features={data.Layer.Features} />
-      </>
-    );
+    features = data.Layer.Features;
   }
 
-  return <div>Loading</div>;
+  return (
+    <>
+      <SecurityReportChart features={features} />
+      <hr />
+      <SecurityReportTable features={features} />
+    </>
+  );
 }
 
 interface SecurityReportProps {

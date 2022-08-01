@@ -4,6 +4,7 @@ import {ChartDonut} from '@patternfly/react-charts';
 import {
   PageSection,
   PageSectionVariants,
+  Skeleton,
   Split,
   SplitItem,
   Title,
@@ -22,12 +23,19 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
           size={TitleSizes['3xl']}
           className="pf-u-mb-sm"
         >
-          Quay Security Reporting has detected {props.total} vulnerabilities
+          {props.total ? (
+            `Quay Security Reporting has detected ${props.total} vulnerabilities`
+          ) : (
+            <Skeleton width="400px" />
+          )}
         </Title>
         <Title headingLevel="h3" className="pf-u-mb-lg">
-          Patches are available for {props.patchesAvailable} vulnerabilities
+          {props.total ? (
+            `Patches are available for ${props.patchesAvailable} vulnerabilities`
+          ) : (
+            <Skeleton width="300px" />
+          )}
         </Title>
-
         {Object.keys(props.stats).map((vulnLevel) => {
           if (props.stats[vulnLevel] > 0) {
             return (
@@ -50,29 +58,33 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
 function VulnerabilityChart(props: VulnerabilityStatsProps) {
   return (
     <div style={{height: '20em', width: '20em'}}>
-      <ChartDonut
-        ariaDesc="vulnerability chart"
-        ariaTitle="vulnerability chart"
-        constrainToVisibleArea={true}
-        data={[
-          {x: VulnerabilitySeverity.Critical, y: props.stats.Critical},
-          {x: VulnerabilitySeverity.High, y: props.stats.High},
-          {x: VulnerabilitySeverity.Medium, y: props.stats.Medium},
-          {x: VulnerabilitySeverity.Low, y: props.stats.Low},
-          {x: VulnerabilitySeverity.Negligible, y: props.stats.Negligible},
-          {x: VulnerabilitySeverity.Unknown, y: props.stats.Unknown},
-        ]}
-        colorScale={[
-          getSeverityColor(VulnerabilitySeverity.Critical),
-          getSeverityColor(VulnerabilitySeverity.High),
-          getSeverityColor(VulnerabilitySeverity.Medium),
-          getSeverityColor(VulnerabilitySeverity.Low),
-          getSeverityColor(VulnerabilitySeverity.Negligible),
-          getSeverityColor(VulnerabilitySeverity.Unknown),
-        ]}
-        labels={({datum}) => `${datum.x}: ${datum.y}`}
-        title={`${props.total}`}
-      />
+      {props.total !== 0 ? (
+        <ChartDonut
+          ariaDesc="vulnerability chart"
+          ariaTitle="vulnerability chart"
+          constrainToVisibleArea={true}
+          data={[
+            {x: VulnerabilitySeverity.Critical, y: props.stats.Critical},
+            {x: VulnerabilitySeverity.High, y: props.stats.High},
+            {x: VulnerabilitySeverity.Medium, y: props.stats.Medium},
+            {x: VulnerabilitySeverity.Low, y: props.stats.Low},
+            {x: VulnerabilitySeverity.Negligible, y: props.stats.Negligible},
+            {x: VulnerabilitySeverity.Unknown, y: props.stats.Unknown},
+          ]}
+          colorScale={[
+            getSeverityColor(VulnerabilitySeverity.Critical),
+            getSeverityColor(VulnerabilitySeverity.High),
+            getSeverityColor(VulnerabilitySeverity.Medium),
+            getSeverityColor(VulnerabilitySeverity.Low),
+            getSeverityColor(VulnerabilitySeverity.Negligible),
+            getSeverityColor(VulnerabilitySeverity.Unknown),
+          ]}
+          labels={({datum}) => `${datum.x}: ${datum.y}`}
+          title={`${props.total}`}
+        />
+      ) : (
+        <Skeleton shape="circle" width="100%" />
+      )}
     </div>
   );
 }

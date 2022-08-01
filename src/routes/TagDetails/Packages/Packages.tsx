@@ -11,15 +11,17 @@ export function Packages(props: PackagesProps) {
   const [data, setData] = useState<Data>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const securityDetails: SecurityDetailsResponse =
-          await getSecurityDetails(props.org, props.repo, props.digest);
-        setData(securityDetails.data);
-      } catch (error) {
-        console.error('Unable to get security details: ', error);
-      }
-    })();
+    if (props.digest !== '') {
+      (async () => {
+        try {
+          const securityDetails: SecurityDetailsResponse =
+            await getSecurityDetails(props.org, props.repo, props.digest);
+          setData(securityDetails.data);
+        } catch (error) {
+          console.error('Unable to get security details: ', error);
+        }
+      })();
+    }
   }, []);
 
   if (data) {
