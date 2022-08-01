@@ -15,6 +15,7 @@ export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const filter = useRecoilValue(filterState);
   const pagination = useRecoilValue(paginationState);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const filteredTags: Tag[] =
     filter !== '' ? tags.filter((tag) => tag.name.includes(filter)) : tags;
@@ -54,9 +55,11 @@ export default function Tags(props: TagsProps) {
         }
         hasAdditional = resp.has_additional;
         page++;
+        setLoading(false);
       } catch (error: any) {
         console.log('error');
         console.log(error);
+        setLoading(false);
       }
     } while (hasAdditional);
   };
@@ -77,6 +80,7 @@ export default function Tags(props: TagsProps) {
         org={props.organization}
         repo={props.repository}
         tags={paginatedTags}
+        loading={loading}
       ></Table>
     </>
   );

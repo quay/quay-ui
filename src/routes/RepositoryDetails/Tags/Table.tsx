@@ -59,6 +59,7 @@ function SubRow(props: SubRowProps) {
             digest={props.tag.manifest_digest}
             tag={props.tag.name}
             arch={props.manifest.platform.architecture}
+            variant="condensed"
           />
         </ExpandableRowContent>
       </Td>
@@ -128,6 +129,7 @@ function Row(props: RowProps) {
               repo={props.repo}
               digest={tag.manifest_digest}
               tag={tag.name}
+              variant="condensed"
             />
           )}
         </Td>
@@ -234,8 +236,10 @@ export default function Table(props: TableProps) {
         ))}
       </TableComposable>
 
-      {/* Loading icon for table without tag data */}
-      {props.tags.length == 0 ? <Spinner isSVG size="lg" /> : null}
+      {props.loading ? <Spinner isSVG size="lg" /> : null}
+      {props.tags.length == 0 && !props.loading ? (
+        <div>This repository is empty.</div>
+      ) : null}
     </>
   );
 }
@@ -244,6 +248,7 @@ interface TableProps {
   org: string;
   repo: string;
   tags: Tag[];
+  loading: boolean;
 }
 
 interface RowProps {

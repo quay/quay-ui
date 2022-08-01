@@ -14,6 +14,7 @@ import CopyTags from './DetailsCopyTags';
 import {Tag} from 'src/resources/TagResource';
 import {formatDate} from 'src/libs/utils';
 import Labels from 'src/components/labels/Labels';
+import SecurityDetails from 'src/routes/RepositoryDetails/Tags/SecurityDetails';
 
 export default function Details(props: DetailsProps) {
   return (
@@ -91,7 +92,12 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="vulnerabilities">
             <DescriptionListTerm>Vulnerabilities</DescriptionListTerm>
             <DescriptionListDescription>
-              {/* TODO - vulernabilities */}
+              <SecurityDetails
+                org={props.org}
+                repo={props.repo}
+                digest={props.digest}
+                tag={props.tag.name}
+              />
             </DescriptionListDescription>
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="labels">
