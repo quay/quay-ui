@@ -20,6 +20,7 @@ enum Variant {
 }
 
 export default function SecurityDetails(props: SecurityDetailsProps) {
+  const [status, setStatus] = useState<string>();
   const [vulnCount, setVulnCount] =
     useState<Map<VulnerabilitySeverity, number>>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,19 +49,22 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           const securityDetails: SecurityDetailsResponse =
             await getSecurityDetails(props.org, props.repo, props.digest);
           const vulns = new Map<VulnerabilitySeverity, number>();
-          for (const feature of securityDetails.data.Layer.Features) {
-            if (feature.Vulnerabilities) {
-              for (const vuln of feature.Vulnerabilities) {
-                if (vuln.Severity in VulnerabilitySeverity) {
-                  if (vulns.has(vuln.Severity)) {
-                    vulns.set(vuln.Severity, vulns.get(vuln.Severity) + 1);
-                  } else {
-                    vulns.set(vuln.Severity, 1);
+          if (securityDetails.data) {
+            for (const feature of securityDetails.data.Layer.Features) {
+              if (feature.Vulnerabilities) {
+                for (const vuln of feature.Vulnerabilities) {
+                  if (vuln.Severity in VulnerabilitySeverity) {
+                    if (vulns.has(vuln.Severity)) {
+                      vulns.set(vuln.Severity, vulns.get(vuln.Severity) + 1);
+                    } else {
+                      vulns.set(vuln.Severity, 1);
+                    }
                   }
                 }
               }
             }
           }
+          setStatus(securityDetails.status);
           setVulnCount(vulns);
           setLoading(false);
         } catch (error: any) {
@@ -68,7 +72,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
         }
       })();
     }
-  }, []);
+  }, [props.digest]);
   const queryParams = new Map<string, string>([
     ['tab', TabIndex.SecurityReport],
   ]);
@@ -76,8 +80,16 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     queryParams.set('arch', props.arch);
   }
 
-  if (loading && props.variant === Variant.condensed) {
+  if (loading) {
     return <Skeleton width="50%"></Skeleton>;
+  }
+
+  if (status === 'queued') {
+    return <div>Queued</div>;
+  } else if (status === 'failed') {
+    return <div>Failed</div>;
+  } else if (status === 'unsupported') {
+    return <div>Unsupported</div>;
   }
 
   if (vulnCount.size === 0) {
