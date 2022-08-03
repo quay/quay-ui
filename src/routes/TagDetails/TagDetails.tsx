@@ -79,8 +79,7 @@ export default function TagDetails() {
         }
       } catch (error: any) {
         // TODO: provide sufficient error handling, will be resolved in a future PR
-        console.log('error');
-        console.log(error);
+        console.error(error);
       }
     })();
   }, [getTags, tagDetails.size]);

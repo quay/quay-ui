@@ -22,6 +22,7 @@ import {
 } from '@patternfly/react-table';
 import {useRecoilValue} from 'recoil';
 import {AuthState} from 'src/atoms/AuthState';
+import {createOrg} from 'src/resources/OrganisationResource';
 
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
@@ -110,7 +111,7 @@ export const CreateOrganizationModal = (
   const orgPlansPopOver = () => {
     return (
       <TableComposable
-        aria-label="Simple table"
+        aria-label="Org plans table"
         variant={'compact'}
         borders={false}
       >
@@ -135,14 +136,11 @@ export const CreateOrganizationModal = (
   };
 
   const createOrganizationHandler = async () => {
-    // handleModalToggle(); // check if this is needed
-    await fetch(`${quayAuth.QUAY_HOSTNAME}/api/v1/organization/`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${quayAuth.QUAY_OAUTH_TOKEN}`,
-      },
-      body: JSON.stringify({name: organizationName, email: organizationEmail}),
-    }).then;
+    try {
+      return await createOrg(organizationName, organizationEmail);
+    } catch (e) {
+      console.error('error creating org', e);
+    }
   };
 
   return (
@@ -207,7 +205,7 @@ export const CreateOrganizationModal = (
           {' '}
           Number of private repositories{' '}
           <Popover
-            aria-label="Basic popover"
+            aria-label="Org plans popover"
             headerContent={<div>Organization Plans</div>}
             bodyContent={orgPlansPopOver}
           >

@@ -2577,6 +2577,5 @@ const mockSecurityResponse = {
 };
 
 mock.onGet(securityUrl).reply((request) => {
-  console.log('security details mock response');
   return [200, mockSecurityResponse];
 });

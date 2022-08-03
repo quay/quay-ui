@@ -170,7 +170,6 @@ export default function OrganizationsList() {
   }, [userOrgs]);
 
   const onDelete = async () => {
-    console.log('Delete clicked');
     const x = selectedOrganization?.forEach(async (nsToBeDeleted) => {
       try {
         await deleteOrg(nsToBeDeleted);

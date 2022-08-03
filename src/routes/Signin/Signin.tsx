@@ -27,10 +27,8 @@ export function Signin() {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
-    console.log(`login submit ${username}, ${password}`);
     try {
       const response = await loginUser(username, password);
-      console.log(response);
       if (response.success) {
         const user = await getUser();
         setUserState(user);

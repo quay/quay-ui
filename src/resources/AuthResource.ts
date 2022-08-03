@@ -34,8 +34,6 @@ export async function loginUser(username: string, password: string) {
 export async function logoutUser() {
   try {
     const response = await axios.post(signoutApiUrl);
-    console.log('logout');
-    console.log(response);
     GlobalAuthState.isLoggedIn = false;
     GlobalAuthState.csrfToken = undefined;
     return response.data;
@@ -47,8 +45,6 @@ export async function logoutUser() {
 export async function getCsrfToken() {
   try {
     const response = await axios.get(csrfTokenUrl);
-    console.log('setting csrf token');
-    console.log(response.data);
     GlobalAuthState.csrfToken = response.data.csrf_token;
     return response.data;
   } catch (error: any) {

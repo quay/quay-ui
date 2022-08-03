@@ -57,8 +57,7 @@ export default function Tags(props: TagsProps) {
         page++;
         setLoading(false);
       } catch (error: any) {
-        console.log('error');
-        console.log(error);
+        console.error(error);
         setLoading(false);
       }
     } while (hasAdditional);

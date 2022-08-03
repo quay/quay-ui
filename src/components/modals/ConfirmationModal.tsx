@@ -13,7 +13,7 @@ export function ConfirmationModal(props: ConfirmationModalProps) {
           }),
         );
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
