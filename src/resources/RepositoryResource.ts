@@ -31,7 +31,7 @@ export async function fetchAllRepos(namespaces: string[]) {
     );
     return repoList;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 

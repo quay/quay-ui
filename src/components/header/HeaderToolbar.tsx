@@ -36,17 +36,13 @@ export function HeaderToolbar() {
   const navigate = useNavigate();
 
   const onDropdownToggle = () => {
-    console.log('onDropdownToggle');
     setIsDropdownOpen((prev) => !prev);
   };
 
   const onDropdownSelect = (e) => {
-    console.log('onDropdownSelect');
-    console.log(e);
     setIsDropdownOpen(false);
     switch (e.target.value) {
       case 'logout':
-        console.log('logout');
         // call the logout API
         logoutUser()
           .then(() => {

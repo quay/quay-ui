@@ -68,7 +68,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           setVulnCount(vulns);
           setLoading(false);
         } catch (error: any) {
-          console.log('Unable to get security details: ', error);
+          console.error('Unable to get security details: ', error);
         }
       })();
     }

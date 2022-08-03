@@ -122,7 +122,6 @@ function VulnerabilitiesEntry(props: VulnerabilitiesEntryProps) {
   }
 
   let total = 0;
-  console.log(props.counts);
   Object.values(props.counts).map((v) => (total += v));
 
   const remaining = total - props.counts[props.highestSeverity];
