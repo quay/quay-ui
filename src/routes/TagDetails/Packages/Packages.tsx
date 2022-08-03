@@ -10,19 +10,22 @@ import PackagesTable from './PackagesTable';
 export function Packages(props: PackagesProps) {
   const [data, setData] = useState<Data>(null);
 
+  console.log(`got data ${props.org} ${props.repo} ${props.digest}`);
+
   useEffect(() => {
     if (props.digest !== '') {
       (async () => {
         try {
           const securityDetails: SecurityDetailsResponse =
             await getSecurityDetails(props.org, props.repo, props.digest);
+          console.log('setting response', data);
           setData(securityDetails.data);
         } catch (error) {
           console.error('Unable to get security details: ', error);
         }
       })();
     }
-  }, []);
+  }, [props.digest]);
 
   if (data) {
     return (
