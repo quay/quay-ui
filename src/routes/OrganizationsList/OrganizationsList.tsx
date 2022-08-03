@@ -20,6 +20,7 @@ import {
   SelectOption,
   SelectVariant,
   SelectGroup,
+  Slider,
 } from '@patternfly/react-core';
 
 import './css/Organizations.scss';
@@ -29,6 +30,7 @@ import {useRecoilValue} from 'recoil';
 import {UserOrgs} from 'src/atoms/UserState';
 import {deleteOrg} from 'src/resources/OrganisationResource';
 import {useEffect, useState} from 'react';
+import * as React from 'react';
 
 export default function OrganizationsList() {
   const [organizationsList, setOrganizationsList] = useState<

@@ -21,7 +21,7 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import {useRecoilValue} from 'recoil';
-import {AuthState} from '../../atoms/AuthState';
+import {AuthState} from 'src/atoms/AuthState';
 
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
@@ -31,18 +31,19 @@ export const CreateOrganizationModal = (
 
   const [organizationName, setOrganizationName] = React.useState('');
   const [organizationEmail, setOrganizationEmail] = React.useState('');
-  const [repoCount, setRepoCount] = React.useState(250);
+  const [repoCount, setRepoCount] = React.useState(0);
+  const [repoCost, setRepoCost] = React.useState(0);
 
   const reposWithCost = [
-    {value: 0, label: '0'},
-    {value: 30, label: '10'},
-    {value: 60, label: '20'},
-    {value: 125, label: '50'},
-    {value: 250, label: '125'},
-    {value: 450, label: '250'},
-    {value: 850, label: '500'},
-    {value: 1600, label: '1000'},
-    {value: 2100, label: '2000'},
+    {value: 0, label: '0', cost: 0},
+    {value: 1, label: '10', cost: 30},
+    {value: 2, label: '20', cost: 60},
+    {value: 3, label: '50', cost: 125},
+    {value: 4, label: '125', cost: 250},
+    {value: 5, label: '250', cost: 450},
+    {value: 6, label: '500', cost: 850},
+    {value: 7, label: '1000', cost: 1600},
+    {value: 8, label: '2000', cost: 2100},
   ];
 
   const handleNameInputChange = (value: any) => {
@@ -53,8 +54,9 @@ export const CreateOrganizationModal = (
     setOrganizationEmail(value);
   };
 
-  const handleRepoCountChange = (value: any) => {
-    setRepoCount(value);
+  const handleRepoCountChange = (value: number) => {
+    setRepoCount(parseInt(reposWithCost[value].label));
+    setRepoCost(reposWithCost[value].cost);
   };
 
   const orgPricing = [
@@ -192,16 +194,12 @@ export const CreateOrganizationModal = (
             name="modal-with-form-form-name"
             value={organizationEmail}
             onChange={handleEmailInputChange}
-            // ref={nameInputRef}
           />
         </FormGroup>
         <br />
-
-        {/* <Text component={TextVariants.h3}> Choose your organization's plan: ${repoCount}</Text>
-        <Text component={TextVariants.small}> Number of private repositories </Text> */}
       </Form>
       <FormGroup
-        label={`Choose your organization's plan: $${repoCount}`}
+        label={`Choose your organization's plan: $${repoCost}`}
         isRequired
         fieldId="modal-with-form-form-email"
       >
@@ -217,9 +215,10 @@ export const CreateOrganizationModal = (
           </Popover>
         </Text>
         <Slider
+          className={'create-org-modal-slider'}
           value={repoCount}
-          showTicks
           customSteps={reposWithCost}
+          max={reposWithCost.length - 1}
           onChange={handleRepoCountChange}
         />
       </FormGroup>
