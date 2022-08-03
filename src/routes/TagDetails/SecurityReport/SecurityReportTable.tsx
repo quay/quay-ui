@@ -85,9 +85,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
     if (vulnerability.Metadata) {
       hashInput += vulnerability.Metadata.RepoName;
     }
-    const key = sha1(hashInput);
-    console.log(`input: ${hashInput}, key: ${key}`);
-    return key;
+    return sha1(hashInput);
   };
 
   const setRepoExpanded = (key: string, isExpanding = true) =>
