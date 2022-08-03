@@ -34,6 +34,10 @@ $pf-global-gutter--md: 1.5rem;
   --pf-c-button--disabled--BackgroundColor: transparent
 }
 
+.create-org-modal-slider {
+  word-break: normal;
+}
+
 // search placeholder text color
 // .pf-c-form-control {
 //   --pf-c-form-control--placeholder--Color: #989898
