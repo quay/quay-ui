@@ -33,6 +33,7 @@ import {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
+import {Pagination} from '@patternfly/react-core';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -47,6 +48,12 @@ export default function RepositoriesList() {
   const [repositoryList, setRepositoryList] =
     useRecoilState(repositoryListState);
 
+  const [perPage, setPerPage] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
+  const paginatedRepositoryList = repositoryList.slice(
+    page * perPage - perPage,
+    page * perPage - perPage + perPage,
+  );
   const isRepoSelectable = (repo: Repository) => repo.name !== ''; // Arbitrary logic for this example
   const selectableRepos = repositoryList.filter(isRepoSelectable);
   const [selectedRepoNames, setSelectedRepoNames] = useState<string[]>([]);
@@ -356,6 +363,18 @@ export default function RepositoriesList() {
             selectAllRepos={selectAllRepos}
           />
         </Toolbar>
+        <Pagination
+          perPageComponent="button"
+          itemCount={repositoryList.length}
+          perPage={perPage}
+          page={page}
+          onSetPage={(_event, pageNumber) => setPage(pageNumber)}
+          onPerPageSelect={(_event, perPageNumber) => {
+            setPage(1);
+            setPerPage(perPageNumber);
+          }}
+          widgetId="pagination-options-menu-top"
+        />
         <TableComposable aria-label="Selectable table">
           <Thead>
             <Tr>
@@ -384,7 +403,7 @@ export default function RepositoriesList() {
                 </Td>
               </Tr>
             ) : (
-              repositoryList.map((repo, rowIndex) => (
+              paginatedRepositoryList.map((repo, rowIndex) => (
                 <Tr key={rowIndex}>
                   <Td
                     select={{

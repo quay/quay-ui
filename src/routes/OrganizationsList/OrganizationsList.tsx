@@ -22,6 +22,7 @@ import {
   SelectGroup,
   Slider,
 } from '@patternfly/react-core';
+import {Pagination} from '@patternfly/react-core';
 
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
@@ -43,6 +44,12 @@ export default function OrganizationsList() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState<string[]>(
     [],
+  );
+  const [perPage, setPerPage] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
+  const paginatedOrganizationsList = organizationsList.slice(
+    page * perPage - perPage,
+    page * perPage - perPage + perPage,
   );
 
   const userOrgs = useRecoilValue(UserOrgs);
@@ -250,6 +257,18 @@ export default function OrganizationsList() {
               </ToolbarItem>
             </ToolbarContent>
           </Toolbar>
+          <Pagination
+            perPageComponent="button"
+            itemCount={organizationsList.length}
+            perPage={perPage}
+            page={page}
+            onSetPage={(_event, pageNumber) => setPage(pageNumber)}
+            onPerPageSelect={(_event, perPageNumber) => {
+              setPage(1);
+              setPerPage(perPageNumber);
+            }}
+            widgetId="pagination-options-menu-top"
+          />
           <TableComposable aria-label="Selectable table">
             <Thead>
               <Tr>
@@ -270,7 +289,7 @@ export default function OrganizationsList() {
               </Tr>
             </Thead>
             <Tbody>
-              {organizationsList.map((org, rowIndex) => (
+              {paginatedOrganizationsList.map((org, rowIndex) => (
                 <Tr key={org.name}>
                   <Td
                     select={{
