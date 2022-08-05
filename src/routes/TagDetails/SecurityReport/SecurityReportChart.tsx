@@ -20,7 +20,7 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
     message = <> Quay Security Reporting has detected No vulnerabilities </>;
   } else if (props.total > 0) {
     message = (
-      <> Quay Security Reporting has detected ${props.total} vulnerabilities </>
+      <> Quay Security Reporting has detected {props.total} vulnerabilities </>
     );
   }
 
@@ -29,7 +29,7 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
     patchesMessage = <> </>;
   } else if (props.total > 0) {
     patchesMessage = (
-      <> Patches are available for ${props.patchesAvailable} vulnerabilities</>
+      <> Patches are available for {props.patchesAvailable} vulnerabilities</>
     );
   }
 
@@ -127,7 +127,7 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
     });
   });
   // no vulnerabilities
-  if (total == 0) {
+  if (props.features.length > 0 && total == 0) {
     stats[VulnerabilitySeverity.None] = 1;
   }
 
