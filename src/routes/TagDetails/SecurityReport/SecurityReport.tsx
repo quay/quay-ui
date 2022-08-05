@@ -1,35 +1,16 @@
-import {useEffect, useState} from 'react';
 import SecurityReportTable from './SecurityReportTable';
-import {
-  Data,
-  getSecurityDetails,
-  SecurityDetailsResponse,
-} from 'src/resources/TagResource';
 import {SecurityReportChart} from './SecurityReportChart';
-import {LoadingPage} from 'src/components/LoadingPage';
+import {useRecoilState} from 'recoil';
+import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
 
 export default function SecurityReport(props: SecurityReportProps) {
-  const [data, setData] = useState<Data>(null);
+  const [data, setData] = useRecoilState(SecurityDetailsState);
 
-  // Grab security details based on digest
-  useEffect(() => {
-    if (props.digest !== '') {
-      (async () => {
-        try {
-          const securityDetails: SecurityDetailsResponse =
-            await getSecurityDetails(props.org, props.repo, props.digest);
-          setData(securityDetails.data);
-        } catch (error) {
-          console.error('Unable to get security details: ', error);
-        }
-      })();
-    }
-  }, [props.digest]);
-
-  let features = [];
+  // Set features to a default of null to distinuish between a completed API call and one that is in progress
+  let features = null;
 
   if (data) {
-    features = data.Layer.Features;
+    features = data.data.Layer.Features;
   }
 
   return (

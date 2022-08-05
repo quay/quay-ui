@@ -12,12 +12,13 @@ import prettyBytes from 'pretty-bytes';
 import {useState} from 'react';
 import {Tag, Manifest} from 'src/resources/TagResource';
 import {selectedTagsState} from 'src/atoms/TagListState';
-import {useRecoilState} from 'recoil';
+import {useRecoilState, useResetRecoilState} from 'recoil';
 import {Link} from 'react-router-dom';
 import {getTagDetailPath} from 'src/routes/NavigationPath';
 import TablePopover from './TablePopover';
 import SecurityDetails from './SecurityDetails';
 import {formatDate} from 'src/libs/utils';
+import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
 
 const columnNames = {
   Tag: 'Tag',
@@ -88,6 +89,11 @@ function SubRow(props: SubRowProps) {
 function Row(props: RowProps) {
   const tag = props.tag;
   const rowIndex = props.rowIndex;
+
+  // Reset SecurityDetailsState so that loading skeletons appear when viewing report
+  const emptySecurityDetails = useResetRecoilState(SecurityDetailsState);
+  const resetSecurityDetails = () => emptySecurityDetails();
+
   return (
     <Tbody
       data-testid="table-entry"
@@ -116,7 +122,10 @@ function Row(props: RowProps) {
           }}
         />
         <Td dataLabel={columnNames.Tag}>
-          <Link to={getTagDetailPath(props.org, props.repo, tag.name)}>
+          <Link
+            to={getTagDetailPath(props.org, props.repo, tag.name)}
+            onClick={resetSecurityDetails}
+          >
             {tag.name}
           </Link>
         </Td>
