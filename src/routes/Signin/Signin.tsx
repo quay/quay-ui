@@ -30,8 +30,6 @@ export function Signin() {
     try {
       const response = await loginUser(username, password);
       if (response.success) {
-        const user = await getUser();
-        setUserState(user);
         setAuthState((old) => {
           return {...old, isSignedIn: true};
         });
