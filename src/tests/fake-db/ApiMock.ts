@@ -7,5 +7,7 @@ import './data/repository/repository';
 import './data/tag/tag';
 import './data/tag/labels';
 import './data/tag/manifest';
+import './data/config/config';
+import './data/config/logo';
 
 mock.onAny().passThrough();
