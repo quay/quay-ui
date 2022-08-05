@@ -1,8 +1,10 @@
 import {Nav, NavItem, NavList, PageSidebar} from '@patternfly/react-core';
 import {Link, useLocation} from 'react-router-dom';
+import {SidebarState} from 'src/atoms/SidebarState';
 import {NavigationPath} from 'src/routes/NavigationPath';
 import OrganizationsList from 'src/routes/OrganizationsList/OrganizationsList';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
+import {useRecoilValue} from 'recoil';
 
 interface SideNavProps {
   isSideNav: boolean;
@@ -28,6 +30,7 @@ const routes: SideNavProps[] = [
 
 export function QuaySidebar() {
   const location = useLocation();
+  const sidebarState = useRecoilValue(SidebarState);
 
   const Navigation = (
     <Nav>
@@ -46,5 +49,10 @@ export function QuaySidebar() {
     </Nav>
   );
 
-  return <PageSidebar className="page-sidebar" theme="dark" nav={Navigation} />;
+  if (sidebarState.isOpen) {
+    return (
+      <PageSidebar className="page-sidebar" theme="dark" nav={Navigation} />
+    );
+  }
+  return <></>;
 }
