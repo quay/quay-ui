@@ -9,9 +9,11 @@ export function useQuayConfig() {
   );
 
   useEffect(() => {
-    fetchQuayConfig().then((config: any) => {
+    (async () => {
+      const config = await fetchQuayConfig();
       setQuayConfig(config);
-    });
-  }, [setQuayConfig]);
+      console.log(config);
+    })();
+  }, []);
   return quayConfig;
 }

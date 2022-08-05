@@ -1,11 +1,14 @@
 // import { getBackendUrl } from '../utils/httputils';
 
-const testConfig = {
-  AUTHENTICATION_TYPE: 'Database',
-};
+import {AxiosResponse} from 'axios';
+import axios from '../libs/axios';
 
-export function fetchQuayConfig() {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(testConfig), 5000);
-  });
+export async function fetchQuayConfig() {
+  const configUrl = '/config';
+  try {
+    const response: AxiosResponse = await axios.get(configUrl);
+    return response.data;
+  } catch (e) {
+    console.error(e);
+  }
 }

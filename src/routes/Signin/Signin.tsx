@@ -4,7 +4,7 @@ import {
   LoginMainFooterBandItem,
   LoginPage,
 } from '@patternfly/react-core';
-import logo from 'src/assets/RH_QuayIO2.svg';
+import logo from 'src/assets/quay.svg';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {GlobalAuthState, loginUser} from 'src/resources/AuthResource';
 import {useNavigate} from 'react-router-dom';
@@ -12,6 +12,8 @@ import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
 import {AuthState} from 'src/atoms/AuthState';
+import axios from '../../libs/axios';
+import {useQuayConfig} from '../../hooks/UseQuayConfig';
 
 export function Signin() {
   const [username, setUsername] = useState('');
@@ -22,6 +24,12 @@ export function Signin() {
   const [, setAuthState] = useRecoilState(AuthState);
 
   const navigate = useNavigate();
+  const quayConfig = useQuayConfig();
+
+  let logoUrl = logo;
+  if (quayConfig && quayConfig.config.ENTERPRISE_DARK_LOGO_URL) {
+    logoUrl = `${axios.defaults.baseURL}${quayConfig.config.ENTERPRISE_DARK_LOGO_URL}`;
+  }
 
   const onLoginButtonClick = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -73,11 +81,11 @@ export function Signin() {
   return (
     <LoginPage
       className={'pdf-u-background-color-100'}
-      brandImgSrc={logo}
+      brandImgSrc={logoUrl}
       brandImgAlt="Red Hat Quay"
       backgroundImgSrc="assets/images/rh_login.jpeg"
       backgroundImgAlt="Red Hat Quay"
-      textContent="Quay.io builds, analyzes and distributes your container images. Store your containers with added security. Easily build and deploy new containers. Scan containers to provide security."
+      textContent="Quay builds, analyzes and distributes your container images. Store your containers with added security. Easily build and deploy new containers. Scan containers to provide security."
       loginTitle="Log in to your account"
     >
       {loginForm}
