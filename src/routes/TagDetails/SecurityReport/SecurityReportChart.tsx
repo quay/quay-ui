@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {ChartDonut} from '@patternfly/react-charts';
 import {
@@ -15,6 +15,24 @@ import {Feature, VulnerabilitySeverity} from 'src/resources/TagResource';
 import {getSeverityColor} from 'src/libs/utils';
 
 function VulnerabilitySummary(props: VulnerabilityStatsProps) {
+  let message = <Skeleton width="400px" />;
+  if (props.stats[VulnerabilitySeverity.None] > 0) {
+    message = <> Quay Security Reporting has detected No vulnerabilities </>;
+  } else if (props.total > 0) {
+    message = (
+      <> Quay Security Reporting has detected ${props.total} vulnerabilities </>
+    );
+  }
+
+  let patchesMessage = <Skeleton width="300px" />;
+  if (props.stats[VulnerabilitySeverity.None] > 0) {
+    patchesMessage = <> </>;
+  } else if (props.total > 0) {
+    patchesMessage = (
+      <> Patches are available for ${props.patchesAvailable} vulnerabilities</>
+    );
+  }
+
   return (
     <div>
       <div className="pf-u-mt-xl pf-u-ml-2xl">
@@ -23,21 +41,16 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
           size={TitleSizes['3xl']}
           className="pf-u-mb-sm"
         >
-          {props.total ? (
-            `Quay Security Reporting has detected ${props.total} vulnerabilities`
-          ) : (
-            <Skeleton width="400px" />
-          )}
+          {message}
         </Title>
         <Title headingLevel="h3" className="pf-u-mb-lg">
-          {props.total ? (
-            `Patches are available for ${props.patchesAvailable} vulnerabilities`
-          ) : (
-            <Skeleton width="300px" />
-          )}
+          {patchesMessage}
         </Title>
         {Object.keys(props.stats).map((vulnLevel) => {
-          if (props.stats[vulnLevel] > 0) {
+          if (
+            props.stats[vulnLevel] > 0 &&
+            vulnLevel != VulnerabilitySeverity.None
+          ) {
             return (
               <div className="pf-u-mb-sm" key={vulnLevel}>
                 <ExclamationTriangleIcon
@@ -58,7 +71,7 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
 function VulnerabilityChart(props: VulnerabilityStatsProps) {
   return (
     <div style={{height: '20em', width: '20em'}}>
-      {props.total !== 0 ? (
+      {props.total !== 0 || props.stats[VulnerabilitySeverity.None] ? (
         <ChartDonut
           ariaDesc="vulnerability chart"
           ariaTitle="vulnerability chart"
@@ -70,6 +83,7 @@ function VulnerabilityChart(props: VulnerabilityStatsProps) {
             {x: VulnerabilitySeverity.Low, y: props.stats.Low},
             {x: VulnerabilitySeverity.Negligible, y: props.stats.Negligible},
             {x: VulnerabilitySeverity.Unknown, y: props.stats.Unknown},
+            {x: VulnerabilitySeverity.None, y: props.stats.None},
           ]}
           colorScale={[
             getSeverityColor(VulnerabilitySeverity.Critical),
@@ -78,6 +92,7 @@ function VulnerabilityChart(props: VulnerabilityStatsProps) {
             getSeverityColor(VulnerabilitySeverity.Low),
             getSeverityColor(VulnerabilitySeverity.Negligible),
             getSeverityColor(VulnerabilitySeverity.Unknown),
+            getSeverityColor(VulnerabilitySeverity.None),
           ]}
           labels={({datum}) => `${datum.x}: ${datum.y}`}
           title={`${props.total}`}
@@ -111,6 +126,10 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
       }
     });
   });
+  // no vulnerabilities
+  if (total == 0) {
+    stats[VulnerabilitySeverity.None] = 1;
+  }
 
   return (
     <PageSection variant={PageSectionVariants.light}>
