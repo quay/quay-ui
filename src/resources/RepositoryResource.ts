@@ -4,9 +4,9 @@ import axios from 'src/libs/axios';
 export interface IRepository {
   namespace: string;
   name: string;
-  description: string;
+  description?: string;
   is_public: boolean;
-  kind: string;
+  kind?: string;
   state?: string;
   last_modified?: string;
   popularity?: number;
@@ -19,7 +19,6 @@ export interface RepositoryCreationResponse {
   kind: string;
 }
 
-// TO DO - use axios.all for doing multiple GETs for all ns query parameter
 export async function fetchAllRepos(namespaces: string[]) {
   try {
     const repoList = await Promise.all(
@@ -77,5 +76,20 @@ export async function setRepositoryVisibility(
   } catch (e) {
     // TODO: Find a better way to propagate errors
     console.error(e);
+  }
+}
+
+export async function bulkDeleteRepositories(repos: IRepository[]) {
+  try {
+    const response = await Promise.all(
+      repos.map((repo) => {
+        return axios.delete(
+          `/api/v1/repository/${repo.namespace + '/' + repo.name}`,
+        );
+      }),
+    );
+    return response;
+  } catch (error) {
+    console.error(error);
   }
 }

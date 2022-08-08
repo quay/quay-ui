@@ -113,7 +113,7 @@ module.exports = env => {
         output: {
             filename: '[name].bundle.js',
             path: path.resolve(__dirname, 'dist'),
-            publicPath: ASSET_PATH
+            publicPath: ASSET_PATH,
         },
         plugins: [
             new HtmlWebpackPlugin({

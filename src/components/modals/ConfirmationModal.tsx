@@ -1,7 +1,12 @@
 import {setRepositoryVisibility} from 'src/resources/RepositoryResource';
 import {Modal, ModalVariant, Button} from '@patternfly/react-core';
+import {getUser} from 'src/resources/UserResource';
+import {useRecoilState} from 'recoil';
+import {UserState} from 'src/atoms/UserState';
 
 export function ConfirmationModal(props: ConfirmationModalProps) {
+  const [, setUserState] = useRecoilState(UserState);
+
   async function changeVisibility() {
     if (props.selectedItems.length > 0) {
       const visibility = props.makePublic ? 'public' : 'private';
@@ -19,8 +24,9 @@ export function ConfirmationModal(props: ConfirmationModalProps) {
   }
 
   const handleModalConfirm = async () => {
-    await changeVisibility().then(() => {
-      props.fetchRepos(true);
+    await changeVisibility().then(async () => {
+      const user = await getUser();
+      setUserState(user);
       props.toggleModal();
       props.selectAllRepos(false);
     });
@@ -54,6 +60,5 @@ type ConfirmationModalProps = {
   selectedItems: string[];
   makePublic: boolean;
   toggleModal: () => void;
-  fetchRepos: (refresh) => void;
   selectAllRepos: (isSelecting) => void;
 };

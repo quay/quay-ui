@@ -25,15 +25,21 @@ import {
 } from '@patternfly/react-table';
 import {useRecoilState, useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
-import {repositoryListState} from 'src/atoms/RepositoryState';
-import {fetchAllRepos} from 'src/resources/RepositoryResource';
-import {DeleteRepositoryModal} from './DeleteRepositoryModal';
+import {
+  bulkDeleteRepositories,
+  fetchAllRepos,
+  IRepository,
+} from 'src/resources/RepositoryResource';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
 import {Pagination} from '@patternfly/react-core';
+import {selectedReposState} from 'src/atoms/RepositoryState';
+import {formatDate} from 'src/libs/utils';
+import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
+import {getUser} from 'src/resources/UserResource';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -45,8 +51,8 @@ export default function RepositoriesList() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
-  const [repositoryList, setRepositoryList] =
-    useRecoilState(repositoryListState);
+  const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
+  const [, setUserState] = useRecoilState(UserState);
 
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
@@ -54,35 +60,38 @@ export default function RepositoriesList() {
     page * perPage - perPage,
     page * perPage - perPage + perPage,
   );
-  const isRepoSelectable = (repo: Repository) => repo.name !== ''; // Arbitrary logic for this example
+  const [selectedRepoNames, setSelectedRepoNames] =
+    useRecoilState(selectedReposState);
+  const isRepoSelectable = (repo: IRepository) => repo.name !== ''; // Arbitrary logic for this example
   const selectableRepos = repositoryList.filter(isRepoSelectable);
-  const [selectedRepoNames, setSelectedRepoNames] = useState<string[]>([]);
-
-  const setRepoSelected = (repo: Repository, isSelecting = true) =>
-    setSelectedRepoNames((prevSelected) => {
-      const otherSelectedRepoNames = prevSelected.filter(
-        (r) => r !== repo.path,
-      );
-      return isSelecting && isRepoSelectable(repo)
-        ? [...otherSelectedRepoNames, repo.path]
-        : otherSelectedRepoNames;
-    });
 
   const selectAllRepos = (isSelecting = true) =>
-    setSelectedRepoNames(isSelecting ? selectableRepos.map((r) => r.path) : []);
+    setSelectedRepoNames(
+      isSelecting ? selectableRepos.map((r) => r.namespace + '/' + r.name) : [],
+    );
+
+  const setRepoSelected = (repo: IRepository, isSelecting = true) =>
+    setSelectedRepoNames((prevSelected) => {
+      const otherSelectedRepoNames = prevSelected.filter(
+        (r) => r !== r.namespace + '/' + r.name,
+      );
+      return isSelecting && isRepoSelectable(repo)
+        ? [...otherSelectedRepoNames, repo.namespace + '/' + repo.name]
+        : otherSelectedRepoNames;
+    });
 
   const areAllReposSelected =
     selectedRepoNames.length === selectableRepos.length;
 
-  const isRepoSelected = (repo: Repository) =>
-    selectedRepoNames.includes(repo.path);
+  const isRepoSelected = (repo: IRepository) =>
+    selectedRepoNames.includes(repo.namespace + '/' + repo.name);
 
   const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
     number | null
   >(null);
 
   const onSelectRepo = (
-    repo: Repository,
+    repo: IRepository,
     rowIndex: number,
     isSelecting: boolean,
   ) => {
@@ -123,15 +132,23 @@ export default function RepositoriesList() {
   const currentOrg = getReponameFromURL(useLocation().pathname);
 
   const handleDeleteModalToggle = () => {
+    setKebabOpen(!isKebabOpen);
     setDeleteKebabOption((prevState) => ({
       isModalOpen: !prevState.isModalOpen,
     }));
   };
 
-  const handleRepoDeletion = () => {
-    setKebabOpen(!isKebabOpen);
-    handleDeleteModalToggle();
-    // TODO: ADD API calls for bulk/ selected repo deletion
+  const handleRepoDeletion = async (repos: IRepository[]) => {
+    setDeleteKebabOption((prevState) => ({
+      isModalOpen: !prevState.isModalOpen,
+    }));
+    const response = await bulkDeleteRepositories(repos);
+    const deleteFailed = response.some((resp) => resp.status !== 204);
+    if (!deleteFailed) {
+      // Fetch user recomputes "repositoryList" via useEffect
+      const user = await getUser();
+      setUserState(user);
+    }
   };
 
   const fetchConfirmationModalText = () => {
@@ -169,7 +186,7 @@ export default function RepositoriesList() {
   ];
 
   const kebabItems = [
-    <DropdownItem key="delete" onClick={handleRepoDeletion}>
+    <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
       Delete
     </DropdownItem>,
 
@@ -206,7 +223,8 @@ export default function RepositoriesList() {
     setRepositorySearchInput(value);
   };
 
-  async function fetchRepos(refresh = false) {
+  async function fetchRepos() {
+    setRepositoryList([]);
     const listOfOrgNames = [];
     if (userOrgs) {
       // check if view is global vs scoped to a organization
@@ -217,33 +235,21 @@ export default function RepositoriesList() {
       } else {
         listOfOrgNames.push(currentOrg);
       }
-      try {
-        if (refresh) {
-          setRepositoryList([]);
-        }
-        await fetchAllRepos(listOfOrgNames).then((response) => {
-          response.map((eachResponse) =>
-            eachResponse?.data.repositories.map((repo) => {
-              setRepositoryList((prevRepos) => [
-                ...prevRepos,
-                {
-                  name: repo.name,
-                  namespace: repo.namespace,
-                  path: repo.namespace + '/' + repo.name,
-                  isPublic: repo.is_public,
-                  tags: 1,
-                  size: '1.1GB',
-                  pulls: 108,
-                  lastPull: 'TBA',
-                  lastModified: 'TBA',
-                },
-              ]);
-            }),
-          );
-        });
-      } catch (e) {
-        console.error(e);
-      }
+      await fetchAllRepos(listOfOrgNames).then((response) => {
+        response.map((eachResponse) =>
+          eachResponse?.data.repositories.map((repo) => {
+            setRepositoryList((prevRepos) => [
+              ...prevRepos,
+              {
+                namespace: repo.namespace,
+                name: repo.name,
+                is_public: repo.is_public,
+                last_modified: repo.last_modified,
+              },
+            ]);
+          }),
+        );
+      });
     }
   }
 
@@ -251,8 +257,21 @@ export default function RepositoriesList() {
     fetchRepos();
   }, [userOrgs]);
 
-  const updateListHandler = (value: RepositoryListProps) => {
+  const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);
+  };
+
+  /* Mapper object used to render bulk delete table 
+    - keys are actual column names of the table
+    - value is an object type with a "label" which maps to the attributes of <T> 
+      and an optional "transformFunc" which can be used to modify the value being displayed */
+  const mapOfColNamesToTableData = {
+    Repository: {label: 'name'},
+    Visibility: {
+      label: 'is_public',
+      transformFunc: (value) => (value ? 'public' : 'private'),
+    },
+    Size: {label: 'size'},
   };
 
   return (
@@ -313,29 +332,39 @@ export default function RepositoriesList() {
                   handleModalToggle={() =>
                     setCreateRepoModalOpen(!isCreateRepoModalOpen)
                   }
-                  orgNameProp={currentOrg}
+                  orgName={currentOrg}
                   updateListHandler={updateListHandler}
                 />
               ) : null}{' '}
             </ToolbarItem>
             <ToolbarItem>
-              <Dropdown
-                onSelect={() => setKebabOpen(!isKebabOpen)}
-                toggle={
-                  <KebabToggle
-                    onToggle={() => setKebabOpen(!isKebabOpen)}
-                    id="toggle-id-6"
-                  />
-                }
-                isOpen={isKebabOpen}
-                isPlain
-                dropdownItems={kebabItems}
-              />
+              {selectedRepoNames.length !== 0 ? (
+                <Dropdown
+                  onSelect={() => setKebabOpen(!isKebabOpen)}
+                  toggle={
+                    <KebabToggle
+                      onToggle={() => setKebabOpen(!isKebabOpen)}
+                      id="toggle-id-6"
+                    />
+                  }
+                  isOpen={isKebabOpen}
+                  isPlain
+                  dropdownItems={kebabItems}
+                />
+              ) : null}
               {deleteKebabOption.isModalOpen ? (
-                <DeleteRepositoryModal
+                <BulkDeleteModalTemplate
+                  mapOfColNamesToTableData={mapOfColNamesToTableData}
                   handleModalToggle={handleDeleteModalToggle}
-                  handleRepoDeletion={handleRepoDeletion}
+                  handleBulkDeletion={handleRepoDeletion}
                   isModalOpen={deleteKebabOption.isModalOpen}
+                  selectedItems={repositoryList.filter((repo) =>
+                    selectedRepoNames.some(
+                      (selected) =>
+                        repo.namespace + '/' + repo.name === selected,
+                    ),
+                  )}
+                  resourceName={'repositories'}
                 />
               ) : null}
             </ToolbarItem>
@@ -348,7 +377,6 @@ export default function RepositoriesList() {
             toggleModal={toggleMakePublicClick}
             buttonText="Make public"
             makePublic={true}
-            fetchRepos={fetchRepos}
             selectAllRepos={selectAllRepos}
           />
           <ConfirmationModal
@@ -359,7 +387,6 @@ export default function RepositoriesList() {
             buttonText="Make private"
             selectedItems={selectedRepoNames}
             makePublic={false}
-            fetchRepos={fetchRepos}
             selectAllRepos={selectAllRepos}
           />
         </Toolbar>
@@ -427,15 +454,14 @@ export default function RepositoriesList() {
                   </Td>
                   <Td dataLabel={columnNames.visibility}>
                     {' '}
-                    {repo.isPublic ? 'public' : 'private'}
+                    {repo.is_public ? 'public' : 'private'}
                   </Td>
-                  <Td dataLabel={columnNames.tags}> {repo.tags} </Td>
-                  <Td dataLabel={columnNames.size}> {repo.size} </Td>
-                  <Td dataLabel={columnNames.pulls}> {repo.pulls} </Td>
-                  <Td dataLabel={columnNames.lastPull}> {repo.lastPull} </Td>
+                  <Td dataLabel={columnNames.tags}> - </Td>
+                  <Td dataLabel={columnNames.size}> -</Td>
+                  <Td dataLabel={columnNames.pulls}> - </Td>
+                  <Td dataLabel={columnNames.lastPull}> - </Td>
                   <Td dataLabel={columnNames.lastModified}>
-                    {' '}
-                    {repo.lastModified}{' '}
+                    {formatDate(repo.last_modified)}
                   </Td>
                 </Tr>
               ))
@@ -445,28 +471,4 @@ export default function RepositoriesList() {
       </PageSection>
     </Page>
   );
-}
-
-export type RepositoryListProps = {
-  name: string;
-  namespace: string;
-  path: string;
-  isPublic: boolean;
-  tags: number;
-  size: string;
-  pulls: number;
-  lastPull: string;
-  lastModified: string;
-};
-
-interface Repository {
-  name: string;
-  namespace: string;
-  path: string;
-  isPublic: boolean;
-  tags: number;
-  size: string;
-  pulls: number;
-  lastPull: string;
-  lastModified: string;
 }

@@ -235,3 +235,8 @@ mock.onPost(visibilityPathRegex).reply((request: AxiosRequestConfig) => {
   const {visibility} = JSON.parse(request.data);
   return [200, successResponse];
 });
+
+const deleteRepoRegex = new RegExp(`/api/v1/repository/.+/.+`);
+mock.onDelete(deleteRepoRegex).reply((request: AxiosRequestConfig) => {
+  return [200, successResponse];
+});

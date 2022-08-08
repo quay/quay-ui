@@ -20,18 +20,24 @@ import {
   SelectOption,
   SelectVariant,
   SelectGroup,
-  Slider,
+  DropdownItem,
+  Dropdown,
+  KebabToggle,
 } from '@patternfly/react-core';
 import {Pagination} from '@patternfly/react-core';
 
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
-import {useRecoilValue} from 'recoil';
-import {UserOrgs} from 'src/atoms/UserState';
-import {deleteOrg} from 'src/resources/OrganisationResource';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import {UserOrgs, UserState} from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
-import * as React from 'react';
+import {
+  bulkDeleteOrganizations,
+  getOrg,
+} from 'src/resources/OrganisationResource';
+import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
+import {getUser, IUserResource} from 'src/resources/UserResource';
 
 export default function OrganizationsList() {
   const [organizationsList, setOrganizationsList] = useState<
@@ -52,7 +58,12 @@ export default function OrganizationsList() {
     page * perPage - perPage + perPage,
   );
 
+  const [deleteOption, setDeleteOption] = useState({
+    isModalOpen: false,
+    isKebabOpen: false,
+  });
   const userOrgs = useRecoilValue(UserOrgs);
+  const [user, setUserState] = useRecoilState(UserState);
 
   const columnNames = {
     name: 'Organization',
@@ -157,9 +168,20 @@ export default function OrganizationsList() {
     };
   }, []);
 
-  useEffect(() => {
+  const fetchData = async () => {
+    setOrganizationsList([]);
+
     if (userOrgs) {
-      userOrgs.map((org: any) => {
+      const user: IUserResource = await getUser();
+      // TODO: add other attributes for a user org to be displayed
+      const listOfOrgs = [
+        ...userOrgs,
+        {
+          name: user.username,
+        },
+      ];
+
+      listOfOrgs.map((org: any) => {
         setOrganizationsList((prevOrganizations) => [
           ...prevOrganizations,
           {
@@ -174,20 +196,41 @@ export default function OrganizationsList() {
         ]);
       });
     }
+  };
+
+  useEffect(() => {
+    const fetch = async () => {
+      fetchData();
+    };
+    fetch();
   }, [userOrgs]);
 
-  const onDelete = async () => {
-    const x = selectedOrganization?.forEach(async (nsToBeDeleted) => {
-      try {
-        await deleteOrg(nsToBeDeleted);
-        setOrganizationsList((prev) =>
-          prev.filter((ns) => ns.name !== nsToBeDeleted),
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    });
+  const handleOrgDeletion = async () => {
+    setDeleteOption((prevState) => ({
+      ...prevState,
+      isModalOpen: !prevState.isModalOpen,
+    }));
+    const response = await bulkDeleteOrganizations(selectedOrganization);
+    const deleteFailed = response.some((resp) => resp.status !== 204);
+    if (!deleteFailed) {
+      const user = await getUser();
+      setUserState(user);
+    }
   };
+
+  const kebabItems = [
+    <DropdownItem
+      key="delete"
+      onClick={() =>
+        setDeleteOption((prev) => ({
+          isKebabOpen: !prev.isKebabOpen,
+          isModalOpen: !prev.isModalOpen,
+        }))
+      }
+    >
+      Delete
+    </DropdownItem>,
+  ];
 
   const options = [
     <SelectGroup label="Role" key="group1">
@@ -195,6 +238,18 @@ export default function OrganizationsList() {
       <SelectOption key={1} value="Private" />
     </SelectGroup>,
   ];
+
+  /* Mapper object used to render bulk delete table 
+    - keys are actual column names of the table
+    - value is an object type with a "label" which maps to the attributes of <T> 
+      and an optional "transformFunc" which can be used to modify the value being displayed */
+  const mapOfColNamesToTableData = {
+    Organization: {label: 'name'},
+    'Repo Count': {
+      label: 'repoCount',
+    },
+    Tags: {label: 'tagCount'},
+  };
 
   return (
     <Page>
@@ -231,15 +286,49 @@ export default function OrganizationsList() {
                 />
               </ToolbarItem>
               <ToolbarItem>
-                <Button
-                  isDisabled={selectedOrganization.length === 0}
-                  variant="primary"
-                  className="pf-c-button pf-m-plain"
-                  type="button"
-                  onClick={onDelete}
-                >
-                  <i className="fas fa-trash"></i>
-                </Button>
+                {selectedOrganization.length !== 0 ? (
+                  <Dropdown
+                    onSelect={() =>
+                      setDeleteOption((prev) => ({
+                        ...prev,
+                        isKebabOpen: !prev.isKebabOpen,
+                      }))
+                    }
+                    toggle={
+                      <KebabToggle
+                        onToggle={() =>
+                          setDeleteOption((prev) => ({
+                            ...prev,
+                            isKebabOpen: !prev.isKebabOpen,
+                          }))
+                        }
+                        id="toggle-id-6"
+                      />
+                    }
+                    isOpen={deleteOption.isKebabOpen}
+                    isPlain
+                    dropdownItems={kebabItems}
+                  />
+                ) : null}
+                {deleteOption.isModalOpen ? (
+                  <BulkDeleteModalTemplate
+                    mapOfColNamesToTableData={mapOfColNamesToTableData}
+                    handleModalToggle={() =>
+                      setDeleteOption((prev) => ({
+                        ...prev,
+                        isModalOpen: !prev.isModalOpen,
+                      }))
+                    }
+                    handleBulkDeletion={handleOrgDeletion}
+                    isModalOpen={deleteOption.isModalOpen}
+                    selectedItems={organizationsList.filter((org) =>
+                      selectedOrganization.some(
+                        (selectedOrgName) => org.name === selectedOrgName,
+                      ),
+                    )}
+                    resourceName={'organizations'}
+                  />
+                ) : null}
               </ToolbarItem>
               <ToolbarItem alignment={{xl: 'alignRight'}}>
                 <Button
@@ -290,7 +379,7 @@ export default function OrganizationsList() {
             </Thead>
             <Tbody>
               {paginatedOrganizationsList.map((org, rowIndex) => (
-                <Tr key={org.name}>
+                <Tr key={rowIndex}>
                   <Td
                     select={{
                       rowIndex,

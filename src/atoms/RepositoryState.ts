@@ -1,6 +1,6 @@
-import {atom, selector} from 'recoil';
+import {atom} from 'recoil';
 
-export const repositoryListState = atom({
-  key: 'RepositoryList',
+export const selectedReposState = atom({
+  key: 'selectedReposState',
   default: [],
 });
