@@ -17,6 +17,7 @@ import {useRecoilState, useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
 import {
   createNewRepository,
+  IRepository,
   RepositoryCreationResponse,
 } from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
@@ -32,12 +33,12 @@ export const CreateRepositoryModalTemplate = (
   props: CreateRepositoryModalTemplateProps,
 ): JSX.Element => {
   const userOrgs = useRecoilValue(UserOrgs);
-  const [, setUserState] = useRecoilState(UserState);
+  const [userState, setUserState] = useRecoilState(UserState);
 
   const [currentOrganization, setCurrentOrganization] = useState({
     // For org scoped view, the name is set current org and for Repository list view,
     // the name is set to 1st value from the Namespace dropdown
-    name: props.orgName !== null ? props.orgName : userOrgs[0].name,
+    name: props.orgName !== null ? props.orgName : null,
     isDropdownOpen: false,
   });
 
@@ -58,8 +59,14 @@ export const CreateRepositoryModalTemplate = (
     setNewRepository({...newRepository, description: value});
   };
 
-  // TODO (harish): Show user and list of orgs in the Namespace dropdown
-  // see PROJQUAY-3900 comment for details
+  const orgSelectionList = (
+    <>
+      {userOrgs.map((orgs, idx) => (
+        <SelectOption key={idx} value={orgs.name}></SelectOption>
+      ))}
+      ;
+    </>
+  );
 
   const createRepositoryHandler = async () => {
     props.handleModalToggle();
@@ -89,17 +96,6 @@ export const CreateRepositoryModalTemplate = (
       isDropdownOpen: !prevState.isDropdownOpen,
     }));
   };
-
-  const planUpgradeAlert = () => (
-    <Alert variant="warning" title="Plan upgrade needed" isInline>
-      <p>
-        In order to make this repository private under TBD, you will need to
-        upgrade the namespace&apos;s plan.
-        <br />
-        <a href="#">Upgrade TBD plan</a>
-      </p>
-    </Alert>
-  );
 
   return (
     <Modal
@@ -141,11 +137,15 @@ export const CreateRepositoryModalTemplate = (
               isOpen={currentOrganization.isDropdownOpen}
               width="200px"
               isDisabled={props.orgName !== null}
+              placeholderText={'Select namespace'}
               selections={currentOrganization.name}
             >
-              {userOrgs.map((orgs, idx) => (
-                <SelectOption key={idx} value={orgs.name}></SelectOption>
-              ))}
+              <SelectOption
+                key={userState.username}
+                value={userState.username}
+              ></SelectOption>
+              <Divider component="li" key={'org-username-divider'} />
+              {orgSelectionList}
             </Select>
           </FormGroup>
           <FormGroup
@@ -200,9 +200,6 @@ export const CreateRepositoryModalTemplate = (
             value={visibilityType.PRIVATE}
             description="You choose who can see,pull and push from/to this repository."
           />
-          {repoVisibility === visibilityType.PRIVATE
-            ? planUpgradeAlert()
-            : null}
         </FormGroup>
       </Form>
     </Modal>
@@ -213,4 +210,5 @@ type CreateRepositoryModalTemplateProps = {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
   orgName?: string;
+  updateListHandler: (value: IRepository) => void;
 };
