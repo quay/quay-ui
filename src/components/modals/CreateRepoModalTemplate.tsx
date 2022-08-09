@@ -23,6 +23,7 @@ import {
 import {useRef, useState} from 'react';
 import {AxiosResponse} from 'axios';
 import {getUser} from 'src/resources/UserResource';
+import {ExclamationCircleIcon} from '@patternfly/react-icons';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -40,6 +41,11 @@ export const CreateRepositoryModalTemplate = (
     // the name is set to 1st value from the Namespace dropdown
     name: props.orgName !== null ? props.orgName : null,
     isDropdownOpen: false,
+  });
+
+  const [validationState, setValidationState] = useState({
+    repoName: true,
+    namespace: true,
   });
 
   const [newRepository, setNewRepository] = useState({
@@ -67,19 +73,24 @@ export const CreateRepositoryModalTemplate = (
       ;
     </>
   );
+  const validateInput = () => {
+    const validNamespace = !!currentOrganization.name;
+    const validRepo = !!newRepository.name;
+    setValidationState({repoName: validRepo, namespace: validNamespace});
+    return validNamespace && validRepo;
+  };
 
   const createRepositoryHandler = async () => {
+    if (!validateInput()) {
+      return;
+    }
     props.handleModalToggle();
-    let visibility;
-    repoVisibility === visibilityType.PUBLIC
-      ? (visibility = 'public')
-      : (visibility = 'private');
 
     const repoCreationResponse: AxiosResponse<RepositoryCreationResponse> =
       await createNewRepository(
         currentOrganization.name,
         newRepository.name,
-        visibility,
+        repoVisibility.toLowerCase(),
         newRepository.description,
         'image',
       );
@@ -123,6 +134,10 @@ export const CreateRepositoryModalTemplate = (
             isInline
             label="Namespace"
             fieldId="modal-with-form-form-name"
+            isRequired
+            helperTextInvalid="Select a namespace"
+            helperTextInvalidIcon={<ExclamationCircleIcon />}
+            validated={validationState.namespace ? 'success' : 'error'}
           >
             <Select
               variant={SelectVariant.single}
@@ -153,6 +168,9 @@ export const CreateRepositoryModalTemplate = (
             isRequired
             fieldId="modal-with-form-form-name"
             isStack
+            helperTextInvalid="Enter a repository name"
+            helperTextInvalidIcon={<ExclamationCircleIcon />}
+            validated={validationState.repoName ? 'success' : 'error'}
           >
             <TextInput
               isRequired
