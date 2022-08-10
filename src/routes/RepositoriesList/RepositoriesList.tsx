@@ -1,19 +1,10 @@
 import {
-  Button,
-  Dropdown,
   DropdownItem,
-  DropdownToggle,
-  DropdownToggleCheckbox,
-  KebabToggle,
   Page,
   PageSection,
   PageSectionVariants,
   Spinner,
-  TextInput,
   Title,
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
 } from '@patternfly/react-core';
 import {
   TableComposable,
@@ -30,16 +21,15 @@ import {
   fetchAllRepos,
   IRepository,
 } from 'src/resources/RepositoryResource';
-import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
-import {Pagination} from '@patternfly/react-core';
 import {selectedReposState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser} from 'src/resources/UserResource';
+import {RepositoryToolBar} from '../../components/toolbar/RepositoryToolBar';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -47,13 +37,13 @@ function getReponameFromURL(pathname: string): string {
 
 export default function RepositoriesList() {
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = useState(false);
-  const [isSelectDropDownOpen, setSelectDropDownOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
   const [, setUserState] = useRecoilState(UserState);
 
+  // Pagination related state
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
   const paginatedRepositoryList = repositoryList.slice(
@@ -120,9 +110,6 @@ export default function RepositoriesList() {
     setmakePrivateModal(!makePrivateModalOpen);
   };
 
-  const [repositorySearchInput, setRepositorySearchInput] =
-    useState('Filter by name..');
-
   const [deleteKebabOption, setDeleteKebabOption] = useState({
     isModalOpen: false,
   });
@@ -150,40 +137,6 @@ export default function RepositoriesList() {
       setUserState(user);
     }
   };
-
-  const fetchConfirmationModalText = () => {
-    if (selectedRepoNames.length == 1) {
-      return selectedRepoNames[0];
-    }
-    return selectedRepoNames.length;
-  };
-
-  const fetchMakePublicDescription = () => {
-    if (selectedRepoNames.length == 0) {
-      return 'Please select one/more repositories to change visibility.';
-    }
-    return (
-      'Update ' +
-      fetchConfirmationModalText() +
-      ' repositories visibility to be public so they are visible to all user, and may be pulled by all users.'
-    );
-  };
-
-  const fetchMakePrivateDescription = () => {
-    if (selectedRepoNames.length == 0) {
-      return 'Please select one/more repositories to change visibility.';
-    }
-    return (
-      'Update ' +
-      fetchConfirmationModalText() +
-      ' repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.'
-    );
-  };
-
-  const selectDropdownItems = [
-    <DropdownItem key="Select all">Select all</DropdownItem>,
-    <DropdownItem key="Select none">Select none</DropdownItem>,
-  ];
 
   const kebabItems = [
     <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
@@ -217,10 +170,6 @@ export default function RepositoriesList() {
     pulls: 'Pulls',
     lastPull: 'Last Pull',
     lastModified: 'Last Modified',
-  };
-
-  const handleFilteredSearch = (value: any) => {
-    setRepositorySearchInput(value);
   };
 
   async function fetchRepos() {
@@ -274,6 +223,34 @@ export default function RepositoriesList() {
     Size: {label: 'size'},
   };
 
+  const createRepoModal = () => {
+    return (
+      <CreateRepositoryModalTemplate
+        isModalOpen={isCreateRepoModalOpen}
+        handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
+        orgName={currentOrg}
+        updateListHandler={updateListHandler}
+      />
+    );
+  };
+
+  const deleteModal = () => {
+    return (
+      <BulkDeleteModalTemplate
+        mapOfColNamesToTableData={mapOfColNamesToTableData}
+        handleModalToggle={handleDeleteModalToggle}
+        handleBulkDeletion={handleRepoDeletion}
+        isModalOpen={deleteKebabOption.isModalOpen}
+        selectedItems={repositoryList.filter((repo) =>
+          selectedRepoNames.some(
+            (selected) => repo.namespace + '/' + repo.name === selected,
+          ),
+        )}
+        resourceName={'repositories'}
+      />
+    );
+  };
+
   return (
     <Page>
       {currentOrg === null ? (
@@ -285,122 +262,27 @@ export default function RepositoriesList() {
       ) : null}
 
       <PageSection variant={PageSectionVariants.light}>
-        <Toolbar>
-          <ToolbarContent>
-            <ToolbarItem variant="bulk-select">
-              <Dropdown
-                onSelect={() => setSelectDropDownOpen(!isSelectDropDownOpen)}
-                toggle={
-                  <DropdownToggle
-                    id="stacked-example-toggle"
-                    splitButtonItems={[
-                      <DropdownToggleCheckbox
-                        id="example-checkbox-1"
-                        key="split-checkbox"
-                        aria-label="Select all"
-                      />,
-                    ]}
-                    onToggle={() =>
-                      setSelectDropDownOpen(!isSelectDropDownOpen)
-                    }
-                  />
-                }
-                isOpen={isSelectDropDownOpen}
-                dropdownItems={selectDropdownItems}
-              />
-            </ToolbarItem>
-            <ToolbarItem>
-              <TextInput
-                isRequired
-                type="search"
-                id="modal-with-form-form-name"
-                name="search input"
-                value={repositorySearchInput}
-                onChange={handleFilteredSearch}
-              />
-            </ToolbarItem>
-            <ToolbarItem>
-              <Button
-                variant="primary"
-                onClick={() => setCreateRepoModalOpen(true)}
-              >
-                Create Repository
-              </Button>
-              {isCreateRepoModalOpen ? (
-                <CreateRepositoryModalTemplate
-                  isModalOpen={isCreateRepoModalOpen}
-                  handleModalToggle={() =>
-                    setCreateRepoModalOpen(!isCreateRepoModalOpen)
-                  }
-                  orgName={currentOrg}
-                  updateListHandler={updateListHandler}
-                />
-              ) : null}{' '}
-            </ToolbarItem>
-            <ToolbarItem>
-              {selectedRepoNames.length !== 0 ? (
-                <Dropdown
-                  onSelect={() => setKebabOpen(!isKebabOpen)}
-                  toggle={
-                    <KebabToggle
-                      onToggle={() => setKebabOpen(!isKebabOpen)}
-                      id="toggle-id-6"
-                    />
-                  }
-                  isOpen={isKebabOpen}
-                  isPlain
-                  dropdownItems={kebabItems}
-                />
-              ) : null}
-              {deleteKebabOption.isModalOpen ? (
-                <BulkDeleteModalTemplate
-                  mapOfColNamesToTableData={mapOfColNamesToTableData}
-                  handleModalToggle={handleDeleteModalToggle}
-                  handleBulkDeletion={handleRepoDeletion}
-                  isModalOpen={deleteKebabOption.isModalOpen}
-                  selectedItems={repositoryList.filter((repo) =>
-                    selectedRepoNames.some(
-                      (selected) =>
-                        repo.namespace + '/' + repo.name === selected,
-                    ),
-                  )}
-                  resourceName={'repositories'}
-                />
-              ) : null}
-            </ToolbarItem>
-          </ToolbarContent>
-          <ConfirmationModal
-            title="Make repositories public"
-            description={fetchMakePublicDescription()}
-            modalOpen={makePublicModalOpen}
-            selectedItems={selectedRepoNames}
-            toggleModal={toggleMakePublicClick}
-            buttonText="Make public"
-            makePublic={true}
-            selectAllRepos={selectAllRepos}
-          />
-          <ConfirmationModal
-            title="Make repositories private"
-            description={fetchMakePrivateDescription()}
-            modalOpen={makePrivateModalOpen}
-            toggleModal={toggleMakePrivateClick}
-            buttonText="Make private"
-            selectedItems={selectedRepoNames}
-            makePublic={false}
-            selectAllRepos={selectAllRepos}
-          />
-        </Toolbar>
-        <Pagination
-          perPageComponent="button"
-          itemCount={repositoryList.length}
+        <RepositoryToolBar
+          currentOrg={currentOrg}
+          createRepoModal={createRepoModal}
+          isCreateRepoModalOpen={isCreateRepoModalOpen}
+          setCreateRepoModalOpen={setCreateRepoModalOpen}
+          isKebabOpen={isKebabOpen}
+          setKebabOpen={setKebabOpen}
+          kebabItems={kebabItems}
+          selectedRepoNames={selectedRepoNames}
+          deleteModal={deleteModal}
+          deleteKebabIsOpen={deleteKebabOption.isModalOpen}
+          makePublicModalOpen={makePublicModalOpen}
+          toggleMakePublicClick={toggleMakePublicClick}
+          makePrivateModalOpen={makePrivateModalOpen}
+          toggleMakePrivateClick={toggleMakePrivateClick}
+          selectAllRepos={selectAllRepos}
+          repositoryList={repositoryList}
           perPage={perPage}
           page={page}
-          onSetPage={(_event, pageNumber) => setPage(pageNumber)}
-          onPerPageSelect={(_event, perPageNumber) => {
-            setPage(1);
-            setPerPage(perPageNumber);
-          }}
-          widgetId="pagination-options-menu-top"
+          setPage={setPage}
+          setPerPage={setPerPage}
         />
         <TableComposable aria-label="Selectable table">
           <Thead>
