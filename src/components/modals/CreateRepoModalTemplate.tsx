@@ -17,11 +17,13 @@ import {useRecoilState, useRecoilValue} from 'recoil';
 import {UserOrgs, UserState} from 'src/atoms/UserState';
 import {
   createNewRepository,
+  IRepository,
   RepositoryCreationResponse,
 } from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
 import {AxiosResponse} from 'axios';
 import {getUser} from 'src/resources/UserResource';
+import {ExclamationCircleIcon} from '@patternfly/react-icons';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -32,13 +34,18 @@ export const CreateRepositoryModalTemplate = (
   props: CreateRepositoryModalTemplateProps,
 ): JSX.Element => {
   const userOrgs = useRecoilValue(UserOrgs);
-  const [, setUserState] = useRecoilState(UserState);
+  const [userState, setUserState] = useRecoilState(UserState);
 
   const [currentOrganization, setCurrentOrganization] = useState({
     // For org scoped view, the name is set current org and for Repository list view,
     // the name is set to 1st value from the Namespace dropdown
-    name: props.orgName !== null ? props.orgName : userOrgs[0].name,
+    name: props.orgName !== null ? props.orgName : null,
     isDropdownOpen: false,
+  });
+
+  const [validationState, setValidationState] = useState({
+    repoName: true,
+    namespace: true,
   });
 
   const [newRepository, setNewRepository] = useState({
@@ -58,21 +65,32 @@ export const CreateRepositoryModalTemplate = (
     setNewRepository({...newRepository, description: value});
   };
 
-  // TODO (harish): Show user and list of orgs in the Namespace dropdown
-  // see PROJQUAY-3900 comment for details
+  const orgSelectionList = (
+    <>
+      {userOrgs.map((orgs, idx) => (
+        <SelectOption key={idx} value={orgs.name}></SelectOption>
+      ))}
+      ;
+    </>
+  );
+  const validateInput = () => {
+    const validNamespace = !!currentOrganization.name;
+    const validRepo = !!newRepository.name;
+    setValidationState({repoName: validRepo, namespace: validNamespace});
+    return validNamespace && validRepo;
+  };
 
   const createRepositoryHandler = async () => {
+    if (!validateInput()) {
+      return;
+    }
     props.handleModalToggle();
-    let visibility;
-    repoVisibility === visibilityType.PUBLIC
-      ? (visibility = 'public')
-      : (visibility = 'private');
 
     const repoCreationResponse: AxiosResponse<RepositoryCreationResponse> =
       await createNewRepository(
         currentOrganization.name,
         newRepository.name,
-        visibility,
+        repoVisibility.toLowerCase(),
         newRepository.description,
         'image',
       );
@@ -89,17 +107,6 @@ export const CreateRepositoryModalTemplate = (
       isDropdownOpen: !prevState.isDropdownOpen,
     }));
   };
-
-  const planUpgradeAlert = () => (
-    <Alert variant="warning" title="Plan upgrade needed" isInline>
-      <p>
-        In order to make this repository private under TBD, you will need to
-        upgrade the namespace&apos;s plan.
-        <br />
-        <a href="#">Upgrade TBD plan</a>
-      </p>
-    </Alert>
-  );
 
   return (
     <Modal
@@ -127,6 +134,10 @@ export const CreateRepositoryModalTemplate = (
             isInline
             label="Namespace"
             fieldId="modal-with-form-form-name"
+            isRequired
+            helperTextInvalid="Select a namespace"
+            helperTextInvalidIcon={<ExclamationCircleIcon />}
+            validated={validationState.namespace ? 'success' : 'error'}
           >
             <Select
               variant={SelectVariant.single}
@@ -141,11 +152,15 @@ export const CreateRepositoryModalTemplate = (
               isOpen={currentOrganization.isDropdownOpen}
               width="200px"
               isDisabled={props.orgName !== null}
+              placeholderText={'Select namespace'}
               selections={currentOrganization.name}
             >
-              {userOrgs.map((orgs, idx) => (
-                <SelectOption key={idx} value={orgs.name}></SelectOption>
-              ))}
+              <SelectOption
+                key={userState.username}
+                value={userState.username}
+              ></SelectOption>
+              <Divider component="li" key={'org-username-divider'} />
+              {orgSelectionList}
             </Select>
           </FormGroup>
           <FormGroup
@@ -153,6 +168,9 @@ export const CreateRepositoryModalTemplate = (
             isRequired
             fieldId="modal-with-form-form-name"
             isStack
+            helperTextInvalid="Enter a repository name"
+            helperTextInvalidIcon={<ExclamationCircleIcon />}
+            validated={validationState.repoName ? 'success' : 'error'}
           >
             <TextInput
               isRequired
@@ -200,9 +218,6 @@ export const CreateRepositoryModalTemplate = (
             value={visibilityType.PRIVATE}
             description="You choose who can see,pull and push from/to this repository."
           />
-          {repoVisibility === visibilityType.PRIVATE
-            ? planUpgradeAlert()
-            : null}
         </FormGroup>
       </Form>
     </Modal>
@@ -213,4 +228,5 @@ type CreateRepositoryModalTemplateProps = {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
   orgName?: string;
+  updateListHandler: (value: IRepository) => void;
 };
