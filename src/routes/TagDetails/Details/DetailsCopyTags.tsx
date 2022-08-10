@@ -6,9 +6,12 @@ import {
   ClipboardCopy,
   Title,
 } from '@patternfly/react-core';
-import {getDomain} from 'src/routes/NavigationPath';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
 export default function CopyTags(props: CopyTagsProps) {
+  const config = useQuayConfig();
+  const domain = config?.config.SERVER_HOSTNAME;
+
   return (
     <>
       <Title headingLevel="h3">Fetch Tag</Title>
@@ -22,9 +25,7 @@ export default function CopyTags(props: CopyTagsProps) {
               hoverTip="Copy"
               clickTip="Copied"
             >
-              {`podman pull ${getDomain()}/${props.org}/${props.repo}:${
-                props.tag
-              }`}
+              {`podman pull ${domain}/${props.org}/${props.repo}:${props.tag}`}
             </ClipboardCopy>
           </DescriptionListDescription>
         </DescriptionListGroup>
@@ -37,9 +38,7 @@ export default function CopyTags(props: CopyTagsProps) {
               hoverTip="Copy"
               clickTip="Copied"
             >
-              {`docker pull ${getDomain()}/${props.org}/${props.repo}:${
-                props.tag
-              }`}
+              {`docker pull ${domain}/${props.org}/${props.repo}:${props.tag}`}
             </ClipboardCopy>
           </DescriptionListDescription>
         </DescriptionListGroup>
@@ -52,9 +51,7 @@ export default function CopyTags(props: CopyTagsProps) {
               hoverTip="Copy"
               clickTip="Copied"
             >
-              {`podman pull ${getDomain()}/${props.org}/${props.repo}@${
-                props.digest
-              }`}
+              {`podman pull ${domain}/${props.org}/${props.repo}@${props.digest}`}
             </ClipboardCopy>
           </DescriptionListDescription>
         </DescriptionListGroup>
@@ -67,9 +64,7 @@ export default function CopyTags(props: CopyTagsProps) {
               hoverTip="Copy"
               clickTip="Copied"
             >
-              {`docker pull ${getDomain()}/${props.org}/${props.repo}@${
-                props.digest
-              }`}
+              {`docker pull ${domain}/${props.org}/${props.repo}@${props.digest}`}
             </ClipboardCopy>
           </DescriptionListDescription>
         </DescriptionListGroup>
