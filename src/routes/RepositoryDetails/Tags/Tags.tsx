@@ -1,8 +1,12 @@
 import {Toolbar} from './Toolbar';
 import Table from './Table';
 import {useState, useEffect} from 'react';
-import {filterState, paginationState} from 'src/atoms/TagListState';
-import {useRecoilValue} from 'recoil';
+import {
+  filterState,
+  paginationState,
+  selectedTagsState,
+} from 'src/atoms/TagListState';
+import {useRecoilValue, useResetRecoilState} from 'recoil';
 import {
   Tag,
   TagsResponse,
@@ -16,6 +20,7 @@ export default function Tags(props: TagsProps) {
   const filter = useRecoilValue(filterState);
   const pagination = useRecoilValue(paginationState);
   const [loading, setLoading] = useState<boolean>(true);
+  const resetSelectedTags = useResetRecoilState(selectedTagsState);
 
   const filteredTags: Tag[] =
     filter !== '' ? tags.filter((tag) => tag.name.includes(filter)) : tags;
@@ -64,6 +69,7 @@ export default function Tags(props: TagsProps) {
   };
 
   useEffect(() => {
+    resetSelectedTags();
     loadTags();
   }, []);
 
