@@ -11,14 +11,6 @@ import {
   Popover,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
-import {
-  TableComposable,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@patternfly/react-table';
 import {createOrg} from 'src/resources/OrganisationResource';
 import {useRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
@@ -31,22 +23,8 @@ export const CreateOrganizationModal = (
 ): JSX.Element => {
   const [organizationName, setOrganizationName] = useState('');
   const [organizationEmail, setOrganizationEmail] = useState('');
-  const [repoCount, setRepoCount] = useState(0);
-  const [repoCost, setRepoCost] = useState(0);
   const [, setUserState] = useRecoilState(UserState);
   const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
-
-  const reposWithCost = [
-    {value: 0, label: '0', cost: 0},
-    {value: 1, label: '10', cost: 30},
-    {value: 2, label: '20', cost: 60},
-    {value: 3, label: '50', cost: 125},
-    {value: 4, label: '125', cost: 250},
-    {value: 5, label: '250', cost: 450},
-    {value: 6, label: '500', cost: 850},
-    {value: 7, label: '1000', cost: 1600},
-    {value: 8, label: '2000', cost: 2100},
-  ];
 
   const handleNameInputChange = (value: any) => {
     setOrganizationName(value);
@@ -54,91 +32,6 @@ export const CreateOrganizationModal = (
 
   const handleEmailInputChange = (value: any) => {
     setOrganizationEmail(value);
-  };
-
-  const handleRepoCountChange = (value: number) => {
-    setRepoCount(parseInt(reposWithCost[value].label));
-    setRepoCost(reposWithCost[value].cost);
-  };
-
-  const orgPricing = [
-    {
-      PLAN: 'Open Source',
-      'PRIVATE REPOSITORIES': 5,
-      PRICE: '$15',
-    },
-    {
-      PLAN: 'Micro',
-      'PRIVATE REPOSITORIES': 10,
-      PRICE: '$30',
-    },
-    {
-      PLAN: 'Small',
-      'PRIVATE REPOSITORIES': 20,
-      PRICE: '$60',
-    },
-    {
-      PLAN: 'Medium',
-      'PRIVATE REPOSITORIES': 50,
-      PRICE: '$125',
-    },
-    {
-      PLAN: 'Large',
-      'PRIVATE REPOSITORIES': 125,
-      PRICE: '$250',
-    },
-    {
-      PLAN: 'Extra Large',
-      'PRIVATE REPOSITORIES': 250,
-      PRICE: '$450',
-    },
-    {
-      PLAN: 'XXL',
-      'PRIVATE REPOSITORIES': 500,
-      PRICE: '$850',
-    },
-    {
-      PLAN: 'XXXL',
-      'PRIVATE REPOSITORIES': 1000,
-      PRICE: '$1600',
-    },
-    {
-      PLAN: 'XXXXL',
-      'PRIVATE REPOSITORIES': 2000,
-      PRICE: '$3100',
-    },
-    {
-      PLAN: 'XXXXXL',
-      'PRIVATE REPOSITORIES': 15000,
-      PRICE: '$217000',
-    },
-  ];
-
-  const orgPlansPopOver = () => {
-    return (
-      <TableComposable
-        aria-label="Org plans table"
-        variant={'compact'}
-        borders={false}
-      >
-        <Thead>
-          <Tr>
-            <Th>PLAN</Th>
-            <Th>PRIVATE REPOSITORIES</Th>
-            <Th>PRICE</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {orgPricing.map((org) => (
-            <Tr key={org.PLAN}>
-              <Td>{org.PLAN}</Td>
-              <Td>{org['PRIVATE REPOSITORIES']}</Td>
-              <Td>{org.PRICE}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </TableComposable>
-    );
   };
 
   const createOrganizationHandler = async () => {
