@@ -216,31 +216,6 @@ export const CreateOrganizationModal = (
         </FormGroup>
         <br />
       </Form>
-      <FormGroup
-        label={`Choose your organization's plan: $${repoCost}`}
-        isRequired
-        fieldId="modal-with-form-form-email"
-      >
-        <Text component={TextVariants.small}>
-          {' '}
-          Number of private repositories{' '}
-          <Popover
-            aria-label="Org plans popover"
-            headerContent={<div>Organization Plans</div>}
-            bodyContent={orgPlansPopOver}
-          >
-            <i className="fas fa-question-circle"></i>
-          </Popover>
-        </Text>
-        <Slider
-          className={'create-org-modal-slider'}
-          value={repoCount}
-          customSteps={reposWithCost}
-          max={reposWithCost.length - 1}
-          onChange={handleRepoCountChange}
-          min={0}
-        />
-      </FormGroup>
     </Modal>
   );
 };

@@ -239,9 +239,9 @@ export default function OrganizationsList() {
     </SelectGroup>,
   ];
 
-  /* Mapper object used to render bulk delete table 
+  /* Mapper object used to render bulk delete table
     - keys are actual column names of the table
-    - value is an object type with a "label" which maps to the attributes of <T> 
+    - value is an object type with a "label" which maps to the attributes of <T>
       and an optional "transformFunc" which can be used to modify the value being displayed */
   const mapOfColNamesToTableData = {
     Organization: {label: 'name'},
