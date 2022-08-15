@@ -25,7 +25,7 @@ import {useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
-import {selectedReposState} from 'src/atoms/RepositoryState';
+import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser} from 'src/resources/UserResource';
@@ -42,22 +42,25 @@ export default function RepositoriesList() {
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
   const [, setUserState] = useRecoilState(UserState);
+  const filter = useRecoilValue(filterRepoState);
+  const filteredRepos =
+    filter !== ''
+      ? repositoryList.filter((repo) => repo.name.includes(filter))
+      : repositoryList;
 
   // Pagination related state
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const paginatedRepositoryList = repositoryList.slice(
+  const paginatedRepositoryList = filteredRepos.slice(
     page * perPage - perPage,
     page * perPage - perPage + perPage,
   );
   const [selectedRepoNames, setSelectedRepoNames] =
     useRecoilState(selectedReposState);
   const isRepoSelectable = (repo: IRepository) => repo.name !== ''; // Arbitrary logic for this example
-  const selectableRepos = repositoryList.filter(isRepoSelectable);
-
   const selectAllRepos = (isSelecting = true) =>
     setSelectedRepoNames(
-      isSelecting ? selectableRepos.map((r) => r.namespace + '/' + r.name) : [],
+      isSelecting ? filteredRepos.map((r) => r.namespace + '/' + r.name) : [],
     );
 
   const setRepoSelected = (repo: IRepository, isSelecting = true) =>
@@ -70,8 +73,7 @@ export default function RepositoriesList() {
         : otherSelectedRepoNames;
     });
 
-  const areAllReposSelected =
-    selectedRepoNames.length === selectableRepos.length;
+  const areAllReposSelected = selectedRepoNames.length === filteredRepos.length;
 
   const isRepoSelected = (repo: IRepository) =>
     selectedRepoNames.includes(repo.namespace + '/' + repo.name);
@@ -85,22 +87,9 @@ export default function RepositoriesList() {
     rowIndex: number,
     isSelecting: boolean,
   ) => {
-    // If the user is shift + selecting the checkboxes, then all intermediate checkboxes should be selected
-    // if (shifting && recentSelectedRowIndex !== null) {
-    //   const numberSelected = rowIndex - recentSelectedRowIndex;
-    //   const intermediateIndexes =
-    //     numberSelected > 0
-    //       ? Array.from(new Array(numberSelected + 1), (_x, i) => i + recentSelectedRowIndex)
-    //       : Array.from(new Array(Math.abs(numberSelected) + 1), (_x, i) => i + rowIndex);
-    //   intermediateIndexes.forEach(index => setRepoSelected(repositories[index], isSelecting));
-    // } else {
     setRepoSelected(repo, isSelecting);
-    // }
     setRecentSelectedRowIndex(rowIndex);
   };
-
-  // const selectAllNamespaces = (isSelecting = true) =>
-  //   setSelectedRepoNames(isSelecting ? selectableRepos.map(r => r.path) : []);
 
   const toggleMakePublicClick = () => {
     setmakePublicModal(!makePublicModalOpen);

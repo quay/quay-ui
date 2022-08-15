@@ -5,14 +5,25 @@ import {FilterBar} from './FilterBar';
 import {ToolbarButton} from './ToolbarButton';
 import {Kebab} from './Kebab';
 import {ToolbarPagination} from './Pagination';
+import {filterOrgState} from 'src/atoms/UserState';
+import {useRecoilState} from 'recoil';
 
 export function OrganizationToolBar(props: OrganizationToolBarProps) {
+  const [filterOrg, setOrgFilter] = useRecoilState(filterOrgState);
+  const filterOrgs = (value: string) => {
+    setOrgFilter(value);
+  };
+
   return (
     <Toolbar>
       <ToolbarContent>
         <DropdownCheckbox selectedItems={props.selectedOrganization} />
         <DropdownFilter />
-        <FilterBar />
+        <FilterBar
+          placeholderText="Filter by name"
+          value={filterOrg}
+          onChange={filterOrgs}
+        />
         <ToolbarButton
           buttonValue="Create Organization"
           Modal={props.createOrgModal}

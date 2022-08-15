@@ -1,4 +1,5 @@
 import {Toolbar, ToolbarContent, ToolbarItem} from '@patternfly/react-core';
+import {useRecoilState} from 'recoil';
 import {DropdownCheckbox} from './DropdownCheckbox';
 import {DropdownFilter} from './DropdownFilter';
 import {FilterBar} from './FilterBar';
@@ -6,8 +7,14 @@ import {ToolbarButton} from './ToolbarButton';
 import {Kebab} from './Kebab';
 import {ConfirmationModal} from '../modals/ConfirmationModal';
 import {ToolbarPagination} from './Pagination';
+import {filterRepoState} from 'src/atoms/RepositoryState';
 
 export function RepositoryToolBar(props: RepositoryToolBarProps) {
+  const [filterRepo, setRepoFilter] = useRecoilState(filterRepoState);
+  const filterRepos = (value: string) => {
+    setRepoFilter(value);
+  };
+
   const fetchConfirmationModalText = () => {
     if (props.selectedRepoNames.length == 1) {
       return props.selectedRepoNames[0];
@@ -42,7 +49,11 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
       <ToolbarContent>
         <DropdownCheckbox selectedItems={props.selectedRepoNames} />
         <DropdownFilter />
-        <FilterBar />
+        <FilterBar
+          placeholderText="Filter by repo name"
+          value={filterRepo}
+          onChange={filterRepos}
+        />
         <ToolbarButton
           buttonValue="Create Repository"
           Modal={props.createRepoModal}

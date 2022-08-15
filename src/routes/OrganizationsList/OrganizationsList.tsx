@@ -19,7 +19,12 @@ import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import {UserOrgs, UserState} from 'src/atoms/UserState';
+import {
+  selectedOrgsState,
+  UserOrgs,
+  UserState,
+  filterOrgState,
+} from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
 import {
   bulkDeleteOrganizations,
@@ -37,13 +42,18 @@ export default function OrganizationsList() {
   const [organizationSearchInput, setOrganizationSearchInput] = useState(
     'Filter by name or ID..',
   );
-  const [selectedOrganization, setSelectedOrganization] = useState<string[]>(
-    [],
-  );
+
+  const filter = useRecoilValue(filterOrgState);
+  const [selectedOrganization, setSelectedOrganization] =
+    useRecoilState(selectedOrgsState);
+  const filteredOrgs =
+    filter !== ''
+      ? organizationsList.filter((repo) => repo.name.includes(filter))
+      : organizationsList;
 
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const paginatedOrganizationsList = organizationsList.slice(
+  const paginatedOrganizationsList = filteredOrgs.slice(
     page * perPage - perPage,
     page * perPage - perPage + perPage,
   );
@@ -68,18 +78,12 @@ export default function OrganizationsList() {
     setOrganizationSearchInput(value);
   };
 
-  const onSelect = () => {
-    // TODO: Add filter logic
-  };
   const isOrgSelectable = (org) => org.name !== ''; // Arbitrary logic for this example
-  const selectableOrgs = organizationsList.filter(isOrgSelectable);
-
   // Logic for handling all ns checkbox selections from <Th>
   const selectAllOrganizations = (isSelecting = true) => {
     setSelectedOrganization(
-      isSelecting ? selectableOrgs.map((ns) => ns.name) : [],
+      isSelecting ? filteredOrgs.map((ns) => ns.name) : [],
     );
-    console.log('selected orgs', selectedOrganization);
   };
 
   const areAllOrganizationsSelected =
