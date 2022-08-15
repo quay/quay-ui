@@ -1,40 +1,25 @@
-import {
-  Data,
-  getSecurityDetails,
-  SecurityDetailsResponse,
-} from 'src/resources/TagResource';
 import {PackagesChart} from './PackagesChart';
-import {useEffect, useState} from 'react';
 import PackagesTable from './PackagesTable';
+import {useRecoilState} from 'recoil';
+import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
 
 export function Packages(props: PackagesProps) {
-  const [data, setData] = useState<Data>(null);
+  const [data, setData] = useRecoilState(SecurityDetailsState);
 
-  useEffect(() => {
-    if (props.digest !== '') {
-      (async () => {
-        try {
-          const securityDetails: SecurityDetailsResponse =
-            await getSecurityDetails(props.org, props.repo, props.digest);
-          setData(securityDetails.data);
-        } catch (error) {
-          console.error('Unable to get security details: ', error);
-        }
-      })();
-    }
-  }, [props.digest]);
+  // Set features to a default of null to distinguish between a completed API call and one that is in progress
+  let features = null;
 
   if (data) {
-    return (
-      <>
-        <PackagesChart features={data.Layer.Features} />
-        <hr />
-        <PackagesTable features={data.Layer.Features} />
-      </>
-    );
+    features = data.data.Layer.Features;
   }
 
-  return <div>Loading</div>;
+  return (
+    <>
+      <PackagesChart features={features} />
+      <hr />
+      <PackagesTable features={features} />
+    </>
+  );
 }
 
 interface PackagesProps {

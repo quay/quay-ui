@@ -13,7 +13,9 @@ module.exports = merge(common('development'), {
         host: HOST,
         port: PORT,
         compress: true,
-        historyApiFallback: true,
+        historyApiFallback: {
+            disableDotRule: true,
+          },
         open: true
     },
     module: {

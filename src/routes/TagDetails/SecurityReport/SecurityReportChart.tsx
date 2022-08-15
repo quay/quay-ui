@@ -1,5 +1,3 @@
-import React, {useEffect} from 'react';
-
 import {ChartDonut} from '@patternfly/react-charts';
 import {
   PageSection,
@@ -17,7 +15,7 @@ import {getSeverityColor} from 'src/libs/utils';
 function VulnerabilitySummary(props: VulnerabilityStatsProps) {
   let message = <Skeleton width="400px" />;
   if (props.stats[VulnerabilitySeverity.None] > 0) {
-    message = <> Quay Security Reporting has detected No vulnerabilities </>;
+    message = <> Quay Security Reporting has detected no vulnerabilities </>;
   } else if (props.total > 0) {
     message = (
       <> Quay Security Reporting has detected {props.total} vulnerabilities </>
@@ -51,16 +49,21 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
             props.stats[vulnLevel] > 0 &&
             vulnLevel != VulnerabilitySeverity.None
           ) {
-            return (
-              <div className="pf-u-mb-sm" key={vulnLevel}>
-                <ExclamationTriangleIcon
-                  color={getSeverityColor(vulnLevel as VulnerabilitySeverity)}
-                  className="pf-u-mr-md"
-                />
-                <b>{props.stats[vulnLevel]}</b> {vulnLevel}-level
-                vulnerabilities
-              </div>
-            );
+            return;
+            {
+              props.stats.Pending === 0 ? (
+                <div className="pf-u-mb-sm" key={vulnLevel}>
+                  <ExclamationTriangleIcon
+                    color={getSeverityColor(vulnLevel as VulnerabilitySeverity)}
+                    className="pf-u-mr-md"
+                  />
+                  <b>{props.stats[vulnLevel]}</b> {vulnLevel}-level
+                  vulnerabilities
+                </div>
+              ) : (
+                <div></div>
+              );
+            }
           }
         })}
       </div>
@@ -71,7 +74,9 @@ function VulnerabilitySummary(props: VulnerabilityStatsProps) {
 function VulnerabilityChart(props: VulnerabilityStatsProps) {
   return (
     <div style={{height: '20em', width: '20em'}}>
-      {props.total !== 0 || props.stats[VulnerabilitySeverity.None] ? (
+      {props.stats.Pending > 0 ? (
+        <Skeleton shape="circle" width="100%" />
+      ) : (
         <ChartDonut
           ariaDesc="vulnerability chart"
           ariaTitle="vulnerability chart"
@@ -97,8 +102,6 @@ function VulnerabilityChart(props: VulnerabilityStatsProps) {
           labels={({datum}) => `${datum.x}: ${datum.y}`}
           title={`${props.total}`}
         />
-      ) : (
-        <Skeleton shape="circle" width="100%" />
       )}
     </div>
   );
@@ -113,22 +116,31 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
     Negligible: 0,
     Unknown: 0,
     None: 0,
+    Pending: 0,
   };
 
   let patchesAvailable = 0;
   let total = 0;
-  props.features.map((feature) => {
-    feature.Vulnerabilities.map((vulnerability) => {
-      stats[vulnerability.Severity] += 1;
-      total += 1;
-      if (vulnerability.FixedBy.length > 0) {
-        patchesAvailable += 1;
-      }
+
+  // Count vulnerabilities if API call has completed
+  if (props.features) {
+    props.features.map((feature) => {
+      feature.Vulnerabilities.map((vulnerability) => {
+        stats[vulnerability.Severity] += 1;
+        total += 1;
+        if (vulnerability.FixedBy.length > 0) {
+          patchesAvailable += 1;
+        }
+      });
     });
-  });
-  // no vulnerabilities
-  if (props.features.length > 0 && total == 0) {
-    stats[VulnerabilitySeverity.None] = 1;
+
+    // No vulnerabilities
+    if (total == 0) {
+      stats[VulnerabilitySeverity.None] = 1;
+    }
+  } else {
+    // Waiting on API call to finish
+    stats.Pending = 1;
   }
 
   return (
@@ -161,6 +173,7 @@ export interface VulnerabilityStats {
   Negligible: number;
   Unknown: number;
   None: number;
+  Pending: number;
 }
 
 interface VulnerabilityStatsProps {

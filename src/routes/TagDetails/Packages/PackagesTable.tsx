@@ -5,7 +5,6 @@ import {
   VulnerabilitySeverity,
   VulnerabilityOrder,
 } from 'src/resources/TagResource';
-import React from 'react';
 import {
   TableComposable,
   Thead,
@@ -14,7 +13,12 @@ import {
   Tbody,
   Td,
 } from '@patternfly/react-table';
-import {PageSection, PageSectionVariants, Title} from '@patternfly/react-core';
+import {
+  PageSection,
+  PageSectionVariants,
+  Spinner,
+  Title,
+} from '@patternfly/react-core';
 import {useRecoilState} from 'recoil';
 import {
   filteredPackagesListState,
@@ -145,32 +149,34 @@ export default function PackagesTable({features}: PackagesProps) {
   );
 
   useEffect(() => {
-    const packagesList: PackagesListItem[] = [];
-    features.map((feature: Feature) => {
-      packagesList.push({
-        PackageName: feature.Name,
-        CurrentVersion: feature.Version,
-        Vulnerabilities: feature.Vulnerabilities,
+    if (features) {
+      const packagesList: PackagesListItem[] = [];
+      features.map((feature: Feature) => {
+        packagesList.push({
+          PackageName: feature.Name,
+          CurrentVersion: feature.Version,
+          Vulnerabilities: feature.Vulnerabilities,
 
-        VulnerabilityCounts: getVulnerabilitiesCount(feature.Vulnerabilities),
-        HighestVulnerabilitySeverity: getHighestVulnerabilitySeverity(
-          feature.Vulnerabilities,
-        ),
+          VulnerabilityCounts: getVulnerabilitiesCount(feature.Vulnerabilities),
+          HighestVulnerabilitySeverity: getHighestVulnerabilitySeverity(
+            feature.Vulnerabilities,
+          ),
 
-        VulnerabilityCountsAfterFix: getVulnerabilitiesCount(
-          feature.Vulnerabilities,
-          true,
-        ),
-        HighestVulnerabilitySeverityAfterFix: getHighestVulnerabilitySeverity(
-          feature.Vulnerabilities,
-          true,
-        ),
-      } as PackagesListItem);
-    });
+          VulnerabilityCountsAfterFix: getVulnerabilitiesCount(
+            feature.Vulnerabilities,
+            true,
+          ),
+          HighestVulnerabilitySeverityAfterFix: getHighestVulnerabilitySeverity(
+            feature.Vulnerabilities,
+            true,
+          ),
+        } as PackagesListItem);
+      });
 
-    const sortedPackagesList = sortPackages(packagesList);
-    setPackagesList(sortedPackagesList);
-    setFilteredPackagesList(sortedPackagesList);
+      const sortedPackagesList = sortPackages(packagesList);
+      setPackagesList(sortedPackagesList);
+      setFilteredPackagesList(sortedPackagesList);
+    }
   }, [features]);
 
   return (
@@ -179,7 +185,7 @@ export default function PackagesTable({features}: PackagesProps) {
       <PackagesFilter />
       <TableComposable aria-label="packages table" variant={'compact'}>
         <TableHead />
-        {filteredPackagesList ? (
+        {filteredPackagesList.length !== 0 ? (
           filteredPackagesList.map((pkg: PackagesListItem) => {
             return (
               <Tbody key={pkg.PackageName + pkg.CurrentVersion}>
@@ -207,11 +213,11 @@ export default function PackagesTable({features}: PackagesProps) {
             );
           })
         ) : (
-          <tbody>
-            <tr>
-              <td> Loading</td>
-            </tr>
-          </tbody>
+          <Tbody>
+            <Tr>
+              <Td>{!features ? <Spinner size="lg" /> : <div></div>}</Td>
+            </Tr>
+          </Tbody>
         )}
       </TableComposable>
     </PageSection>

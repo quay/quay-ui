@@ -80,11 +80,16 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
   const [expandedVulnKeys, setExpandedVulnKeys] = React.useState<string[]>([]);
 
   const generateUniqueKey = (vulnerability: VulnerabilityListItem) => {
-    let hashInput = vulnerability.Advisory + vulnerability.Description;
+    let hashInput =
+      vulnerability.PackageName +
+      vulnerability.Advisory +
+      vulnerability.Description +
+      vulnerability.Severity;
 
     if (vulnerability.Metadata) {
       hashInput += vulnerability.Metadata.RepoName;
     }
+
     return sha1(hashInput);
   };
 
@@ -97,24 +102,26 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
   const isRepoExpanded = (key: string) => expandedVulnKeys.includes(key);
 
   useEffect(() => {
-    const vulnList: VulnerabilityListItem[] = [];
-    features.map((feature: Feature) => {
-      feature.Vulnerabilities.map((vulnerability: Vulnerability) => {
-        vulnList.push({
-          PackageName: feature.Name,
-          CurrentVersion: feature.Version,
-          Description: vulnerability.Description,
-          NamespaceName: vulnerability.NamespaceName,
-          Advisory: vulnerability.Name,
-          Severity: vulnerability.Severity,
-          FixedInVersion: vulnerability.FixedBy,
-          Metadata: vulnerability.Metadata,
-          Link: vulnerability.Link,
-        } as VulnerabilityListItem);
+    if (features) {
+      const vulnList: VulnerabilityListItem[] = [];
+      features.map((feature: Feature) => {
+        feature.Vulnerabilities.map((vulnerability: Vulnerability) => {
+          vulnList.push({
+            PackageName: feature.Name,
+            CurrentVersion: feature.Version,
+            Description: vulnerability.Description,
+            NamespaceName: vulnerability.NamespaceName,
+            Advisory: vulnerability.Name,
+            Severity: vulnerability.Severity,
+            FixedInVersion: vulnerability.FixedBy,
+            Metadata: vulnerability.Metadata,
+            Link: vulnerability.Link,
+          } as VulnerabilityListItem);
+        });
       });
-    });
-    setVulnList(vulnList);
-    setFilteredVulnList(vulnList);
+      setVulnList(vulnList);
+      setFilteredVulnList(vulnList);
+    }
   }, [features]);
 
   return (
@@ -206,9 +213,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
         ) : (
           <Tbody>
             <Tr>
-              <Td>
-                <Spinner size="lg" />
-              </Td>
+              <Td>{!features ? <Spinner size="lg" /> : <div></div>}</Td>
             </Tr>
           </Tbody>
         )}

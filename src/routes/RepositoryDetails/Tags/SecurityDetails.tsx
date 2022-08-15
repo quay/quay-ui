@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {
   SecurityDetailsResponse,
   getSecurityDetails,
+  Data,
 } from 'src/resources/TagResource';
 import {Link} from 'react-router-dom';
 import {Skeleton, Spinner} from '@patternfly/react-core';
@@ -13,6 +14,8 @@ import {
   CheckCircleIcon,
 } from '@patternfly/react-icons';
 import {getSeverityColor} from 'src/libs/utils';
+import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
+import {useRecoilState, useResetRecoilState} from 'recoil';
 
 enum Variant {
   condensed = 'condensed',
@@ -24,6 +27,12 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
   const [vulnCount, setVulnCount] =
     useState<Map<VulnerabilitySeverity, number>>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+  const [data, setData] = useRecoilState(SecurityDetailsState);
+
+  // Reset SecurityDetailsState so that loading skeletons appear when viewing report
+  const emptySecurityDetails = useResetRecoilState(SecurityDetailsState);
+  const resetSecurityDetails = () => emptySecurityDetails();
 
   const severityOrder = [
     VulnerabilitySeverity.Critical,
@@ -50,6 +59,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
             await getSecurityDetails(props.org, props.repo, props.digest);
           const vulns = new Map<VulnerabilitySeverity, number>();
           if (securityDetails.data) {
+            setData(securityDetails);
             for (const feature of securityDetails.data.Layer.Features) {
               if (feature.Vulnerabilities) {
                 for (const vuln of feature.Vulnerabilities) {
@@ -69,6 +79,8 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           setLoading(false);
         } catch (error: any) {
           console.error('Unable to get security details: ', error);
+          setError(true);
+          setLoading(false);
         }
       })();
     }
@@ -92,10 +104,16 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     return <div>Unsupported</div>;
   }
 
+  // API call failed, hide replace skeleton with error indicator
+  if (error) {
+    return <div>Error</div>;
+  }
+
   if (vulnCount.size === 0) {
     return (
       <Link
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
+        onClick={resetSecurityDetails}
       >
         <CheckCircleIcon color="green" />
         <span>None Detected</span>
@@ -108,6 +126,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     return (
       <Link
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
+        onClick={resetSecurityDetails}
       >
         <div>
           <ExclamationTriangleIcon
@@ -140,7 +159,10 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
       );
     });
   return (
-    <Link to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}>
+    <Link
+      to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
+      onClick={resetSecurityDetails}
+    >
       {counts}
     </Link>
   );
