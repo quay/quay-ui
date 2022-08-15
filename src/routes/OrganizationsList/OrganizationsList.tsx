@@ -11,8 +11,6 @@ import {
   PageSection,
   PageSectionVariants,
   Title,
-  SelectOption,
-  SelectGroup,
   DropdownItem,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
@@ -101,7 +99,6 @@ export default function OrganizationsList() {
       return isSelecting && isOrgSelectable(ns)
         ? [...otherSelectedOrganizationNames, ns.name]
         : otherSelectedOrganizationNames;
-      console.log('selected orgs', selectedOrganization);
     });
 
   // To allow shift+click to select/deselect multiple rows
