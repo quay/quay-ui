@@ -29,7 +29,7 @@ import {selectedReposState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser} from 'src/resources/UserResource';
-import {RepositoryToolBar} from '../../components/toolbar/RepositoryToolBar';
+import {RepositoryToolBar} from 'src/components/toolbar/RepositoryToolBar';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -110,9 +110,7 @@ export default function RepositoriesList() {
     setmakePrivateModal(!makePrivateModalOpen);
   };
 
-  const [deleteKebabOption, setDeleteKebabOption] = useState({
-    isModalOpen: false,
-  });
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const userOrgs = useRecoilValue(UserOrgs);
   const currentUser = useRecoilValue(UserState);
@@ -120,15 +118,11 @@ export default function RepositoriesList() {
 
   const handleDeleteModalToggle = () => {
     setKebabOpen(!isKebabOpen);
-    setDeleteKebabOption((prevState) => ({
-      isModalOpen: !prevState.isModalOpen,
-    }));
+    setDeleteModalOpen(!isDeleteModalOpen);
   };
 
   const handleRepoDeletion = async (repos: IRepository[]) => {
-    setDeleteKebabOption((prevState) => ({
-      isModalOpen: !prevState.isModalOpen,
-    }));
+    setDeleteModalOpen(!isDeleteModalOpen);
     const response = await bulkDeleteRepositories(repos);
     const deleteFailed = response.some((resp) => resp.status !== 204);
     if (!deleteFailed) {
@@ -206,6 +200,7 @@ export default function RepositoriesList() {
     fetchRepos();
   }, [userOrgs]);
 
+  // TODO: @sunanda delete if not needed
   const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);
   };
@@ -223,33 +218,28 @@ export default function RepositoriesList() {
     Size: {label: 'size'},
   };
 
-  const createRepoModal = () => {
-    return (
-      <CreateRepositoryModalTemplate
-        isModalOpen={isCreateRepoModalOpen}
-        handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
-        orgName={currentOrg}
-        updateListHandler={updateListHandler}
-      />
-    );
-  };
+  const createRepoModal = (
+    <CreateRepositoryModalTemplate
+      isModalOpen={isCreateRepoModalOpen}
+      handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
+      orgName={currentOrg}
+    />
+  );
 
-  const deleteModal = () => {
-    return (
-      <BulkDeleteModalTemplate
-        mapOfColNamesToTableData={mapOfColNamesToTableData}
-        handleModalToggle={handleDeleteModalToggle}
-        handleBulkDeletion={handleRepoDeletion}
-        isModalOpen={deleteKebabOption.isModalOpen}
-        selectedItems={repositoryList.filter((repo) =>
-          selectedRepoNames.some(
-            (selected) => repo.namespace + '/' + repo.name === selected,
-          ),
-        )}
-        resourceName={'repositories'}
-      />
-    );
-  };
+  const deleteRepositoryModal = (
+    <BulkDeleteModalTemplate
+      mapOfColNamesToTableData={mapOfColNamesToTableData}
+      handleModalToggle={handleDeleteModalToggle}
+      handleBulkDeletion={handleRepoDeletion}
+      isModalOpen={isDeleteModalOpen}
+      selectedItems={repositoryList.filter((repo) =>
+        selectedRepoNames.some(
+          (selected) => repo.namespace + '/' + repo.name === selected,
+        ),
+      )}
+      resourceName={'repositories'}
+    />
+  );
 
   return (
     <Page>
@@ -271,8 +261,8 @@ export default function RepositoriesList() {
           setKebabOpen={setKebabOpen}
           kebabItems={kebabItems}
           selectedRepoNames={selectedRepoNames}
-          deleteModal={deleteModal}
-          deleteKebabIsOpen={deleteKebabOption.isModalOpen}
+          deleteModal={deleteRepositoryModal}
+          deleteKebabIsOpen={isDeleteModalOpen}
           makePublicModalOpen={makePublicModalOpen}
           toggleMakePublicClick={toggleMakePublicClick}
           makePrivateModalOpen={makePrivateModalOpen}

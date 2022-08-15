@@ -26,7 +26,7 @@ export function DropdownFilter() {
   ];
 
   return (
-    <ToolbarItem>
+    <ToolbarItem spacer={{default: 'spacerNone'}}>
       <Dropdown
         onSelect={onSelect}
         toggle={

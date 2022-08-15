@@ -7,7 +7,7 @@ import {Kebab} from './Kebab';
 import {ConfirmationModal} from '../modals/ConfirmationModal';
 import {ToolbarPagination} from './Pagination';
 
-export function RepositoryToolBar(props: ToolBarProps) {
+export function RepositoryToolBar(props: RepositoryToolBarProps) {
   const fetchConfirmationModalText = () => {
     if (props.selectedRepoNames.length == 1) {
       return props.selectedRepoNames[0];
@@ -40,11 +40,11 @@ export function RepositoryToolBar(props: ToolBarProps) {
   return (
     <Toolbar>
       <ToolbarContent>
-        <DropdownCheckbox />
+        <DropdownCheckbox selectedItems={props.selectedRepoNames} />
         <DropdownFilter />
         <FilterBar />
         <ToolbarButton
-          currentOrg={props.currentOrg}
+          buttonValue="Create Repository"
           Modal={props.createRepoModal}
           isModalOpen={props.isCreateRepoModalOpen}
           setModalOpen={props.setCreateRepoModalOpen}
@@ -59,15 +59,13 @@ export function RepositoryToolBar(props: ToolBarProps) {
           ) : null}
           {props.deleteKebabIsOpen ? props.deleteModal : null}
         </ToolbarItem>
-        <ToolbarItem>
-          <ToolbarPagination
-            repositoryList={props.repositoryList}
-            perPage={props.perPage}
-            page={props.page}
-            setPage={props.setPage}
-            setPerPage={props.setPerPage}
-          />
-        </ToolbarItem>
+        <ToolbarPagination
+          repositoryList={props.repositoryList}
+          perPage={props.perPage}
+          page={props.page}
+          setPage={props.setPage}
+          setPerPage={props.setPerPage}
+        />
       </ToolbarContent>
       <ConfirmationModal
         title="Make repositories public"
@@ -93,16 +91,16 @@ export function RepositoryToolBar(props: ToolBarProps) {
   );
 }
 
-type ToolBarProps = {
+type RepositoryToolBarProps = {
   currentOrg: string;
-  createRepoModal: () => void;
+  createRepoModal: object;
   isCreateRepoModalOpen: boolean;
   setCreateRepoModalOpen: (open) => void;
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
   kebabItems: any[];
   selectedRepoNames: any[];
-  deleteModal: () => void;
+  deleteModal: object;
   deleteKebabIsOpen: boolean;
   makePublicModalOpen: boolean;
   toggleMakePublicClick: () => void;

@@ -7,7 +7,7 @@ import {
   ToolbarItem,
 } from '@patternfly/react-core';
 
-export function DropdownCheckbox() {
+export function DropdownCheckbox(props: DropdownCheckboxProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const onToggle = (isOpen: boolean) => {
@@ -25,9 +25,10 @@ export function DropdownCheckbox() {
   };
 
   const dropdownItems = [
-    <DropdownItem key="select-none">Select none(0 items)</DropdownItem>,
-    <DropdownItem key="select-page-items">Select page(5 items)</DropdownItem>,
-    <DropdownItem key="select-all-items">Select all(50 items)</DropdownItem>,
+    <DropdownItem key="select-none"></DropdownItem>,
+    // TODO: Implement below items
+    // <DropdownItem key="select-page-items">Select page(5 items)</DropdownItem>,
+    // <DropdownItem key="select-all-items">Select all(50 items)</DropdownItem>,
   ];
 
   return (
@@ -42,7 +43,9 @@ export function DropdownCheckbox() {
                 key="split-checkbox"
                 aria-label="Select all"
               >
-                10 selected
+                {props.selectedItems.length != 0
+                  ? props.selectedItems.length + ' selected'
+                  : ''}
               </DropdownToggleCheckbox>,
             ]}
             onToggle={onToggle}
@@ -55,3 +58,7 @@ export function DropdownCheckbox() {
     </ToolbarItem>
   );
 }
+
+type DropdownCheckboxProps = {
+  selectedItems: any[];
+};

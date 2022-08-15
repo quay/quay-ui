@@ -4,16 +4,16 @@ export function ToolbarButton(props: ToolbarButtonProps) {
   return (
     <ToolbarItem>
       <Button variant="primary" onClick={() => props.setModalOpen(true)}>
-        Create Repository
+        {props.buttonValue}
       </Button>
-      {props.isModalOpen ? props.Modal() : null}{' '}
+      {props.isModalOpen ? props.Modal : null}{' '}
     </ToolbarItem>
   );
 }
 
 type ToolbarButtonProps = {
-  currentOrg: string;
-  Modal: () => void;
+  buttonValue: string;
+  Modal: object;
   isModalOpen: boolean;
   setModalOpen: (open) => void;
 };
