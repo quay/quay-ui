@@ -42,19 +42,23 @@ export default function RepositoriesList() {
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
   const [, setUserState] = useRecoilState(UserState);
+
+  // Filtering Repositories after applied filter
   const filter = useRecoilValue(filterRepoState);
   const filteredRepos =
     filter !== ''
       ? repositoryList.filter((repo) => repo.name.includes(filter))
       : repositoryList;
 
-  // Pagination related state
+  // Pagination related states
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
   const paginatedRepositoryList = filteredRepos.slice(
     page * perPage - perPage,
     page * perPage - perPage + perPage,
   );
+
+  // Select related states
   const [selectedRepoNames, setSelectedRepoNames] =
     useRecoilState(selectedReposState);
   const isRepoSelectable = (repo: IRepository) => repo.name !== ''; // Arbitrary logic for this example

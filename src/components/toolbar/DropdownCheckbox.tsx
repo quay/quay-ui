@@ -68,6 +68,9 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
                 key="split-checkbox"
                 aria-label="Select all"
                 isChecked={props.selectedItems.length > 0 ? true : false}
+                onChange={(checked) =>
+                  checked ? selectPageItems() : deSelectAll()
+                }
               >
                 {props.selectedItems.length != 0
                   ? props.selectedItems.length + ' selected'
