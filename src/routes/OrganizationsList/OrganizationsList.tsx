@@ -156,7 +156,9 @@ export default function OrganizationsList() {
   }, []);
 
   const fetchData = async () => {
+    // clearing previous states
     setOrganizationsList([]);
+    setSelectedOrganization([]);
 
     if (userOrgs) {
       const user: IUserResource = await getUser();

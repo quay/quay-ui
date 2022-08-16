@@ -157,7 +157,10 @@ export default function RepositoriesList() {
   };
 
   async function fetchRepos() {
+    // clearing previous states
     setRepositoryList([]);
+    setSelectedRepoNames([]);
+
     const listOfOrgNames = [];
     if (userOrgs) {
       // check if view is global vs scoped to a organization
