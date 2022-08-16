@@ -10,12 +10,52 @@ import {
 export function DropdownCheckbox(props: DropdownCheckboxProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const onChecked = (checked: boolean) => {
-    // If items selected and checkbox is clicked to de-select the items
-    if (!checked && props.selectedItems.length > 0) {
-      props.setItemAsSelected([]);
-    }
+  const deSelectAll = () => {
+    props.deSelectAll([]);
+    setIsOpen(false);
   };
+
+  const selectPageItems = () => {
+    props.itemsPerPageList.map((value, index) =>
+      props.onItemSelect(value, index, true),
+    );
+    setIsOpen(false);
+  };
+
+  const selectAllItems = () => {
+    props.allItemsList.map((value, index) =>
+      props.onItemSelect(value, index, true),
+    );
+    setIsOpen(false);
+  };
+
+  const dropdownItems = [
+    <DropdownItem
+      key="select-none-action"
+      component="button"
+      onClick={deSelectAll}
+    >
+      Select none
+    </DropdownItem>,
+    <DropdownItem
+      key="select-page-items-action"
+      component="button"
+      onClick={selectPageItems}
+    >
+      Select page (
+      {props.allItemsList.length > props.itemsPerPageList.length
+        ? props.itemsPerPageList.length
+        : props.allItemsList.length}
+      )
+    </DropdownItem>,
+    <DropdownItem
+      key="select-all-items-action"
+      component="button"
+      onClick={selectAllItems}
+    >
+      Select all ({props.allItemsList.length})
+    </DropdownItem>,
+  ];
 
   return (
     <ToolbarItem variant="bulk-select">
@@ -28,7 +68,6 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
                 key="split-checkbox"
                 aria-label="Select all"
                 isChecked={props.selectedItems.length > 0 ? true : false}
-                onChange={onChecked}
               >
                 {props.selectedItems.length != 0
                   ? props.selectedItems.length + ' selected'
@@ -36,9 +75,11 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
               </DropdownToggleCheckbox>,
             ]}
             id="toolbar-dropdown-checkbox"
+            onToggle={() => setIsOpen(!isOpen)}
           />
         }
         isOpen={isOpen}
+        dropdownItems={dropdownItems}
       />
     </ToolbarItem>
   );
@@ -46,5 +87,8 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
 
 type DropdownCheckboxProps = {
   selectedItems: any[];
-  setItemAsSelected: (selectedList) => void;
+  deSelectAll: (selectedList) => void;
+  allItemsList: any[];
+  itemsPerPageList: any[];
+  onItemSelect: (Item, rowIndex, isSelecting) => void;
 };

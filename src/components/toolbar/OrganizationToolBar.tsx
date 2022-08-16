@@ -19,7 +19,10 @@ export function OrganizationToolBar(props: OrganizationToolBarProps) {
       <ToolbarContent>
         <DropdownCheckbox
           selectedItems={props.selectedOrganization}
-          setItemAsSelected={props.setSelectedOrganization}
+          deSelectAll={props.setSelectedOrganization}
+          allItemsList={props.organizationsList}
+          itemsPerPageList={props.paginatedOrganizationsList}
+          onItemSelect={props.onSelectOrganization}
         />
         <DropdownFilter />
         <FilterBar
@@ -71,4 +74,6 @@ type OrganizationToolBarProps = {
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
   setSelectedOrganization: (selectedOrgList) => void;
+  paginatedOrganizationsList: any[];
+  onSelectOrganization: (Org, rowIndex, isSelecting) => void;
 };

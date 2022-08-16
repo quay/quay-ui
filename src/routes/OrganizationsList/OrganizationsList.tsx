@@ -279,6 +279,8 @@ export default function OrganizationsList() {
             setPage={setPage}
             setPerPage={setPerPage}
             setSelectedOrganization={setSelectedOrganization}
+            paginatedOrganizationsList={paginatedOrganizationsList}
+            onSelectOrganization={onSelectOrganization}
           />
           <TableComposable aria-label="Selectable table">
             <Thead>

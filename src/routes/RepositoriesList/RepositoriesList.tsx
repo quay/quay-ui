@@ -264,6 +264,8 @@ export default function RepositoriesList() {
           setPage={setPage}
           setPerPage={setPerPage}
           setSelectedRepoNames={setSelectedRepoNames}
+          paginatedRepositoryList={paginatedRepositoryList}
+          onSelectRepo={onSelectRepo}
         />
         <TableComposable aria-label="Selectable table">
           <Thead>
