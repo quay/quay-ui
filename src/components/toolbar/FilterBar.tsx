@@ -6,7 +6,7 @@ export function FilterBar(props: FilterBarProps) {
       <TextInput
         isRequired
         type="search"
-        id="modal-with-form-form-name"
+        id="toolbar-text-input"
         name="search input"
         placeholder={props.placeholderText}
         value={props.value}

@@ -27,7 +27,7 @@ import {useEffect, useState} from 'react';
 import {bulkDeleteOrganizations} from 'src/resources/OrganisationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser, IUserResource} from 'src/resources/UserResource';
-import {OrganizationToolBar} from 'src/components/toolbar/OrganizationToolBar';
+import {OrganizationToolBar} from 'src/routes/OrganizationsList/OrganizationToolBar';
 
 export default function OrganizationsList() {
   const [organizationsList, setOrganizationsList] = useState<

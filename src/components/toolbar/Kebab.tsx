@@ -1,4 +1,6 @@
 import {Dropdown, KebabToggle} from '@patternfly/react-core';
+import * as React from 'react';
+import {DropdownItemProps} from '@patternfly/react-core/dist/esm/components/Dropdown/DropdownItem';
 
 export function Kebab(props: KebabProps) {
   return (
@@ -20,5 +22,5 @@ export function Kebab(props: KebabProps) {
 type KebabProps = {
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
-  kebabItems: any[];
+  kebabItems: React.FunctionComponent<DropdownItemProps>[];
 };

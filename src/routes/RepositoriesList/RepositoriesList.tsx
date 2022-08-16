@@ -29,7 +29,7 @@ import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser} from 'src/resources/UserResource';
-import {RepositoryToolBar} from 'src/components/toolbar/RepositoryToolBar';
+import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;

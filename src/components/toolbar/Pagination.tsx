@@ -23,6 +23,6 @@ type ToolbarPaginationProps = {
   repositoryList: any[];
   perPage: number;
   page: number;
-  setPage: (pageNumber) => void;
-  setPerPage: (perPageNumber) => void;
+  setPage: (pageNumber: number) => void;
+  setPerPage: (perPageNumber: number) => void;
 };

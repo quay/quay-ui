@@ -18,7 +18,6 @@ export interface IOrganization {
 
 export async function bulkDeleteOrganizations(orgs: string[]) {
   try {
-    console.log('orgs in bulkDeleteOrganizations', orgs);
     const response = await Promise.all(
       orgs.map((orgName) => {
         return axios.delete(`/api/v1/organization/${orgName}`);

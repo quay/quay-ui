@@ -1,12 +1,14 @@
 import {Toolbar, ToolbarContent, ToolbarItem} from '@patternfly/react-core';
-import {DropdownCheckbox} from './DropdownCheckbox';
-import {DropdownFilter} from './DropdownFilter';
-import {FilterBar} from './FilterBar';
-import {ToolbarButton} from './ToolbarButton';
-import {Kebab} from './Kebab';
-import {ToolbarPagination} from './Pagination';
+import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
+import {DropdownFilter} from 'src/components/toolbar/DropdownFilter';
+import {FilterBar} from 'src/components/toolbar/FilterBar';
+import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
+import {Kebab} from 'src/components/toolbar/Kebab';
+import {ToolbarPagination} from 'src/components/toolbar/Pagination';
 import {filterOrgState} from 'src/atoms/UserState';
 import {useRecoilState} from 'recoil';
+import * as React from 'react';
+import {DropdownItemProps} from '@patternfly/react-core/dist/esm/components/Dropdown/DropdownItem';
 
 export function OrganizationToolBar(props: OrganizationToolBarProps) {
   const [filterOrg, setOrgFilter] = useRecoilState(filterOrgState);
@@ -37,7 +39,7 @@ export function OrganizationToolBar(props: OrganizationToolBarProps) {
           setModalOpen={props.setOrganizationModalOpen}
         />
         <ToolbarItem>
-          {props.selectedOrganization.length !== 0 ? (
+          {props.selectedOrganization?.length !== 0 ? (
             <Kebab
               isKebabOpen={props.isKebabOpen}
               setKebabOpen={props.setKebabOpen}
@@ -64,7 +66,7 @@ type OrganizationToolBarProps = {
   setOrganizationModalOpen: (open) => void;
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
-  kebabItems: any[];
+  kebabItems: React.FunctionComponent<DropdownItemProps>[];
   selectedOrganization: any[];
   deleteKebabIsOpen: boolean;
   deleteModal: object;

@@ -6,6 +6,7 @@ import {
   DropdownItem,
   ToolbarItem,
 } from '@patternfly/react-core';
+import {FilterIcon} from '@patternfly/react-icons';
 
 export function DropdownFilter() {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,7 +23,7 @@ export function DropdownFilter() {
 
   const dropdownItems = [
     <DropdownItem key="col-name">Name</DropdownItem>,
-    <DropdownItem key="col-name">Visibility</DropdownItem>,
+    <DropdownItem key="col-visibility">Visibility</DropdownItem>,
   ];
 
   return (
@@ -33,7 +34,7 @@ export function DropdownFilter() {
           <DropdownToggle
             id="toolbar-dropdown-filter"
             onToggle={() => setIsOpen(isOpen)}
-            icon={<i className="fa fa-filter"></i>}
+            icon={<FilterIcon />}
           >
             Name
           </DropdownToggle>
