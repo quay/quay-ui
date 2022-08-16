@@ -47,7 +47,10 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
   return (
     <Toolbar>
       <ToolbarContent>
-        <DropdownCheckbox selectedItems={props.selectedRepoNames} />
+        <DropdownCheckbox
+          selectedItems={props.selectedRepoNames}
+          setItemAsSelected={props.setSelectedRepoNames}
+        />
         <DropdownFilter />
         <FilterBar
           placeholderText="Filter by repo name"
@@ -123,4 +126,5 @@ type RepositoryToolBarProps = {
   page: number;
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
+  setSelectedRepoNames: (selectedRepoList) => void;
 };

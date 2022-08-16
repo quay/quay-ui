@@ -118,6 +118,7 @@ export default function RepositoriesList() {
       // Fetch user recomputes "repositoryList" via useEffect
       const user = await getUser();
       setUserState(user);
+      setSelectedRepoNames([]);
     }
   };
 
@@ -262,17 +263,12 @@ export default function RepositoriesList() {
           page={page}
           setPage={setPage}
           setPerPage={setPerPage}
+          setSelectedRepoNames={setSelectedRepoNames}
         />
         <TableComposable aria-label="Selectable table">
           <Thead>
             <Tr>
-              <Th
-                select={{
-                  onSelect: (_event, isSelecting) =>
-                    selectAllRepos(isSelecting),
-                  isSelected: areAllReposSelected,
-                }}
-              />
+              <Th />
               <Th>{columnNames.repoName}</Th>
               <Th>{columnNames.visibility}</Th>
               <Th>{columnNames.tags}</Th>

@@ -26,10 +26,7 @@ import {
   filterOrgState,
 } from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
-import {
-  bulkDeleteOrganizations,
-  IOrganization,
-} from 'src/resources/OrganisationResource';
+import {bulkDeleteOrganizations} from 'src/resources/OrganisationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser, IUserResource} from 'src/resources/UserResource';
 import {OrganizationToolBar} from 'src/components/toolbar/OrganizationToolBar';
@@ -205,6 +202,7 @@ export default function OrganizationsList() {
     if (!deleteFailed) {
       const user = await getUser();
       setUserState(user);
+      setSelectedOrganization([]);
     }
   };
 
@@ -217,13 +215,6 @@ export default function OrganizationsList() {
     <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
       Delete
     </DropdownItem>,
-  ];
-
-  const options = [
-    <SelectGroup label="Role" key="group1">
-      <SelectOption key={0} value="Public" />
-      <SelectOption key={1} value="Private" />
-    </SelectGroup>,
   ];
 
   /* Mapper object used to render bulk delete table
@@ -287,17 +278,12 @@ export default function OrganizationsList() {
             page={page}
             setPage={setPage}
             setPerPage={setPerPage}
+            setSelectedOrganization={setSelectedOrganization}
           />
           <TableComposable aria-label="Selectable table">
             <Thead>
               <Tr>
-                <Th
-                  select={{
-                    onSelect: (_event, isSelecting) =>
-                      selectAllOrganizations(isSelecting),
-                    isSelected: areAllOrganizationsSelected,
-                  }}
-                />
+                <Th />
                 <Th>{columnNames.name}</Th>
                 <Th>{columnNames.repoCount}</Th>
                 <Th>{columnNames.tagCount}</Th>

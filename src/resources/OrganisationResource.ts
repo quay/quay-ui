@@ -16,26 +16,6 @@ export interface IOrganization {
   preferred_namespace?: boolean;
 }
 
-export async function getOrg(orgname: string) {
-  const getOrgUrl = `/api/v1/organization/${orgname}/`;
-  try {
-    const response = await axios.get(getOrgUrl);
-    return response.status;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-export async function deleteOrg(orgname: string) {
-  const deleteApiUrl = `/api/v1/organization/${orgname}`;
-  try {
-    const response = await axios.delete(deleteApiUrl);
-    return response.status;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
 export async function bulkDeleteOrganizations(orgs: string[]) {
   try {
     console.log('orgs in bulkDeleteOrganizations', orgs);

@@ -17,7 +17,10 @@ export function OrganizationToolBar(props: OrganizationToolBarProps) {
   return (
     <Toolbar>
       <ToolbarContent>
-        <DropdownCheckbox selectedItems={props.selectedOrganization} />
+        <DropdownCheckbox
+          selectedItems={props.selectedOrganization}
+          setItemAsSelected={props.setSelectedOrganization}
+        />
         <DropdownFilter />
         <FilterBar
           placeholderText="Filter by name"
@@ -67,4 +70,5 @@ type OrganizationToolBarProps = {
   page: number;
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
+  setSelectedOrganization: (selectedOrgList) => void;
 };
