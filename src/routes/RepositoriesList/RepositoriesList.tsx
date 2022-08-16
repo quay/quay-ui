@@ -190,7 +190,6 @@ export default function RepositoriesList() {
     fetchRepos();
   }, [userOrgs]);
 
-  // TODO: @sunanda delete if not needed
   const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);
   };
@@ -213,6 +212,7 @@ export default function RepositoriesList() {
       isModalOpen={isCreateRepoModalOpen}
       handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
       orgName={currentOrg}
+      updateListHandler={updateListHandler}
     />
   );
 
