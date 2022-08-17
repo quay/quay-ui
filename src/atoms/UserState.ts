@@ -15,3 +15,13 @@ export const UserOrgs = selector<IOrganization[] | undefined>({
     return user ? user.organizations : undefined;
   },
 });
+
+export const selectedOrgsState = atom<IOrganization[]>({
+  key: 'selectedOrgsState',
+  default: [],
+});
+
+export const filterOrgState = atom({
+  key: 'filterOrgState',
+  default: '',
+});

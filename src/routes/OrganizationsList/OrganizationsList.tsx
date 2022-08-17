@@ -7,37 +7,27 @@ import {
   Td,
 } from '@patternfly/react-table';
 import {
-  Button,
-  TextInput,
   Page,
   PageSection,
   PageSectionVariants,
   Title,
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
-  Select,
-  SelectOption,
-  SelectVariant,
-  SelectGroup,
   DropdownItem,
-  Dropdown,
-  KebabToggle,
 } from '@patternfly/react-core';
-import {Pagination} from '@patternfly/react-core';
-
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import {UserOrgs, UserState} from 'src/atoms/UserState';
-import {useEffect, useState} from 'react';
 import {
-  bulkDeleteOrganizations,
-  getOrg,
-} from 'src/resources/OrganisationResource';
+  selectedOrgsState,
+  UserOrgs,
+  UserState,
+  filterOrgState,
+} from 'src/atoms/UserState';
+import {useEffect, useState} from 'react';
+import {bulkDeleteOrganizations} from 'src/resources/OrganisationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser, IUserResource} from 'src/resources/UserResource';
+import {OrganizationToolBar} from 'src/routes/OrganizationsList/OrganizationToolBar';
 
 export default function OrganizationsList() {
   const [organizationsList, setOrganizationsList] = useState<
@@ -47,21 +37,25 @@ export default function OrganizationsList() {
   const [organizationSearchInput, setOrganizationSearchInput] = useState(
     'Filter by name or ID..',
   );
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [selectedOrganization, setSelectedOrganization] = useState<string[]>(
-    [],
-  );
+
+  const filter = useRecoilValue(filterOrgState);
+  const [selectedOrganization, setSelectedOrganization] =
+    useRecoilState(selectedOrgsState);
+  const filteredOrgs =
+    filter !== ''
+      ? organizationsList.filter((repo) => repo.name.includes(filter))
+      : organizationsList;
+
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const paginatedOrganizationsList = organizationsList.slice(
+  const paginatedOrganizationsList = filteredOrgs.slice(
     page * perPage - perPage,
     page * perPage - perPage + perPage,
   );
 
-  const [deleteOption, setDeleteOption] = useState({
-    isModalOpen: false,
-    isKebabOpen: false,
-  });
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+
+  const [isKebabOpen, setKebabOpen] = useState(false);
   const userOrgs = useRecoilValue(UserOrgs);
   const [user, setUserState] = useRecoilState(UserState);
 
@@ -75,22 +69,15 @@ export default function OrganizationsList() {
     lastModified: 'Last Modified',
   };
 
-  const handleModalToggle = () => {
-    setOrganizationModalOpen(!isOrganizationModalOpen);
-  };
-
   const handleFilteredSearch = (value: any) => {
     setOrganizationSearchInput(value);
   };
 
-  const onSelect = () => {
-    // TODO: Add filter logic
-  };
-
+  const isOrgSelectable = (org) => org.name !== ''; // Arbitrary logic for this example
   // Logic for handling all ns checkbox selections from <Th>
   const selectAllOrganizations = (isSelecting = true) => {
     setSelectedOrganization(
-      isSelecting ? organizationsList.map((ns) => ns.name) : [],
+      isSelecting ? filteredOrgs.map((ns) => ns.name) : [],
     );
   };
 
@@ -109,7 +96,7 @@ export default function OrganizationsList() {
       const otherSelectedOrganizationNames = prevSelected.filter(
         (r) => r !== ns.name,
       );
-      return isSelecting
+      return isSelecting && isOrgSelectable(ns)
         ? [...otherSelectedOrganizationNames, ns.name]
         : otherSelectedOrganizationNames;
     });
@@ -169,7 +156,9 @@ export default function OrganizationsList() {
   }, []);
 
   const fetchData = async () => {
+    // clearing previous states
     setOrganizationsList([]);
+    setSelectedOrganization([]);
 
     if (userOrgs) {
       const user: IUserResource = await getUser();
@@ -206,37 +195,25 @@ export default function OrganizationsList() {
   }, [userOrgs]);
 
   const handleOrgDeletion = async () => {
-    setDeleteOption((prevState) => ({
-      ...prevState,
-      isModalOpen: !prevState.isModalOpen,
-    }));
+    setDeleteModalIsOpen(!deleteModalIsOpen);
     const response = await bulkDeleteOrganizations(selectedOrganization);
     const deleteFailed = response.some((resp) => resp.status !== 204);
     if (!deleteFailed) {
       const user = await getUser();
       setUserState(user);
+      setSelectedOrganization([]);
     }
   };
 
+  const handleDeleteModalToggle = () => {
+    setKebabOpen(!isKebabOpen);
+    setDeleteModalIsOpen(!deleteModalIsOpen);
+  };
+
   const kebabItems = [
-    <DropdownItem
-      key="delete"
-      onClick={() =>
-        setDeleteOption((prev) => ({
-          isKebabOpen: !prev.isKebabOpen,
-          isModalOpen: !prev.isModalOpen,
-        }))
-      }
-    >
+    <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
       Delete
     </DropdownItem>,
-  ];
-
-  const options = [
-    <SelectGroup label="Role" key="group1">
-      <SelectOption key={0} value="Public" />
-      <SelectOption key={1} value="Private" />
-    </SelectGroup>,
   ];
 
   /* Mapper object used to render bulk delete table
@@ -251,6 +228,30 @@ export default function OrganizationsList() {
     Tags: {label: 'tagCount'},
   };
 
+  const createOrgModal = (
+    <CreateOrganizationModal
+      isModalOpen={isOrganizationModalOpen}
+      handleModalToggle={() =>
+        setOrganizationModalOpen(!isOrganizationModalOpen)
+      }
+    />
+  );
+
+  const deleteModal = (
+    <BulkDeleteModalTemplate
+      mapOfColNamesToTableData={mapOfColNamesToTableData}
+      handleModalToggle={() => setDeleteModalIsOpen(!deleteModalIsOpen)}
+      handleBulkDeletion={handleOrgDeletion}
+      isModalOpen={deleteModalIsOpen}
+      selectedItems={organizationsList.filter((org) =>
+        selectedOrganization.some(
+          (selectedOrgName) => org.name === selectedOrgName,
+        ),
+      )}
+      resourceName={'organizations'}
+    />
+  );
+
   return (
     <Page>
       <PageSection variant={PageSectionVariants.light} hasShadowBottom>
@@ -261,113 +262,29 @@ export default function OrganizationsList() {
 
       <PageSection>
         <PageSection variant={PageSectionVariants.light}>
-          <Toolbar>
-            <ToolbarContent>
-              <ToolbarItem spacer={{default: 'spacerNone'}}>
-                <Select
-                  variant={SelectVariant.checkbox}
-                  aria-label="Select Input"
-                  onToggle={() => setFilterOpen(!filterOpen)}
-                  onSelect={onSelect}
-                  isOpen={filterOpen}
-                  placeholderText="Filter"
-                >
-                  {options}
-                </Select>
-              </ToolbarItem>
-              <ToolbarItem>
-                <TextInput
-                  isRequired
-                  type="search"
-                  id="modal-with-form-form-name"
-                  name="search input"
-                  value={organizationSearchInput}
-                  onChange={handleFilteredSearch}
-                />
-              </ToolbarItem>
-              <ToolbarItem>
-                {selectedOrganization.length !== 0 ? (
-                  <Dropdown
-                    onSelect={() =>
-                      setDeleteOption((prev) => ({
-                        ...prev,
-                        isKebabOpen: !prev.isKebabOpen,
-                      }))
-                    }
-                    toggle={
-                      <KebabToggle
-                        onToggle={() =>
-                          setDeleteOption((prev) => ({
-                            ...prev,
-                            isKebabOpen: !prev.isKebabOpen,
-                          }))
-                        }
-                        id="toggle-id-6"
-                      />
-                    }
-                    isOpen={deleteOption.isKebabOpen}
-                    isPlain
-                    dropdownItems={kebabItems}
-                  />
-                ) : null}
-                {deleteOption.isModalOpen ? (
-                  <BulkDeleteModalTemplate
-                    mapOfColNamesToTableData={mapOfColNamesToTableData}
-                    handleModalToggle={() =>
-                      setDeleteOption((prev) => ({
-                        ...prev,
-                        isModalOpen: !prev.isModalOpen,
-                      }))
-                    }
-                    handleBulkDeletion={handleOrgDeletion}
-                    isModalOpen={deleteOption.isModalOpen}
-                    selectedItems={organizationsList.filter((org) =>
-                      selectedOrganization.some(
-                        (selectedOrgName) => org.name === selectedOrgName,
-                      ),
-                    )}
-                    resourceName={'organizations'}
-                  />
-                ) : null}
-              </ToolbarItem>
-              <ToolbarItem alignment={{xl: 'alignRight'}}>
-                <Button
-                  variant="primary"
-                  onClick={() => setOrganizationModalOpen(true)}
-                >
-                  Create Organization
-                </Button>
-                {isOrganizationModalOpen ? (
-                  <CreateOrganizationModal
-                    isModalOpen={isOrganizationModalOpen}
-                    handleModalToggle={handleModalToggle}
-                  />
-                ) : null}
-              </ToolbarItem>
-            </ToolbarContent>
-          </Toolbar>
-          <Pagination
-            perPageComponent="button"
-            itemCount={organizationsList.length}
+          <OrganizationToolBar
+            createOrgModal={createOrgModal}
+            isOrganizationModalOpen={isOrganizationModalOpen}
+            setOrganizationModalOpen={setOrganizationModalOpen}
+            isKebabOpen={isKebabOpen}
+            setKebabOpen={setKebabOpen}
+            kebabItems={kebabItems}
+            selectedOrganization={selectedOrganization}
+            deleteKebabIsOpen={deleteModalIsOpen}
+            deleteModal={deleteModal}
+            organizationsList={organizationsList}
             perPage={perPage}
             page={page}
-            onSetPage={(_event, pageNumber) => setPage(pageNumber)}
-            onPerPageSelect={(_event, perPageNumber) => {
-              setPage(1);
-              setPerPage(perPageNumber);
-            }}
-            widgetId="pagination-options-menu-top"
+            setPage={setPage}
+            setPerPage={setPerPage}
+            setSelectedOrganization={setSelectedOrganization}
+            paginatedOrganizationsList={paginatedOrganizationsList}
+            onSelectOrganization={onSelectOrganization}
           />
           <TableComposable aria-label="Selectable table">
             <Thead>
               <Tr>
-                <Th
-                  select={{
-                    onSelect: (_event, isSelecting) =>
-                      selectAllOrganizations(isSelecting),
-                    isSelected: areAllOrganizationsSelected,
-                  }}
-                />
+                <Th />
                 <Th>{columnNames.name}</Th>
                 <Th>{columnNames.repoCount}</Th>
                 <Th>{columnNames.tagCount}</Th>
@@ -386,6 +303,7 @@ export default function OrganizationsList() {
                       onSelect: (_event, isSelecting) =>
                         onSelectOrganization(org, rowIndex, isSelecting),
                       isSelected: isOrganizationSelected(org),
+                      disable: !isOrgSelectable(org),
                     }}
                   />
                   <Td dataLabel={columnNames.name}>
