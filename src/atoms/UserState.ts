@@ -16,7 +16,7 @@ export const UserOrgs = selector<IOrganization[] | undefined>({
   },
 });
 
-export const selectedOrgsState = atom({
+export const selectedOrgsState = atom<IOrganization[]>({
   key: 'selectedOrgsState',
   default: [],
 });
