@@ -1,5 +1,6 @@
 import {AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
+import {assertHttpCode} from './ErrorHandling';
 
 export interface TagsResponse {
   page: number;
@@ -129,37 +130,38 @@ export async function getTags(
   limit = 100,
   specificTag = null,
 ) {
-  try {
-    let path = `/api/v1/repository/${org}/${repo}/tag/?limit=${limit}&page=${page}&onlyActiveTags=true`;
-    if (specificTag) {
-      path = path.concat(`&specificTag=${specificTag}`);
-    }
-    const response: AxiosResponse<TagsResponse> = await axios.get(path);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(`API error getting tags ${error.message}`);
+  let path = `/api/v1/repository/${org}/${repo}/tag/?limit=${limit}&page=${page}&onlyActiveTags=true`;
+  if (specificTag) {
+    path = path.concat(`&specificTag=${specificTag}`);
   }
+  const response: AxiosResponse<TagsResponse> = await axios.get(path);
+  assertHttpCode(response.status, 200);
+  return response.data;
 }
 
 export async function getLabels(org: string, repo: string, digest: string) {
-  try {
-    const response: AxiosResponse<LabelsResponse> = await axios.get(
-      `/api/v1/repository/${org}/${repo}/manifest/${digest}/labels`,
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(`API error getting labels ${error.message}`);
-  }
+  const response: AxiosResponse<LabelsResponse> = await axios.get(
+    `/api/v1/repository/${org}/${repo}/manifest/${digest}/labels`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
+}
+
+interface TagLocation {
+  org: string;
+  repo: string;
+  tag: string;
+}
+
+export async function bulkDeleteTags(tags: TagLocation[]) {
+  await Promise.all(tags.map((tag) => deleteTag(tag.org, tag.repo, tag.tag)));
 }
 
 export async function deleteTag(org: string, repo: string, tag: string) {
-  try {
-    const response: AxiosResponse = await axios.delete(
-      `/api/v1/repository/${org}/${repo}/tag/${tag}`,
-    );
-  } catch (error: any) {
-    throw new Error(`API error deleting tags ${error.message}`);
-  }
+  const response: AxiosResponse = await axios.delete(
+    `/api/v1/repository/${org}/${repo}/tag/${tag}`,
+  );
+  assertHttpCode(response.status, 204);
 }
 
 export async function getManifestByDigest(
@@ -167,14 +169,11 @@ export async function getManifestByDigest(
   repo: string,
   digest: string,
 ) {
-  try {
-    const response: AxiosResponse<ManifestByDigestResponse> = await axios.get(
-      `/api/v1/repository/${org}/${repo}/manifest/${digest}`,
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(`API error getting manifest by digest ${error.message}`);
-  }
+  const response: AxiosResponse<ManifestByDigestResponse> = await axios.get(
+    `/api/v1/repository/${org}/${repo}/manifest/${digest}`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
 }
 
 export async function getSecurityDetails(
@@ -182,12 +181,9 @@ export async function getSecurityDetails(
   repo: string,
   digest: string,
 ) {
-  try {
-    const response: AxiosResponse<SecurityDetailsResponse> = await axios.get(
-      `/api/v1/repository/${org}/${repo}/manifest/${digest}/security?vulnerabilities=true`,
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(`API error getting security details ${error.message}`);
-  }
+  const response: AxiosResponse<SecurityDetailsResponse> = await axios.get(
+    `/api/v1/repository/${org}/${repo}/manifest/${digest}/security?vulnerabilities=true`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
 }

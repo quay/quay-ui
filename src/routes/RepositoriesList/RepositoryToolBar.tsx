@@ -8,8 +8,7 @@ import {Kebab} from 'src/components/toolbar/Kebab';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {ToolbarPagination} from 'src/components/toolbar/Pagination';
 import {filterRepoState} from 'src/atoms/RepositoryState';
-import * as React from 'react';
-import {DropdownItemProps} from '@patternfly/react-core/dist/esm/components/Dropdown/DropdownItem';
+import {ReactElement} from 'react';
 
 export function RepositoryToolBar(props: RepositoryToolBarProps) {
   const [filterRepo, setRepoFilter] = useRecoilState(filterRepoState);
@@ -117,7 +116,7 @@ type RepositoryToolBarProps = {
   setCreateRepoModalOpen: (open) => void;
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
-  kebabItems: React.FunctionComponent<DropdownItemProps>[];
+  kebabItems: ReactElement[];
   selectedRepoNames: any[];
   deleteModal: object;
   deleteKebabIsOpen: boolean;

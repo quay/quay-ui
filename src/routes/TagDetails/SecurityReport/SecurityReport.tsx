@@ -1,10 +1,20 @@
 import SecurityReportTable from './SecurityReportTable';
 import {SecurityReportChart} from './SecurityReportChart';
-import {useRecoilState} from 'recoil';
-import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import {
+  SecurityDetailsErrorState,
+  SecurityDetailsState,
+} from 'src/atoms/SecurityDetailsState';
+import {isErrorString} from 'src/resources/ErrorHandling';
+import RequestError from 'src/components/errors/RequestError';
 
 export default function SecurityReport(props: SecurityReportProps) {
-  const [data, setData] = useRecoilState(SecurityDetailsState);
+  const data = useRecoilValue(SecurityDetailsState);
+  const error = useRecoilValue(SecurityDetailsErrorState);
+
+  if (isErrorString(error)) {
+    return <RequestError message={error} />;
+  }
 
   // Set features to a default of null to distinuish between a completed API call and one that is in progress
   let features = null;

@@ -1,35 +1,43 @@
 import {setRepositoryVisibility} from 'src/resources/RepositoryResource';
 import {Modal, ModalVariant, Button} from '@patternfly/react-core';
-import {getUser} from 'src/resources/UserResource';
-import {useRecoilState} from 'recoil';
-import {UserState} from 'src/atoms/UserState';
+import {useState} from 'react';
+import FormError from 'src/components/errors/FormError';
+import {addDisplayError} from 'src/resources/ErrorHandling';
+import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 
 export function ConfirmationModal(props: ConfirmationModalProps) {
-  const [, setUserState] = useRecoilState(UserState);
+  const [err, setErr] = useState<string>();
+  const refreshUser = useRefreshUser();
 
-  async function changeVisibility() {
-    if (props.selectedItems.length > 0) {
-      const visibility = props.makePublic ? 'public' : 'private';
-      try {
-        const response = await Promise.all(
-          props.selectedItems.map((item) => {
-            const ls = item.split('/', 2);
-            setRepositoryVisibility(ls[0], ls[1], visibility);
-          }),
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-
-  const handleModalConfirm = async () => {
-    await changeVisibility().then(async () => {
-      const user = await getUser();
-      setUserState(user);
+  const changeVisibility = async () => {
+    const visibility = props.makePublic ? 'public' : 'private';
+    try {
+      // TODO: Could replace this with a 'bulkSetRepoVisibility'
+      // function in RepositoryResource in the future
+      await Promise.all(
+        props.selectedItems.map((item) => {
+          const ls = item.split('/', 2);
+          return setRepositoryVisibility(ls[0], ls[1], visibility);
+        }),
+      );
+      refreshUser();
       props.toggleModal();
       props.selectAllRepos(false);
-    });
+    } catch (error: any) {
+      console.error(error);
+      setErr(addDisplayError('Unable to change visibility', error));
+    }
+  };
+
+  const handleModalConfirm = async () => {
+    // This modal should never render if no items have been selected,
+    // that should be handled by the parent component. Leaving this check
+    // in anyway.
+    if (props.selectedItems.length > 0) {
+      await changeVisibility();
+    } else {
+      setErr('No items selected');
+    }
   };
 
   return (
@@ -47,6 +55,7 @@ export function ConfirmationModal(props: ConfirmationModalProps) {
         </Button>,
       ]}
     >
+      <FormError message={err} setErr={setErr} />
       {props.description}
     </Modal>
   );

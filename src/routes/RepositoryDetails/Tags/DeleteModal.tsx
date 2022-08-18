@@ -1,16 +1,26 @@
 import {Modal, ModalVariant, Button, Label} from '@patternfly/react-core';
-import {deleteTag} from 'src/resources/TagResource';
+import {useState} from 'react';
+import FormError from 'src/components/errors/FormError';
+import {bulkDeleteTags} from 'src/resources/TagResource';
 
 export function DeleteModal(props: ModalProps) {
+  const [err, setErr] = useState<string>();
   const deleteTags = async () => {
-    await Promise.all(
-      props.selectedTags.map(async (tag) =>
-        deleteTag(props.org, props.repo, tag),
-      ),
-    );
-    props.loadTags();
-    props.setIsOpen(!props.isOpen);
-    props.setSelectedTags([]);
+    try {
+      const tags = props.selectedTags.map((tag) => ({
+        org: props.org,
+        repo: props.repo,
+        tag: tag,
+      }));
+      await bulkDeleteTags(tags);
+      props.loadTags();
+      props.setIsOpen(!props.isOpen);
+      props.setSelectedTags([]);
+    } catch (err: any) {
+      console.error(err);
+      // TODO: Add to message the tags that weren't able to be deleted
+      setErr('Unable to delete tags');
+    }
   };
   return (
     <Modal
@@ -44,6 +54,7 @@ export function DeleteModal(props: ModalProps) {
         </Button>,
       ]}
     >
+      <FormError message={err} setErr={setErr} />
       {props.selectedTags.map((tag) => (
         <span key={tag}>
           <Label>{tag}</Label>{' '}

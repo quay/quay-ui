@@ -17,22 +17,37 @@ import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import {
-  selectedOrgsState,
-  UserOrgs,
-  UserState,
-  filterOrgState,
-} from 'src/atoms/UserState';
+import {filterOrgState, selectedOrgsState, UserOrgs} from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
 import {bulkDeleteOrganizations} from 'src/resources/OrganisationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
-import {getUser, IUserResource} from 'src/resources/UserResource';
-import {OrganizationToolBar} from 'src/routes/OrganizationsList/OrganizationToolBar';
+import ErrorBoundary from 'src/components/errors/ErrorBoundary';
+import {useRefreshUser} from 'src/hooks/UseRefreshUser';
+import RequestError from 'src/components/errors/RequestError';
+import {OrganizationToolBar} from './OrganizationToolBar';
 
+// Attempt to render OrganizationsList content,
+// fallback to RequestError on failure
 export default function OrganizationsList() {
-  const [organizationsList, setOrganizationsList] = useState<
-    OrganizationsListProps[]
-  >([]);
+  return (
+    <Page>
+      <PageSection variant={PageSectionVariants.light} hasShadowBottom>
+        <div className="co-m-nav-title--row">
+          <Title headingLevel="h1">Organizations</Title>
+        </div>
+      </PageSection>
+      <PageSection>
+        <ErrorBoundary
+          fallback={<RequestError message={'Unable to load organizations.'} />}
+        >
+          <PageContent />
+        </ErrorBoundary>
+      </PageSection>
+    </Page>
+  );
+}
+
+function PageContent() {
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [organizationSearchInput, setOrganizationSearchInput] = useState(
     'Filter by name or ID..',
@@ -41,6 +56,23 @@ export default function OrganizationsList() {
   const filter = useRecoilValue(filterOrgState);
   const [selectedOrganization, setSelectedOrganization] =
     useRecoilState(selectedOrgsState);
+  const userOrgs = useRecoilValue(UserOrgs);
+  const refreshUser = useRefreshUser();
+  useEffect(() => {
+    // Get latest organizations
+    refreshUser();
+  }, []);
+  // TODO: Using mock values here - remove in the future?
+  const organizationsList = userOrgs.map((org) => ({
+    name: org.name,
+    repoCount: 1,
+    tagCount: 1,
+    size: '1.1GB',
+    pulls: 108,
+    lastPull: 'TBA',
+    lastModified: 'TBA',
+  }));
+
   const filteredOrgs =
     filter !== ''
       ? organizationsList.filter((repo) => repo.name.includes(filter))
@@ -56,8 +88,6 @@ export default function OrganizationsList() {
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
 
   const [isKebabOpen, setKebabOpen] = useState(false);
-  const userOrgs = useRecoilValue(UserOrgs);
-  const [user, setUserState] = useRecoilState(UserState);
 
   const columnNames = {
     name: 'Organization',
@@ -76,9 +106,7 @@ export default function OrganizationsList() {
   const isOrgSelectable = (org) => org.name !== ''; // Arbitrary logic for this example
   // Logic for handling all ns checkbox selections from <Th>
   const selectAllOrganizations = (isSelecting = true) => {
-    setSelectedOrganization(
-      isSelecting ? filteredOrgs.map((ns) => ns.name) : [],
-    );
+    setSelectedOrganization(isSelecting ? filteredOrgs : []);
   };
 
   const areAllOrganizationsSelected =
@@ -86,7 +114,7 @@ export default function OrganizationsList() {
 
   // Logic for handling row-wise checkbox selection in <Td>
   const isOrganizationSelected = (ns: OrganizationsListProps) =>
-    selectedOrganization.includes(ns.name);
+    selectedOrganization.some((org) => org.name === ns.name);
 
   const setOrganizationChecked = (
     ns: OrganizationsListProps,
@@ -94,10 +122,10 @@ export default function OrganizationsList() {
   ) =>
     setSelectedOrganization((prevSelected) => {
       const otherSelectedOrganizationNames = prevSelected.filter(
-        (r) => r !== ns.name,
+        (r) => r.name !== ns.name,
       );
       return isSelecting && isOrgSelectable(ns)
-        ? [...otherSelectedOrganizationNames, ns.name]
+        ? [...otherSelectedOrganizationNames, ns]
         : otherSelectedOrganizationNames;
     });
 
@@ -155,54 +183,14 @@ export default function OrganizationsList() {
     };
   }, []);
 
-  const fetchData = async () => {
-    // clearing previous states
-    setOrganizationsList([]);
-    setSelectedOrganization([]);
-
-    if (userOrgs) {
-      const user: IUserResource = await getUser();
-      // TODO: add other attributes for a user org to be displayed
-      const listOfOrgs = [
-        ...userOrgs,
-        {
-          name: user.username,
-        },
-      ];
-
-      listOfOrgs.map((org: any) => {
-        setOrganizationsList((prevOrganizations) => [
-          ...prevOrganizations,
-          {
-            name: org.name,
-            repoCount: 1,
-            tagCount: 1,
-            size: '1.1GB',
-            pulls: 108,
-            lastPull: 'TBA',
-            lastModified: 'TBA',
-          },
-        ]);
-      });
-    }
-  };
-
-  useEffect(() => {
-    const fetch = async () => {
-      fetchData();
-    };
-    fetch();
-  }, [userOrgs]);
-
   const handleOrgDeletion = async () => {
+    // Error handling is in BulkDeleteModalTemplate,
+    // since that is where it is reported to the user.
+    const orgs = selectedOrganization.map((org) => org.name);
+    await bulkDeleteOrganizations(orgs);
+    refreshUser();
+    setSelectedOrganization([]);
     setDeleteModalIsOpen(!deleteModalIsOpen);
-    const response = await bulkDeleteOrganizations(selectedOrganization);
-    const deleteFailed = response.some((resp) => resp.status !== 204);
-    if (!deleteFailed) {
-      const user = await getUser();
-      setUserState(user);
-      setSelectedOrganization([]);
-    }
   };
 
   const handleDeleteModalToggle = () => {
@@ -245,7 +233,7 @@ export default function OrganizationsList() {
       isModalOpen={deleteModalIsOpen}
       selectedItems={organizationsList.filter((org) =>
         selectedOrganization.some(
-          (selectedOrgName) => org.name === selectedOrgName,
+          (selectedOrg) => org.name === selectedOrg.name,
         ),
       )}
       resourceName={'organizations'}
@@ -254,12 +242,6 @@ export default function OrganizationsList() {
 
   return (
     <Page>
-      <PageSection variant={PageSectionVariants.light} hasShadowBottom>
-        <div className="co-m-nav-title--row">
-          <Title headingLevel="h1">Organizations</Title>
-        </div>
-      </PageSection>
-
       <PageSection>
         <PageSection variant={PageSectionVariants.light}>
           <OrganizationToolBar

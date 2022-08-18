@@ -1,5 +1,6 @@
 import {
   DropdownItem,
+  DropdownItemProps,
   Page,
   PageSection,
   PageSectionVariants,
@@ -15,33 +16,70 @@ import {
   Td,
 } from '@patternfly/react-table';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import {UserOrgs, UserState} from 'src/atoms/UserState';
+import {UserOrgs} from 'src/atoms/UserState';
 import {
   bulkDeleteRepositories,
   fetchAllRepos,
   IRepository,
 } from 'src/resources/RepositoryResource';
-import {useEffect, useState} from 'react';
+import {ReactElement, useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import {CreateRepositoryModalTemplate} from 'src/components/modals/CreateRepoModalTemplate';
+import CreateRepositoryModalTemplate from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
 import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {getUser} from 'src/resources/UserResource';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
+import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
+import ErrorBoundary from 'src/components/errors/ErrorBoundary';
+import {useRefreshUser} from 'src/hooks/UseRefreshUser';
+import RequestError from 'src/components/errors/RequestError';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
 }
 
+// Attempt to render RepositoriesList, fallback to RequestError
+// on failure
 export default function RepositoriesList() {
+  const currentOrg = getReponameFromURL(useLocation().pathname);
+  const [err, setErr] = useState<string>();
+  return (
+    <>
+      {currentOrg === null ? <RepoListTitle /> : null}
+      <ErrorBoundary
+        hasError={isErrorString(err)}
+        fallback={<RequestError message={err} />}
+      >
+        <RepoListContent currentOrg={currentOrg} setErr={setErr} />
+      </ErrorBoundary>
+    </>
+  );
+}
+
+function RepoListTitle() {
+  return (
+    <PageSection variant={PageSectionVariants.light} hasShadowBottom>
+      <div className="co-m-nav-title--row">
+        <Title headingLevel="h1">Repositories</Title>
+      </div>
+    </PageSection>
+  );
+}
+
+function RepoListContent(props: RepoListContentProps) {
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
-  const [, setUserState] = useRecoilState(UserState);
+  const userOrgs = useRecoilValue(UserOrgs);
+  const refreshUser = useRefreshUser();
+  useEffect(() => {
+    // Get latest organizations
+    refreshUser();
+  }, []);
 
   // Filtering Repositories after applied filter
   const filter = useRecoilValue(filterRepoState);
@@ -105,28 +143,22 @@ export default function RepositoriesList() {
 
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const userOrgs = useRecoilValue(UserOrgs);
-  const currentUser = useRecoilValue(UserState);
-  const currentOrg = getReponameFromURL(useLocation().pathname);
-
   const handleDeleteModalToggle = () => {
     setKebabOpen(!isKebabOpen);
     setDeleteModalOpen(!isDeleteModalOpen);
   };
 
   const handleRepoDeletion = async (repos: IRepository[]) => {
+    // No error handling here - it's done within the
+    // BulkDeleteModalTemplate to capture and display to
+    // the user
+    await bulkDeleteRepositories(repos);
+    refreshUser();
+    setSelectedRepoNames([]);
     setDeleteModalOpen(!isDeleteModalOpen);
-    const response = await bulkDeleteRepositories(repos);
-    const deleteFailed = response.some((resp) => resp.status !== 204);
-    if (!deleteFailed) {
-      // Fetch user recomputes "repositoryList" via useEffect
-      const user = await getUser();
-      setUserState(user);
-      setSelectedRepoNames([]);
-    }
   };
 
-  const kebabItems = [
+  const kebabItems: ReactElement[] = [
     <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
       Delete
     </DropdownItem>,
@@ -164,32 +196,29 @@ export default function RepositoriesList() {
     // clearing previous states
     setRepositoryList([]);
     setSelectedRepoNames([]);
-
-    const listOfOrgNames = [];
     if (userOrgs) {
       // check if view is global vs scoped to a organization
-      if (currentOrg === null) {
-        userOrgs.map((org) => listOfOrgNames.push(org.name));
-        // add user to fetch user specific repositories
-        listOfOrgNames.push(currentUser.username);
-      } else {
-        listOfOrgNames.push(currentOrg);
+      const listOfOrgNames: string[] = props.currentOrg
+        ? [props.currentOrg]
+        : userOrgs.map((org) => org.name);
+
+      try {
+        const repos = await fetchAllRepos(listOfOrgNames);
+        // TODO: Here we're formatting repo's into the correct
+        // type. Once we know the return type from the repo's
+        // API we should pass 'repos' directly into 'setRepositoryList'
+        const formattedRepos = repos.map((repo) => ({
+          namespace: repo.namespace,
+          name: repo.name,
+          is_public: repo.is_public,
+          last_modified: repo.last_modified,
+        }));
+        setRepositoryList(formattedRepos);
+      } catch (err) {
+        console.log('setting err');
+        console.error(err);
+        props.setErr(addDisplayError('Unable to get repositores', err));
       }
-      await fetchAllRepos(listOfOrgNames).then((response) => {
-        response.map((eachResponse) =>
-          eachResponse?.data.repositories.map((repo) => {
-            setRepositoryList((prevRepos) => [
-              ...prevRepos,
-              {
-                namespace: repo.namespace,
-                name: repo.name,
-                is_public: repo.is_public,
-                last_modified: repo.last_modified,
-              },
-            ]);
-          }),
-        );
-      });
     }
   }
 
@@ -218,7 +247,7 @@ export default function RepositoriesList() {
     <CreateRepositoryModalTemplate
       isModalOpen={isCreateRepoModalOpen}
       handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
-      orgName={currentOrg}
+      orgName={props.currentOrg}
       updateListHandler={updateListHandler}
     />
   );
@@ -240,17 +269,9 @@ export default function RepositoriesList() {
 
   return (
     <Page>
-      {currentOrg === null ? (
-        <PageSection variant={PageSectionVariants.light} hasShadowBottom>
-          <div className="co-m-nav-title--row">
-            <Title headingLevel="h1">Repositories</Title>
-          </div>
-        </PageSection>
-      ) : null}
-
       <PageSection variant={PageSectionVariants.light}>
         <RepositoryToolBar
-          currentOrg={currentOrg}
+          currentOrg={props.currentOrg}
           createRepoModal={createRepoModal}
           isCreateRepoModalOpen={isCreateRepoModalOpen}
           setCreateRepoModalOpen={setCreateRepoModalOpen}
@@ -308,7 +329,7 @@ export default function RepositoriesList() {
                     }}
                   />
                   <Td dataLabel={columnNames.repoName}>
-                    {currentOrg == null ? (
+                    {props.currentOrg == null ? (
                       <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
                         {repo.namespace}/{repo.name}
                       </Link>
@@ -337,4 +358,9 @@ export default function RepositoriesList() {
       </PageSection>
     </Page>
   );
+}
+
+interface RepoListContentProps {
+  currentOrg: string;
+  setErr: (message: string) => void;
 }

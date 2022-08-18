@@ -1,26 +1,24 @@
 import React, {useState} from 'react';
 import {
+  Alert,
+  AlertActionCloseButton,
   LoginForm,
-  LoginMainFooterBandItem,
   LoginPage,
 } from '@patternfly/react-core';
 import logo from 'src/assets/quay.svg';
-import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {GlobalAuthState, loginUser} from 'src/resources/AuthResource';
 import {useNavigate} from 'react-router-dom';
-import {getUser} from 'src/resources/UserResource';
 import {useRecoilState} from 'recoil';
-import {UserState} from 'src/atoms/UserState';
 import {AuthState} from 'src/atoms/AuthState';
 import axios from '../../libs/axios';
 import {useQuayConfig} from '../../hooks/UseQuayConfig';
+import {AxiosError} from 'axios';
 
 export function Signin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-
-  const [, setUserState] = useRecoilState(UserState);
+  const [err, setErr] = useState<string>();
   const [, setAuthState] = useRecoilState(AuthState);
 
   const navigate = useNavigate();
@@ -38,31 +36,40 @@ export function Signin() {
     try {
       const response = await loginUser(username, password);
       if (response.success) {
-        setAuthState((old) => {
-          return {...old, isSignedIn: true};
-        });
-
+        setAuthState((old) => ({...old, isSignedIn: true, username: username}));
         GlobalAuthState.isLoggedIn = true;
-        navigate('/');
+        navigate('/organizations');
+      } else {
+        setErr('Invalid login credentials');
       }
     } catch (err) {
-      // TODO: handle login error
       console.error(err);
+      if (
+        err instanceof AxiosError &&
+        err.response &&
+        err.response.status === 403
+      ) {
+        setErr('CSRF token expired - please refresh');
+      } else {
+        setErr('Unable to connect to server.');
+      }
     }
   };
 
-  const helperText = (
-    <React.Fragment>
-      <ExclamationCircleIcon />
-      &nbsp;Invalid login credentials.
-    </React.Fragment>
+  const errMessage = (
+    <Alert
+      id="form-error-alert"
+      isInline
+      actionClose={<AlertActionCloseButton onClose={() => setErr(null)} />}
+      variant="danger"
+      title={err}
+    />
   );
 
   const loginForm = (
     <LoginForm
-      showHelperText={false}
-      helperText={helperText}
-      helperTextIcon={<ExclamationCircleIcon />}
+      showHelperText={err != null}
+      helperText={errMessage}
       usernameLabel="Username"
       usernameValue={username}
       onChangeUsername={(v) => setUsername(v)}

@@ -14,12 +14,16 @@ import {
   getManifestByDigest,
   ManifestByDigestResponse,
 } from 'src/resources/TagResource';
+import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
+import ErrorBoundary from 'src/components/errors/ErrorBoundary';
+import RequestError from 'src/components/errors/RequestError';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const filter = useRecoilValue(filterState);
   const pagination = useRecoilValue(paginationState);
   const [loading, setLoading] = useState<boolean>(true);
+  const [err, setErr] = useState<string>();
   const resetSelectedTags = useResetRecoilState(selectedTagsState);
 
   const filteredTags: Tag[] =
@@ -64,6 +68,7 @@ export default function Tags(props: TagsProps) {
       } catch (error: any) {
         console.error(error);
         setLoading(false);
+        setErr(addDisplayError('Unable to get tags', error));
       }
     } while (hasAdditional);
   };
@@ -81,12 +86,17 @@ export default function Tags(props: TagsProps) {
         tagCount={filteredTags.length}
         loadTags={loadTags}
       ></Toolbar>
-      <Table
-        org={props.organization}
-        repo={props.repository}
-        tags={paginatedTags}
-        loading={loading}
-      ></Table>
+      <ErrorBoundary
+        hasError={isErrorString(err)}
+        fallback={<RequestError message={err} />}
+      >
+        <Table
+          org={props.organization}
+          repo={props.repository}
+          tags={paginatedTags}
+          loading={loading}
+        />
+      </ErrorBoundary>
     </>
   );
 }

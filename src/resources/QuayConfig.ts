@@ -2,13 +2,11 @@
 
 import {AxiosResponse} from 'axios';
 import axios from '../libs/axios';
+import {assertHttpCode} from './ErrorHandling';
 
 export async function fetchQuayConfig() {
-  const configUrl = '/config';
-  try {
-    const response: AxiosResponse = await axios.get(configUrl);
-    return response.data;
-  } catch (e) {
-    console.error(e);
-  }
+  // TODO: Add response type to AxiosResponse
+  const response: AxiosResponse = await axios.get('/config');
+  assertHttpCode(response.status, 200);
+  return response.data;
 }
