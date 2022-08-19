@@ -1,37 +1,25 @@
 import {
-  Avatar,
   Button,
-  ButtonVariant,
   Dropdown,
   DropdownGroup,
   DropdownItem,
   DropdownToggle,
-  KebabToggle,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
-import {
-  AttentionBellIcon,
-  CogIcon,
-  HelpIcon,
-  LightbulbIcon,
-  QuestionCircleIcon,
-  UserIcon,
-} from '@patternfly/react-icons';
-import React, {useState} from 'react';
+import {UserIcon} from '@patternfly/react-icons';
+import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
-import {UserState} from 'src/atoms/UserState';
-import {IUserResource} from 'src/resources/UserResource';
+import {useRecoilState} from 'recoil';
+import {CurrentUsernameState} from 'src/atoms/UserState';
 import {GlobalAuthState, logoutUser} from 'src/resources/AuthResource';
 
 export function HeaderToolbar() {
-  const [user] = useRecoilState<IUserResource>(UserState);
-  const resetUser = useResetRecoilState(UserState);
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [currentUsername, setCurrentUsername] =
+    useRecoilState(CurrentUsernameState);
 
   const navigate = useNavigate();
 
@@ -39,22 +27,19 @@ export function HeaderToolbar() {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  const onDropdownSelect = (e) => {
+  const onDropdownSelect = async (e) => {
     setIsDropdownOpen(false);
     switch (e.target.value) {
       case 'logout':
-        // call the logout API
-        logoutUser()
-          .then(() => {
-            // reset the CSRF token
-            GlobalAuthState.csrfToken = undefined;
-            resetUser();
-            navigate('/signin');
-          })
-          .catch((e) => {
-            // TODO: notify error
-            console.error(e);
-          });
+        try {
+          await logoutUser();
+          GlobalAuthState.csrfToken = undefined;
+          setCurrentUsername('');
+          navigate('/signin');
+        } catch (err: any) {
+          console.error(e);
+          // TODO: Notify user error in signing out
+        }
         break;
       default:
         break;
@@ -76,7 +61,7 @@ export function HeaderToolbar() {
       isOpen={isDropdownOpen}
       toggle={
         <DropdownToggle icon={<UserIcon />} onToggle={onDropdownToggle}>
-          {user ? user.username : ''}
+          {currentUsername}
         </DropdownToggle>
       }
       dropdownItems={userDropdownItems}
@@ -93,7 +78,9 @@ export function HeaderToolbar() {
           alignment={{default: 'alignRight'}}
           spacer={{default: 'spacerNone', md: 'spacerMd'}}
         >
-          <ToolbarItem>{user ? userDropdown : signInButton}</ToolbarItem>
+          <ToolbarItem>
+            {currentUsername ? userDropdown : signInButton}
+          </ToolbarItem>
         </ToolbarGroup>
       </ToolbarContent>
     </Toolbar>

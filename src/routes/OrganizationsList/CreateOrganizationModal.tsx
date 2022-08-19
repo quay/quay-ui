@@ -12,19 +12,19 @@ import {
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {createOrg} from 'src/resources/OrganisationResource';
-import {useRecoilState} from 'recoil';
-import {UserState} from 'src/atoms/UserState';
-import {getUser} from 'src/resources/UserResource';
 import {isValidEmail} from 'src/libs/utils';
 import {useState} from 'react';
+import FormError from 'src/components/errors/FormError';
+import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
 ): JSX.Element => {
   const [organizationName, setOrganizationName] = useState('');
   const [organizationEmail, setOrganizationEmail] = useState('');
-  const [, setUserState] = useRecoilState(UserState);
   const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
+  const [err, setErr] = useState<string>();
+  const refreshUser = useRefreshUser();
 
   const handleNameInputChange = (value: any) => {
     setOrganizationName(value);
@@ -35,11 +35,15 @@ export const CreateOrganizationModal = (
   };
 
   const createOrganizationHandler = async () => {
-    const response = await createOrg(organizationName, organizationEmail);
-    props.handleModalToggle();
-    if (response === 'Created') {
-      const user = await getUser();
-      setUserState(user);
+    try {
+      const response = await createOrg(organizationName, organizationEmail);
+      props.handleModalToggle();
+      if (response === 'Created') {
+        refreshUser();
+      }
+    } catch (err) {
+      console.error(err);
+      setErr('Unable to create organization');
     }
   };
 
@@ -74,6 +78,7 @@ export const CreateOrganizationModal = (
         </Button>,
       ]}
     >
+      <FormError message={err} setErr={setErr} />
       <Form id="modal-with-form-form" isWidthLimited>
         <FormGroup
           isInline

@@ -13,16 +13,16 @@ import {
   Alert,
   Divider,
 } from '@patternfly/react-core';
-import {useRecoilState, useRecoilValue} from 'recoil';
-import {UserOrgs, UserState} from 'src/atoms/UserState';
+import {useRecoilValue} from 'recoil';
+import {UserOrgs} from 'src/atoms/UserState';
 import {
   createNewRepository,
   IRepository,
-  RepositoryCreationResponse,
 } from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
-import {AxiosResponse} from 'axios';
-import {getUser} from 'src/resources/UserResource';
+import ErrorBoundary from 'src/components/errors/ErrorBoundary';
+import FormError from '../errors/FormError';
+import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 
 enum visibilityType {
@@ -30,11 +30,45 @@ enum visibilityType {
   PRIVATE = 'PRIVATE',
 }
 
-export const CreateRepositoryModalTemplate = (
+// Attempt to render modal content, fallback to error
+// display if failure
+export default function CreateRepositoryModalTemplate(
   props: CreateRepositoryModalTemplateProps,
-): JSX.Element => {
+) {
+  return (
+    <ErrorBoundary fallback={ErrorModal}>
+      <CreateRepositoryModal {...props} />
+    </ErrorBoundary>
+  );
+}
+
+function ErrorModal(props: ErrorModalProps) {
+  return (
+    <Modal
+      title="Loading Failure"
+      variant={ModalVariant.large}
+      isOpen={props.isOpen}
+      onClose={props.toggle}
+      actions={[
+        <Button key="cancel" variant="link" onClick={props.toggle}>
+          Cancel
+        </Button>,
+      ]}
+    >
+      <div>
+        Error loading create repository form. Please close and try again.
+      </div>
+    </Modal>
+  );
+}
+
+function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
+  if (!props.isModalOpen) {
+    return null;
+  }
   const userOrgs = useRecoilValue(UserOrgs);
-  const [userState, setUserState] = useRecoilState(UserState);
+  const [err, setErr] = useState<string>();
+  const refreshUser = useRefreshUser();
 
   const [currentOrganization, setCurrentOrganization] = useState({
     // For org scoped view, the name is set current org and for Repository list view,
@@ -65,14 +99,6 @@ export const CreateRepositoryModalTemplate = (
     setNewRepository({...newRepository, description: value});
   };
 
-  const orgSelectionList = (
-    <>
-      {userOrgs.map((orgs, idx) => (
-        <SelectOption key={idx} value={orgs.name}></SelectOption>
-      ))}
-      ;
-    </>
-  );
   const validateInput = () => {
     const validNamespace = !!currentOrganization.name;
     const validRepo = !!newRepository.name;
@@ -84,9 +110,7 @@ export const CreateRepositoryModalTemplate = (
     if (!validateInput()) {
       return;
     }
-    props.handleModalToggle();
-
-    const repoCreationResponse: AxiosResponse<RepositoryCreationResponse> =
+    try {
       await createNewRepository(
         currentOrganization.name,
         newRepository.name,
@@ -94,10 +118,11 @@ export const CreateRepositoryModalTemplate = (
         newRepository.description,
         'image',
       );
-    // update the repository list once the creation is succesful
-    if (repoCreationResponse.status === 201) {
-      const user = await getUser();
-      setUserState(user);
+      refreshUser();
+      props.handleModalToggle();
+    } catch (error: any) {
+      console.error(error);
+      setErr('Unable to create repository');
     }
   };
 
@@ -128,6 +153,7 @@ export const CreateRepositoryModalTemplate = (
         </Button>,
       ]}
     >
+      <FormError message={err} setErr={setErr} />
       <Form id="modal-with-form-form" maxWidth="750px">
         <Grid hasGutter md={4}>
           <FormGroup
@@ -155,12 +181,9 @@ export const CreateRepositoryModalTemplate = (
               placeholderText={'Select namespace'}
               selections={currentOrganization.name}
             >
-              <SelectOption
-                key={userState.username}
-                value={userState.username}
-              ></SelectOption>
-              <Divider component="li" key={'org-username-divider'} />
-              {orgSelectionList}
+              {userOrgs.map((orgs, idx) => (
+                <SelectOption key={idx} value={orgs.name}></SelectOption>
+              ))}
             </Select>
           </FormGroup>
           <FormGroup
@@ -222,11 +245,16 @@ export const CreateRepositoryModalTemplate = (
       </Form>
     </Modal>
   );
-};
+}
 
-type CreateRepositoryModalTemplateProps = {
+interface CreateRepositoryModalTemplateProps {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
   orgName?: string;
   updateListHandler: (value: IRepository) => void;
-};
+}
+
+interface ErrorModalProps {
+  isOpen: boolean;
+  toggle?: () => void;
+}

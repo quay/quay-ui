@@ -8,7 +8,6 @@ import {ToolbarPagination} from 'src/components/toolbar/Pagination';
 import {filterOrgState} from 'src/atoms/UserState';
 import {useRecoilState} from 'recoil';
 import * as React from 'react';
-import {DropdownItemProps} from '@patternfly/react-core/dist/esm/components/Dropdown/DropdownItem';
 
 export function OrganizationToolBar(props: OrganizationToolBarProps) {
   const [filterOrg, setOrgFilter] = useRecoilState(filterOrgState);
@@ -66,7 +65,7 @@ type OrganizationToolBarProps = {
   setOrganizationModalOpen: (open) => void;
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
-  kebabItems: React.FunctionComponent<DropdownItemProps>[];
+  kebabItems: React.ReactElement[];
   selectedOrganization: any[];
   deleteKebabIsOpen: boolean;
   deleteModal: object;

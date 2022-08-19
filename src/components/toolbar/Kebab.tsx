@@ -22,5 +22,5 @@ export function Kebab(props: KebabProps) {
 type KebabProps = {
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
-  kebabItems: React.FunctionComponent<DropdownItemProps>[];
+  kebabItems: React.ReactElement[];
 };

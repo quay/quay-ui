@@ -1,4 +1,6 @@
+import {AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
+import {assertHttpCode} from './ErrorHandling';
 import {IAvatar, IOrganization} from './OrganisationResource';
 
 export interface IUserResource {
@@ -33,10 +35,9 @@ export interface IUserResource {
 }
 
 export async function getUser() {
-  try {
-    const response = await axios.get('/api/v1/user/');
-    return response.data;
-  } catch (error) {
-    throw new Error(`API error getting user ${error.message}`);
-  }
+  const response: AxiosResponse<IUserResource> = await axios.get(
+    '/api/v1/user/',
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
 }

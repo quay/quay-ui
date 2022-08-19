@@ -6,7 +6,6 @@ import {
   PageSectionVariants,
   Title,
   PageBreadcrumb,
-  Spinner,
 } from '@patternfly/react-core';
 import {useSearchParams, useLocation} from 'react-router-dom';
 import {useState, useEffect} from 'react';
@@ -20,10 +19,12 @@ import {
   ManifestByDigestResponse,
   Manifest,
 } from 'src/resources/TagResource';
+import {addDisplayError} from 'src/resources/ErrorHandling';
 
 export default function TagDetails() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [architecture, setArchitecture] = useState<string>();
+  const [err, setErr] = useState<string>();
   const [tagDetails, setTagDetails] = useState<Tag>({
     name: '',
     is_manifest_list: false,
@@ -78,11 +79,11 @@ export default function TagDetails() {
           );
         }
       } catch (error: any) {
-        // TODO: provide sufficient error handling, will be resolved in a future PR
         console.error(error);
+        setErr(addDisplayError('Unable to get details for tag', error));
       }
     })();
-  }, [getTags, tagDetails.size]);
+  }, []);
 
   // Pull size and digest from manifest otherwise default to pull from tagDetails
   let size: number = tagDetails.size;
@@ -130,6 +131,7 @@ export default function TagDetails() {
           tag={tagDetails}
           size={size}
           digest={digest}
+          err={err}
         />
       </PageSection>
     </Page>

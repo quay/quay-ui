@@ -1,5 +1,6 @@
 import {AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
+import {assertHttpCode} from './ErrorHandling';
 
 export interface IRepository {
   namespace: string;
@@ -20,18 +21,26 @@ export interface RepositoryCreationResponse {
 }
 
 export async function fetchAllRepos(namespaces: string[]) {
-  try {
-    const repoList = await Promise.all(
-      namespaces.map((ns) => {
-        return axios.get(
-          `/api/v1/repository?last_modified=true&namespace=${ns}`,
-        );
-      }),
-    );
-    return repoList;
-  } catch (error) {
-    console.error(error);
-  }
+  const namespacedRepos = await Promise.all(
+    namespaces.map((ns) => {
+      return getRepositoriesForNamespace(ns);
+    }),
+  );
+  // Flatten responses to a single list of all repositories
+  return namespacedRepos.reduce(
+    (allRepos, namespacedRepos) =>
+      allRepos.concat(namespacedRepos.repositories),
+    [],
+  );
+}
+
+export async function getRepositoriesForNamespace(ns: string) {
+  // TODO: Add return type to AxiosResponse
+  const response: AxiosResponse = await axios.get(
+    `/api/v1/repository?last_modified=true&namespace=${ns}`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
 }
 
 export async function createNewRepository(
@@ -42,19 +51,18 @@ export async function createNewRepository(
   repo_kind: string,
 ) {
   const newRepositoryApiUrl = `/api/v1/repository`;
-  try {
-    const response: AxiosResponse<RepositoryCreationResponse> =
-      await axios.post(newRepositoryApiUrl, {
-        namespace,
-        repository,
-        visibility,
-        description,
-        repo_kind,
-      });
-    return response;
-  } catch (e) {
-    console.error(e);
-  }
+  const response: AxiosResponse<RepositoryCreationResponse> = await axios.post(
+    newRepositoryApiUrl,
+    {
+      namespace,
+      repository,
+      visibility,
+      description,
+      repo_kind,
+    },
+  );
+  assertHttpCode(response.status, 201);
+  return response.data;
 }
 
 export async function setRepositoryVisibility(
@@ -62,34 +70,28 @@ export async function setRepositoryVisibility(
   repositoryName: string,
   visibility: string,
 ) {
-  const repositoryVisibilityUrl =
-    `/api/v1/repository/` +
-    namespace +
-    `/` +
-    repositoryName +
-    `/changevisibility`;
-  try {
-    const response = await axios.post(repositoryVisibilityUrl, {
-      visibility,
-    });
-    return response;
-  } catch (e) {
-    // TODO: Find a better way to propagate errors
-    console.error(e);
-  }
+  // TODO: Add return type to AxiosResponse
+  const api = `/api/v1/repository/${namespace}/${repositoryName}/changevisibility`;
+  const response: AxiosResponse = await axios.post(api, {
+    visibility,
+  });
+  assertHttpCode(response.status, 200);
+  return response.data;
 }
 
 export async function bulkDeleteRepositories(repos: IRepository[]) {
-  try {
-    const response = await Promise.all(
-      repos.map((repo) => {
-        return axios.delete(
-          `/api/v1/repository/${repo.namespace + '/' + repo.name}`,
-        );
-      }),
-    );
-    return response;
-  } catch (error) {
-    console.error(error);
-  }
+  await Promise.all(
+    repos.map((repo) => {
+      return deleteRepository(repo.namespace, repo.name);
+    }),
+  );
+}
+
+// Not returning response from deleting repository for now as
+// it's not required but may want to add it in the future.
+export async function deleteRepository(ns: string, name: string) {
+  const response: AxiosResponse = await axios.delete(
+    `/api/v1/repository/${ns}/${name}`,
+  );
+  assertHttpCode(response.status, 204);
 }

@@ -14,8 +14,12 @@ import {
   CheckCircleIcon,
 } from '@patternfly/react-icons';
 import {getSeverityColor} from 'src/libs/utils';
-import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
+import {
+  SecurityDetailsErrorState,
+  SecurityDetailsState,
+} from 'src/atoms/SecurityDetailsState';
 import {useRecoilState, useResetRecoilState} from 'recoil';
+import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 
 enum Variant {
   condensed = 'condensed',
@@ -27,7 +31,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
   const [vulnCount, setVulnCount] =
     useState<Map<VulnerabilitySeverity, number>>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const [err, setErr] = useRecoilState(SecurityDetailsErrorState);
   const [data, setData] = useRecoilState(SecurityDetailsState);
 
   // Reset SecurityDetailsState so that loading skeletons appear when viewing report
@@ -78,8 +82,8 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           setVulnCount(vulns);
           setLoading(false);
         } catch (error: any) {
-          console.error('Unable to get security details: ', error);
-          setError(true);
+          console.error(error);
+          setErr(addDisplayError('Unable to get security details', error));
           setLoading(false);
         }
       })();
@@ -96,17 +100,16 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     return <Skeleton width="50%"></Skeleton>;
   }
 
+  if (isErrorString(err)) {
+    return <>Unable to get security details</>;
+  }
+
   if (status === 'queued') {
     return <div>Queued</div>;
   } else if (status === 'failed') {
     return <div>Failed</div>;
   } else if (status === 'unsupported') {
     return <div>Unsupported</div>;
-  }
-
-  // API call failed, hide replace skeleton with error indicator
-  if (error) {
-    return <div>Error</div>;
   }
 
   if (vulnCount.size === 0) {

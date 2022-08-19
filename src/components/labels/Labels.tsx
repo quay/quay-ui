@@ -8,6 +8,8 @@ import {Label} from '@patternfly/react-core';
 
 export default function Labels(props: LabelsProps) {
   const [labels, setLabels] = useState<ImageLabel[]>([]);
+  const [err, setErr] = useState<boolean>(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -19,9 +21,14 @@ export default function Labels(props: LabelsProps) {
         setLabels(labelsResp.labels);
       } catch (error: any) {
         console.error('Unable to get labels: ', error);
+        setErr(true);
       }
     })();
   }, []);
+
+  if (err) {
+    return <>Unable to get labels</>;
+  }
 
   return (
     <>
