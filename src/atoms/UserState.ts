@@ -32,6 +32,10 @@ export const UserOrgs = selector<IOrganization[] | undefined>({
     // an error and if returns a 401 redirects to /signin
     if (user) {
       return [{name: user.username}, ...user.organizations];
+    } else {
+      console.error(
+        'Error getting organizations, recieved unexpected empty response from UserState',
+      );
     }
   },
 });

@@ -215,7 +215,6 @@ function RepoListContent(props: RepoListContentProps) {
         }));
         setRepositoryList(formattedRepos);
       } catch (err) {
-        console.log('setting err');
         console.error(err);
         props.setErr(addDisplayError('Unable to get repositores', err));
       }
