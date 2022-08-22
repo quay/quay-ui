@@ -10,8 +10,8 @@ import {GlobalAuthState, loginUser} from 'src/resources/AuthResource';
 import {useNavigate} from 'react-router-dom';
 import {useRecoilState} from 'recoil';
 import {AuthState} from 'src/atoms/AuthState';
-import axios from '../../libs/axios';
-import {useQuayConfig} from '../../hooks/UseQuayConfig';
+import axios, {getCsrfToken} from 'src/libs/axios';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {AxiosError} from 'axios';
 
 export function Signin() {
@@ -37,6 +37,7 @@ export function Signin() {
       const response = await loginUser(username, password);
       if (response.success) {
         setAuthState((old) => ({...old, isSignedIn: true, username: username}));
+        await getCsrfToken();
         GlobalAuthState.isLoggedIn = true;
         navigate('/organizations');
       } else {
