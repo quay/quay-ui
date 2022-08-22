@@ -25,6 +25,9 @@ import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import RequestError from 'src/components/errors/RequestError';
 import {OrganizationToolBar} from './OrganizationToolBar';
+import {CubesIcon} from '@patternfly/react-icons';
+import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
+import Empty from 'src/components/empty/Empty';
 
 // Attempt to render OrganizationsList content,
 // fallback to RequestError on failure
@@ -52,6 +55,7 @@ function PageContent() {
   const [organizationSearchInput, setOrganizationSearchInput] = useState(
     'Filter by name or ID..',
   );
+  const [loading, setLoading] = useState(true);
 
   const filter = useRecoilValue(filterOrgState);
   const [selectedOrganization, setSelectedOrganization] =
@@ -61,6 +65,7 @@ function PageContent() {
   useEffect(() => {
     // Get latest organizations
     refreshUser();
+    setLoading(false);
   }, []);
   // TODO: Using mock values here - remove in the future?
   const organizationsList = userOrgs.map((org) => ({
@@ -239,6 +244,24 @@ function PageContent() {
       resourceName={'organizations'}
     />
   );
+
+  if (!loading && !organizationsList?.length) {
+    return (
+      <Empty
+        icon={CubesIcon}
+        title="Collaborate and share projects across teams"
+        body="Create a shared space of public and private repositories for your developers to collaborate in. Organizations make it easy to add and manage people and permissions"
+        button={
+          <ToolbarButton
+            buttonValue="Create Organization"
+            Modal={createOrgModal}
+            isModalOpen={isOrganizationModalOpen}
+            setModalOpen={setOrganizationModalOpen}
+          />
+        }
+      />
+    );
+  }
 
   return (
     <Page>
