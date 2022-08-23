@@ -73,14 +73,18 @@ export function QuayBreadcrumb() {
 
     for (const value of Array.from(browserHistory.values())) {
       const newObj = {};
-      newObj['pathname'] = value.pathname;
-      if (typeof value.title === 'string') {
-        newObj['title'] = value.title;
-      } else if (value.title?.props?.children) {
-        newObj['title'] = value.title.props.children;
+      newObj['pathname'] = value['pathname'];
+      if (typeof value['title'] === 'string') {
+        newObj['title'] = value['title'];
+      } else if (
+        value['title'] &&
+        value['title']['props'] &&
+        value['title']['props']['children']
+      ) {
+        newObj['title'] = value['title']['props']['children'];
       }
       newObj['active'] =
-        value.pathname.localeCompare(window.location.pathname) === 0;
+        value['pathname'].localeCompare(window.location.pathname) === 0;
       if (newItem['pathname'] == newObj['pathname']) {
         newItem['title'] = newObj['title'];
         break;
@@ -159,6 +163,7 @@ type BreadcrumbMatch = {
 
 type BreadcrumbsRoute = {
   breadcrumb?: BreadcrumbComponentType | any | null;
+  Component?: React.ReactElement | any;
 };
 
 type RouterBreadcrumbDetail = {
