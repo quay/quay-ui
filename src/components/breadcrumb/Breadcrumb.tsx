@@ -4,14 +4,19 @@ import {
   PageBreadcrumb,
 } from '@patternfly/react-core';
 import {NavigationRoutes} from 'src/routes/NavigationPath';
-import {Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import React, {useEffect, useState} from 'react';
 import useBreadcrumbs, {
   BreadcrumbComponentType,
 } from 'use-react-router-breadcrumbs';
 import {useLocation} from 'react-router';
+import {useRecoilState} from 'recoil';
+import {BrowserHistoryState} from 'src/atoms/BrowserHistoryState';
 
 export function QuayBreadcrumb() {
+  const [browserHistory, setBrowserHistoryState] =
+    useRecoilState(BrowserHistoryState);
+
   const [breadcrumbItems, setBreadcrumbItems] = useState<QuayBreadcrumbItem[]>(
     [],
   );
@@ -19,9 +24,16 @@ export function QuayBreadcrumb() {
     disableDefaults: true,
     excludePaths: ['/'],
   });
+  const urlParams = useParams();
 
-  useEffect(() => {
+  const resetBreadCrumbs = () => {
+    setBreadcrumbItems([]);
+    setBrowserHistoryState(new Set());
+  };
+
+  const buildFromRoute = () => {
     const result = [];
+    const history = new Set();
     routerBreadcrumbs.map((object, i) => {
       const newObj = {};
       newObj['pathname'] = object.match.pathname;
@@ -33,28 +45,95 @@ export function QuayBreadcrumb() {
       newObj['active'] =
         object.match.pathname.localeCompare(window.location.pathname) === 0;
       result.push(newObj);
+      history.add(newObj);
     });
     setBreadcrumbItems(result);
+    setBrowserHistoryState(history);
+  };
+
+  const currentBreadcrumbItem = () => {
+    const newItem = {};
+    const lastItem = routerBreadcrumbs[routerBreadcrumbs.length - 1];
+
+    // Form QuayBreadcrumbItem for the current path
+    newItem['pathname'] = lastItem.location.pathname;
+    if (lastItem.match.route.Component.type.name == 'RepositoryDetails') {
+      newItem['title'] = urlParams.repositoryName;
+    } else if (lastItem.match.route.Component.type.name == 'TagDetails') {
+      newItem['title'] = urlParams.tagName;
+    }
+    newItem['active'] = true;
+    return newItem;
+  };
+
+  const buildFromBrowserHistory = () => {
+    const result = [];
+    const history = new Set();
+    const newItem = currentBreadcrumbItem();
+
+    for (const value of Array.from(browserHistory.values())) {
+      const newObj = {};
+      newObj['pathname'] = value.pathname;
+      if (typeof value.title === 'string') {
+        newObj['title'] = value.title;
+      } else if (value.title?.props?.children) {
+        newObj['title'] = value.title.props.children;
+      }
+      newObj['active'] =
+        value.pathname.localeCompare(window.location.pathname) === 0;
+      if (newItem['pathname'] == newObj['pathname']) {
+        newItem['title'] = newObj['title'];
+        break;
+      }
+      result.push(newObj);
+      history.add(newObj);
+    }
+    result.push(newItem);
+    history.add(newItem);
+
+    setBreadcrumbItems(result);
+    setBrowserHistoryState(history);
+  };
+
+  useEffect(() => {
+    // urlParams has atleast one item - {*: 'endpoint'}
+    // If size = 1, no params are defined in the url, so we reset breadcrumb history
+    if (Object.keys(urlParams).length <= 1) {
+      resetBreadCrumbs();
+      return;
+    }
+
+    if (browserHistory.size > 0) {
+      buildFromBrowserHistory();
+    } else {
+      buildFromRoute();
+    }
   }, []);
 
   return (
-    <PageBreadcrumb>
-      <Breadcrumb>
-        {breadcrumbItems.map((object, i) => (
-          <BreadcrumbItem
-            render={(props) => (
-              <Link
-                to={object.pathname}
-                className={object.active ? 'disabled-link' : ''}
-              >
-                {object.title}
-              </Link>
-            )}
-            key={i}
-          />
-        ))}
-      </Breadcrumb>
-    </PageBreadcrumb>
+    <div>
+      {breadcrumbItems.length > 0 ? (
+        <PageBreadcrumb>
+          <Breadcrumb>
+            {breadcrumbItems.map((object, i) => (
+              <BreadcrumbItem
+                render={(props) => (
+                  <Link
+                    to={object.pathname}
+                    className={object.active ? 'disabled-link' : ''}
+                  >
+                    {object.title}
+                  </Link>
+                )}
+                key={i}
+              />
+            ))}
+          </Breadcrumb>
+        </PageBreadcrumb>
+      ) : (
+        ''
+      )}
+    </div>
   );
 }
 
