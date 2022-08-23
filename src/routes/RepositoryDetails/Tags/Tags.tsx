@@ -17,6 +17,8 @@ import {
 import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import RequestError from 'src/components/errors/RequestError';
+import Empty from 'src/components/empty/Empty';
+import {CubesIcon} from '@patternfly/react-icons';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -77,6 +79,16 @@ export default function Tags(props: TagsProps) {
     resetSelectedTags();
     loadTags();
   }, []);
+
+  if (!loading && !tags?.length) {
+    return (
+      <Empty
+        title="There are no viewable tags for this repository"
+        icon={CubesIcon}
+        body="No tags have been pushed to this repository. If you have the correct permissions, you may push tags to this repository."
+      />
+    );
+  }
 
   return (
     <>

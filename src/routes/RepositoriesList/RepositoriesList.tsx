@@ -35,6 +35,9 @@ import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import RequestError from 'src/components/errors/RequestError';
+import Empty from 'src/components/empty/Empty';
+import {CubesIcon} from '@patternfly/react-icons';
+import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -74,6 +77,7 @@ function RepoListContent(props: RepoListContentProps) {
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
+  const [loading, setLoading] = useState(true);
   const userOrgs = useRecoilValue(UserOrgs);
   const refreshUser = useRefreshUser();
   useEffect(() => {
@@ -194,6 +198,7 @@ function RepoListContent(props: RepoListContentProps) {
 
   async function fetchRepos() {
     // clearing previous states
+    setLoading(true);
     setRepositoryList([]);
     setSelectedRepoNames([]);
     if (userOrgs) {
@@ -219,6 +224,7 @@ function RepoListContent(props: RepoListContentProps) {
         props.setErr(addDisplayError('Unable to get repositores', err));
       }
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -265,6 +271,24 @@ function RepoListContent(props: RepoListContentProps) {
       resourceName={'repositories'}
     />
   );
+
+  if (!loading && !repositoryList?.length) {
+    return (
+      <Empty
+        icon={CubesIcon}
+        title="There are no viewable repositories"
+        body="Either no repositories exist yet or you may not have permission to view any. If you have permission, try creating a new repository."
+        button={
+          <ToolbarButton
+            buttonValue="Create Repository"
+            Modal={createRepoModal}
+            isModalOpen={isCreateRepoModalOpen}
+            setModalOpen={setCreateRepoModalOpen}
+          />
+        }
+      />
+    );
+  }
 
   return (
     <Page>
