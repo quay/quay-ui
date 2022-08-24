@@ -28,12 +28,12 @@ export function QuayBreadcrumb() {
 
   const resetBreadCrumbs = () => {
     setBreadcrumbItems([]);
-    setBrowserHistoryState(new Set());
+    setBrowserHistoryState([]);
   };
 
   const buildFromRoute = () => {
     const result = [];
-    const history = new Set();
+    const history = [];
     routerBreadcrumbs.map((object, i) => {
       const newObj = {};
       newObj['pathname'] = object.match.pathname;
@@ -45,7 +45,7 @@ export function QuayBreadcrumb() {
       newObj['active'] =
         object.match.pathname.localeCompare(window.location.pathname) === 0;
       result.push(newObj);
-      history.add(newObj);
+      history.push(newObj);
     });
     setBreadcrumbItems(result);
     setBrowserHistoryState(history);
@@ -68,7 +68,7 @@ export function QuayBreadcrumb() {
 
   const buildFromBrowserHistory = () => {
     const result = [];
-    const history = new Set();
+    const history = [];
     const newItem = currentBreadcrumbItem();
 
     for (const value of Array.from(browserHistory.values())) {
@@ -90,10 +90,10 @@ export function QuayBreadcrumb() {
         break;
       }
       result.push(newObj);
-      history.add(newObj);
+      history.push(newObj);
     }
     result.push(newItem);
-    history.add(newItem);
+    history.push(newItem);
 
     setBreadcrumbItems(result);
     setBrowserHistoryState(history);
@@ -107,7 +107,7 @@ export function QuayBreadcrumb() {
       return;
     }
 
-    if (browserHistory.size > 0) {
+    if (browserHistory.length > 0) {
       buildFromBrowserHistory();
     } else {
       buildFromRoute();
