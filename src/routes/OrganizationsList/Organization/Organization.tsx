@@ -30,15 +30,16 @@ export default function Organization() {
 
   const repositoriesSubNav = [
     {
-      href: NavigationPath.orgDetailRepositoryTab,
+      href: NavigationPath.organizationDetail,
       name: 'Repositories',
       component: <RepositoriesList />,
     },
-    {
-      href: NavigationPath.orgDetailUsageLogsTab,
-      name: 'Usage Logs',
-      component: <UsageLogsTab />,
-    },
+    // Commenting till needed.
+    // {
+    //   href: NavigationPath.orgDetailUsageLogsTab,
+    //   name: 'Usage Logs',
+    //   component: <UsageLogsTab />,
+    // },
   ];
 
   return (
