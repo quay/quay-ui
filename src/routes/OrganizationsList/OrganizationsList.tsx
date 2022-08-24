@@ -33,20 +33,18 @@ import Empty from 'src/components/empty/Empty';
 // fallback to RequestError on failure
 export default function OrganizationsList() {
   return (
-    <Page>
+    <>
       <PageSection variant={PageSectionVariants.light} hasShadowBottom>
         <div className="co-m-nav-title--row">
           <Title headingLevel="h1">Organizations</Title>
         </div>
       </PageSection>
-      <PageSection>
-        <ErrorBoundary
-          fallback={<RequestError message={'Unable to load organizations.'} />}
-        >
-          <PageContent />
-        </ErrorBoundary>
-      </PageSection>
-    </Page>
+      <ErrorBoundary
+        fallback={<RequestError message={'Unable to load organizations.'} />}
+      >
+        <PageContent />
+      </ErrorBoundary>
+    </>
   );
 }
 
@@ -265,68 +263,64 @@ function PageContent() {
 
   return (
     <Page>
-      <PageSection>
-        <PageSection variant={PageSectionVariants.light}>
-          <OrganizationToolBar
-            createOrgModal={createOrgModal}
-            isOrganizationModalOpen={isOrganizationModalOpen}
-            setOrganizationModalOpen={setOrganizationModalOpen}
-            isKebabOpen={isKebabOpen}
-            setKebabOpen={setKebabOpen}
-            kebabItems={kebabItems}
-            selectedOrganization={selectedOrganization}
-            deleteKebabIsOpen={deleteModalIsOpen}
-            deleteModal={deleteModal}
-            organizationsList={organizationsList}
-            perPage={perPage}
-            page={page}
-            setPage={setPage}
-            setPerPage={setPerPage}
-            setSelectedOrganization={setSelectedOrganization}
-            paginatedOrganizationsList={paginatedOrganizationsList}
-            onSelectOrganization={onSelectOrganization}
-          />
-          <TableComposable aria-label="Selectable table">
-            <Thead>
-              <Tr>
-                <Th />
-                <Th>{columnNames.name}</Th>
-                <Th>{columnNames.repoCount}</Th>
-                <Th>{columnNames.tagCount}</Th>
-                <Th>{columnNames.size}</Th>
-                <Th>{columnNames.pulls}</Th>
-                <Th>{columnNames.lastPull}</Th>
-                <Th>{columnNames.lastModified}</Th>
+      <PageSection variant={PageSectionVariants.light}>
+        <OrganizationToolBar
+          createOrgModal={createOrgModal}
+          isOrganizationModalOpen={isOrganizationModalOpen}
+          setOrganizationModalOpen={setOrganizationModalOpen}
+          isKebabOpen={isKebabOpen}
+          setKebabOpen={setKebabOpen}
+          kebabItems={kebabItems}
+          selectedOrganization={selectedOrganization}
+          deleteKebabIsOpen={deleteModalIsOpen}
+          deleteModal={deleteModal}
+          organizationsList={organizationsList}
+          perPage={perPage}
+          page={page}
+          setPage={setPage}
+          setPerPage={setPerPage}
+          setSelectedOrganization={setSelectedOrganization}
+          paginatedOrganizationsList={paginatedOrganizationsList}
+          onSelectOrganization={onSelectOrganization}
+        />
+        <TableComposable aria-label="Selectable table">
+          <Thead>
+            <Tr>
+              <Th />
+              <Th>{columnNames.name}</Th>
+              <Th>{columnNames.repoCount}</Th>
+              <Th>{columnNames.tagCount}</Th>
+              <Th>{columnNames.size}</Th>
+              <Th>{columnNames.pulls}</Th>
+              <Th>{columnNames.lastPull}</Th>
+              <Th>{columnNames.lastModified}</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {paginatedOrganizationsList.map((org, rowIndex) => (
+              <Tr key={rowIndex}>
+                <Td
+                  select={{
+                    rowIndex,
+                    onSelect: (_event, isSelecting) =>
+                      onSelectOrganization(org, rowIndex, isSelecting),
+                    isSelected: isOrganizationSelected(org),
+                    disable: !isOrgSelectable(org),
+                  }}
+                />
+                <Td dataLabel={columnNames.name}>
+                  <Link to={org.name}>{org.name}</Link>
+                </Td>
+                <Td dataLabel={columnNames.repoCount}>{org.repoCount}</Td>
+                <Td dataLabel={columnNames.tagCount}>{org.tagCount}</Td>
+                <Td dataLabel={columnNames.size}>{org.size}</Td>
+                <Td dataLabel={columnNames.pulls}>{org.pulls}</Td>
+                <Td dataLabel={columnNames.lastPull}>{org.lastPull}</Td>
+                <Td dataLabel={columnNames.lastModified}>{org.lastModified}</Td>
               </Tr>
-            </Thead>
-            <Tbody>
-              {paginatedOrganizationsList.map((org, rowIndex) => (
-                <Tr key={rowIndex}>
-                  <Td
-                    select={{
-                      rowIndex,
-                      onSelect: (_event, isSelecting) =>
-                        onSelectOrganization(org, rowIndex, isSelecting),
-                      isSelected: isOrganizationSelected(org),
-                      disable: !isOrgSelectable(org),
-                    }}
-                  />
-                  <Td dataLabel={columnNames.name}>
-                    <Link to={org.name}>{org.name}</Link>
-                  </Td>
-                  <Td dataLabel={columnNames.repoCount}>{org.repoCount}</Td>
-                  <Td dataLabel={columnNames.tagCount}>{org.tagCount}</Td>
-                  <Td dataLabel={columnNames.size}>{org.size}</Td>
-                  <Td dataLabel={columnNames.pulls}>{org.pulls}</Td>
-                  <Td dataLabel={columnNames.lastPull}>{org.lastPull}</Td>
-                  <Td dataLabel={columnNames.lastModified}>
-                    {org.lastModified}
-                  </Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </TableComposable>
-        </PageSection>
+            ))}
+          </Tbody>
+        </TableComposable>
       </PageSection>
     </Page>
   );
