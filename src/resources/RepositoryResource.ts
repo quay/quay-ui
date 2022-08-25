@@ -9,7 +9,7 @@ export interface IRepository {
   is_public: boolean;
   kind?: string;
   state?: string;
-  last_modified?: string;
+  last_modified?: number;
   popularity?: number;
   is_starred?: boolean;
 }
@@ -27,11 +27,15 @@ export async function fetchAllRepos(namespaces: string[]) {
     }),
   );
   // Flatten responses to a single list of all repositories
-  return namespacedRepos.reduce(
+  const allRepos: IRepository[] = namespacedRepos.reduce(
     (allRepos, namespacedRepos) =>
       allRepos.concat(namespacedRepos.repositories),
     [],
   );
+
+  return allRepos.sort((r1, r2) => {
+    return r1.last_modified > r2.last_modified ? -1 : 1;
+  });
 }
 
 export async function getRepositoriesForNamespace(ns: string) {
