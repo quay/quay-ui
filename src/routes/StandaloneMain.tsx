@@ -48,11 +48,13 @@ export function StandaloneMain() {
   const quayConfig = useQuayConfig();
 
   useEffect(() => {
-    (async () => {
-      if (quayConfig?.config?.REGISTRY_TITLE) {
-        document.title = quayConfig.config.REGISTRY_TITLE;
-      }
+    if (quayConfig?.config?.REGISTRY_TITLE) {
+      document.title = quayConfig.config.REGISTRY_TITLE;
+    }
+  }, [quayConfig]);
 
+  useEffect(() => {
+    (async () => {
       try {
         const user = await getUser();
         setCurrentUsername(user.username);
