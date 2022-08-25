@@ -57,7 +57,7 @@ const response = {
     LOCAL_OAUTH_HANDLER: '/oauth/localapp',
     PREFERRED_URL_SCHEME: 'https',
     RECAPTCHA_SITE_KEY: null,
-    REGISTRY_TITLE: 'Quay',
+    REGISTRY_TITLE: 'Mock Quay',
     REGISTRY_TITLE_SHORT: 'Quay',
     SEARCH_MAX_RESULT_PAGE_COUNT: 10,
     SEARCH_RESULTS_PER_PAGE: 10,
