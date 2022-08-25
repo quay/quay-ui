@@ -17,6 +17,7 @@ import {CurrentUsernameState} from 'src/atoms/UserState';
 import {isErrorString} from 'src/resources/ErrorHandling';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import PageLoadError from 'src/components/errors/PageLoadError';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
 const NavigationRoutes = [
   {
@@ -44,8 +45,14 @@ const NavigationRoutes = [
 export function StandaloneMain() {
   const setCurrentUsername = useSetRecoilState(CurrentUsernameState);
   const [err, setErr] = useState<string>();
+  const quayConfig = useQuayConfig();
+
   useEffect(() => {
     (async () => {
+      if (quayConfig?.config?.REGISTRY_TITLE) {
+        document.title = quayConfig.config.REGISTRY_TITLE;
+      }
+
       try {
         const user = await getUser();
         setCurrentUsername(user.username);
