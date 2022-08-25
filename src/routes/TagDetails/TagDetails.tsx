@@ -20,6 +20,7 @@ import {
   Manifest,
 } from 'src/resources/TagResource';
 import {addDisplayError} from 'src/resources/ErrorHandling';
+import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 
 export default function TagDetails() {
   const [searchParams] = useSearchParams();
@@ -98,23 +99,7 @@ export default function TagDetails() {
 
   return (
     <Page>
-      {/* TODO: replace this with generic breadcrumb in future PR */}
-      <PageBreadcrumb>
-        <Breadcrumb>
-          <BreadcrumbItem data-testid="namespace-breadcrumb" to="#">
-            organizations
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="org-breadcrumb" to="#">
-            {org}
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="repo-breadcrumb" to="#">
-            {repo}
-          </BreadcrumbItem>
-          <BreadcrumbItem data-testid="tag-breadcrumb" to="#">
-            {tag}
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </PageBreadcrumb>
+      <QuayBreadcrumb />
       <PageSection variant={PageSectionVariants.light}>
         <Title headingLevel="h1">{tag}</Title>
         <TagArchSelect

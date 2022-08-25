@@ -28,6 +28,7 @@ import {OrganizationToolBar} from './OrganizationToolBar';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import Empty from 'src/components/empty/Empty';
+import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 
 // Attempt to render OrganizationsList content,
 // fallback to RequestError on failure
@@ -263,6 +264,7 @@ function PageContent() {
 
   return (
     <Page>
+      <QuayBreadcrumb />
       <PageSection variant={PageSectionVariants.light}>
         <OrganizationToolBar
           createOrgModal={createOrgModal}

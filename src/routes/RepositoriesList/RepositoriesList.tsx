@@ -29,7 +29,6 @@ import {getRepoDetailPath} from 'src/routes/NavigationPath';
 import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
-import {getUser} from 'src/resources/UserResource';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
 import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
@@ -38,6 +37,7 @@ import RequestError from 'src/components/errors/RequestError';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
+import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -63,11 +63,14 @@ export default function RepositoriesList() {
 
 function RepoListTitle() {
   return (
-    <PageSection variant={PageSectionVariants.light} hasShadowBottom>
-      <div className="co-m-nav-title--row">
-        <Title headingLevel="h1">Repositories</Title>
-      </div>
-    </PageSection>
+    <div>
+      <QuayBreadcrumb />
+      <PageSection variant={PageSectionVariants.light} hasShadowBottom>
+        <div className="co-m-nav-title--row">
+          <Title headingLevel="h1">Repositories</Title>
+        </div>
+      </PageSection>
+    </div>
   );
 }
 
