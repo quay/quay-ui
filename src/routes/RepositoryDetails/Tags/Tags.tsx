@@ -3,7 +3,7 @@ import Table from './Table';
 import {useState, useEffect} from 'react';
 import {filterState, selectedTagsState} from 'src/atoms/TagListState';
 import {Page, PageSection, PageSectionVariants} from '@patternfly/react-core';
-import {useRecoilValue, useResetRecoilState} from 'recoil';
+import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
 import {
   Tag,
   TagsResponse,
@@ -34,6 +34,19 @@ export default function Tags(props: TagsProps) {
     (page - 1) * perPage,
     page * perPage,
   );
+
+  // Control selected tags
+  const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
+  const selectAllTags = (isSelecting = true) => {
+    setSelectedTags(isSelecting ? tags.map((t) => t.name) : []);
+  };
+  const selectTag = (tag: Tag, rowIndex = 0, isSelecting = true) =>
+    setSelectedTags((prevSelected) => {
+      const otherSelectedtagNames = prevSelected.filter((r) => r !== tag.name);
+      return isSelecting
+        ? [...otherSelectedtagNames, tag.name]
+        : otherSelectedtagNames;
+    });
 
   const loadTags = async () => {
     const getManifest = async (tag: Tag) => {
@@ -97,11 +110,13 @@ export default function Tags(props: TagsProps) {
           repository={props.repository}
           tagCount={filteredTags.length}
           loadTags={loadTags}
-          TagList={paginatedTags}
+          TagList={tags}
+          paginatedTags={paginatedTags}
           perPage={perPage}
           page={page}
           setPage={setPage}
           setPerPage={setPerPage}
+          selectTag={selectTag}
         ></TagsToolbar>
         <ErrorBoundary
           hasError={isErrorString(err)}
@@ -112,6 +127,9 @@ export default function Tags(props: TagsProps) {
             repo={props.repository}
             tags={paginatedTags}
             loading={loading}
+            selectAllTags={selectAllTags}
+            selectedTags={selectedTags}
+            selectTag={selectTag}
           />
         </ErrorBoundary>
       </PageSection>

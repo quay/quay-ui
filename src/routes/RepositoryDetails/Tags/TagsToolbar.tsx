@@ -12,6 +12,8 @@ import {DeleteModal} from './DeleteModal';
 import {ToolbarPagination} from 'src/components/toolbar/Pagination';
 import {FilterBar} from 'src/components/toolbar/FilterBar';
 import {Kebab} from 'src/components/toolbar/Kebab';
+import {DropdownFilter} from 'src/components/toolbar/DropdownFilter';
+import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
 
 export function TagsToolbar(props: ToolBarProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -35,6 +37,15 @@ export function TagsToolbar(props: ToolBarProps) {
   return (
     <Toolbar>
       <ToolbarContent>
+        <DropdownCheckbox
+          selectedItems={selectedTags}
+          deSelectAll={setSelectedTags}
+          allItemsList={props.TagList}
+          itemsPerPageList={props.paginatedTags}
+          onItemSelect={props.selectTag}
+        />
+
+        <DropdownFilter />
         <FilterBar
           placeholderText="Filter by Tag name"
           value={filterTags}
@@ -52,7 +63,7 @@ export function TagsToolbar(props: ToolBarProps) {
         </ToolbarItem>
 
         <ToolbarPagination
-          repositoryList={props.TagList}
+          repositoryList={props.paginatedTags}
           perPage={props.perPage}
           page={props.page}
           setPage={props.setPage}
@@ -78,8 +89,10 @@ type ToolBarProps = {
   tagCount: number;
   loadTags: () => void;
   TagList: Tag[];
+  paginatedTags: Tag[];
   perPage: number;
   page: number;
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
+  selectTag: (tag: Tag, rowIndex?: number, isSelecting?: boolean) => void;
 };
