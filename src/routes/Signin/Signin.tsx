@@ -89,7 +89,7 @@ export function Signin() {
 
   return (
     <LoginPage
-      className={'pdf-u-background-color-100'}
+      className={'pdf-u-background-color-100 pf-u-text-align-center'}
       brandImgSrc={logoUrl}
       brandImgAlt="Red Hat Quay"
       backgroundImgSrc="assets/images/rh_login.jpeg"
