@@ -4,17 +4,23 @@ import {
   DropdownGroup,
   DropdownItem,
   DropdownToggle,
+  Form,
+  FormGroup,
+  Switch,
   Toolbar,
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
 import {UserIcon} from '@patternfly/react-icons';
+import React from 'react';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useRecoilState} from 'recoil';
 import {CurrentUsernameState} from 'src/atoms/UserState';
 import {GlobalAuthState, logoutUser} from 'src/resources/AuthResource';
+
+import 'src/components/header/HeaderToolbar.css';
 
 export function HeaderToolbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -70,6 +76,23 @@ export function HeaderToolbar() {
 
   const signInButton = <Button> Sign In </Button>;
 
+  // Toggle between old UI and new UI
+  const [isChecked, setIsChecked] = React.useState<boolean>(true);
+  const toggleSwitch = (checked: boolean) => {
+    setIsChecked(checked);
+
+    // Reload page and trigger patternfly cookie removal
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    window.location.replace(`${protocol}//${host}/angular`);
+  };
+  const toolbarSpacers = {
+    default: 'spacerNone',
+    md: 'spacerSm',
+    lg: 'spacerMd',
+    xl: 'spacerLg',
+  };
+
   return (
     <Toolbar id="toolbar" isFullHeight isStatic>
       <ToolbarContent>
@@ -78,6 +101,22 @@ export function HeaderToolbar() {
           alignment={{default: 'alignRight'}}
           spacer={{default: 'spacerNone', md: 'spacerMd'}}
         >
+          <ToolbarItem spacer={toolbarSpacers}>
+            <Form isHorizontal>
+              <FormGroup
+                label="Current UI"
+                fieldId="horizontal-form-stacked-options"
+              >
+                <Switch
+                  id="header-toolbar-ui-switch"
+                  label="New UI"
+                  labelOff="New UI"
+                  isChecked={isChecked}
+                  onChange={toggleSwitch}
+                />
+              </FormGroup>
+            </Form>
+          </ToolbarItem>
           <ToolbarItem>
             {currentUsername ? userDropdown : signInButton}
           </ToolbarItem>
