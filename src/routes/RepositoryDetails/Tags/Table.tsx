@@ -197,7 +197,7 @@ export default function Table(props: TableProps) {
 
   return (
     <>
-      <TableComposable variant="compact" aria-label="Expandable table">
+      <TableComposable aria-label="Expandable table">
         <Thead>
           <Tr>
             <Th />
