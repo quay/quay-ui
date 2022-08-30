@@ -6,16 +6,17 @@ import {
 } from '@patternfly/react-core';
 import {ReactElement, useState} from 'react';
 import {useRecoilState} from 'recoil';
-import {selectedTagsState} from 'src/atoms/TagListState';
+import {filterState, selectedTagsState} from 'src/atoms/TagListState';
 import {Tag} from 'src/resources/TagResource';
 import {DeleteModal} from './DeleteModal';
-import {FilterByText} from './FilterByText';
 import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {FilterBar} from 'src/components/toolbar/FilterBar';
 import {Kebab} from 'src/components/toolbar/Kebab';
 
 export function TagsToolbar(props: ToolBarProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
+  const [filterTags, setFilter] = useRecoilState(filterState);
 
   const [isKebabOpen, setKebabOpen] = useState(false);
   const kebabItems: ReactElement[] = [
@@ -34,9 +35,11 @@ export function TagsToolbar(props: ToolBarProps) {
   return (
     <Toolbar>
       <ToolbarContent>
-        <ToolbarItem>
-          <FilterByText />
-        </ToolbarItem>
+        <FilterBar
+          placeholderText="Filter by Tag name"
+          value={filterTags}
+          onChange={setFilter}
+        />
 
         <ToolbarItem>
           {selectedTags?.length !== 0 ? (
