@@ -6,8 +6,6 @@ import {
   DropdownToggle,
   Form,
   FormGroup,
-  Popover,
-  PopoverPosition,
   Switch,
   Toolbar,
   ToolbarContent,
@@ -22,7 +20,7 @@ import {useRecoilState} from 'recoil';
 import {CurrentUsernameState} from 'src/atoms/UserState';
 import {GlobalAuthState, logoutUser} from 'src/resources/AuthResource';
 
-import 'src/components/header/QuayHeaderToolbar.css';
+import 'src/components/header/HeaderToolbar.css';
 
 export function HeaderToolbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -95,8 +93,6 @@ export function HeaderToolbar() {
     xl: 'spacerLg',
   };
 
-  const [isPopoverVisible, setPopoverIsVisible] = React.useState<boolean>(true);
-
   return (
     <Toolbar id="toolbar" isFullHeight isStatic>
       <ToolbarContent>
@@ -111,25 +107,13 @@ export function HeaderToolbar() {
                 label="Current UI"
                 fieldId="horizontal-form-stacked-options"
               >
-                <Popover
-                  isVisible={isPopoverVisible}
-                  position={PopoverPosition.bottom}
-                  shouldClose={() => setPopoverIsVisible(false)}
-                  hideOnOutsideClick={false}
-                  bodyContent={
-                    <div>
-                      <div>Click here to return to Current UI</div>
-                    </div>
-                  }
-                >
-                  <Switch
-                    id="header-toolbar-ui-switch"
-                    label="New UI"
-                    labelOff="New UI"
-                    isChecked={isChecked}
-                    onChange={toggleSwitch}
-                  />
-                </Popover>
+                <Switch
+                  id="header-toolbar-ui-switch"
+                  label="New UI"
+                  labelOff="New UI"
+                  isChecked={isChecked}
+                  onChange={toggleSwitch}
+                />
               </FormGroup>
             </Form>
           </ToolbarItem>
