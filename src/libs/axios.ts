@@ -6,7 +6,9 @@ if (process.env.MOCK_API === 'true') {
   require('src/tests/fake-db/ApiMock');
 }
 
-axios.defaults.baseURL = process.env.QUAY_APP_API_URL || window.location.host;
+axios.defaults.baseURL =
+  process.env.REACT_QUAY_APP_API_URL ||
+  `${window.location.protocol}//${window.location.host}`;
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 

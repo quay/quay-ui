@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi8/nodejs-16:latest as build
 
 ARG quay_app_api_url=http://localhost:8080
-ENV QUAY_APP_API_URL=${quay_app_api_url}
+ENV REACT_QUAY_APP_API_URL=${quay_app_api_url}
 
 WORKDIR /opt/app-root
 COPY package.json .
