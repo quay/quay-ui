@@ -22,7 +22,7 @@ import {
   fetchAllRepos,
   IRepository,
 } from 'src/resources/RepositoryResource';
-import {ReactElement, useEffect, useState} from 'react';
+import {ReactElement, Suspense, useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import CreateRepositoryModalTemplate from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
@@ -30,7 +30,11 @@ import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
 import {formatDate} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
-import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
+import {
+  addDisplayError,
+  BulkOperationError,
+  isErrorString,
+} from 'src/resources/ErrorHandling';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import RequestError from 'src/components/errors/RequestError';
@@ -38,6 +42,8 @@ import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
+import {LoadingPage} from 'src/components/LoadingPage';
+import ErrorModal from 'src/components/errors/ErrorModal';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -47,16 +53,29 @@ function getReponameFromURL(pathname: string): string {
 // on failure
 export default function RepositoriesList() {
   const currentOrg = getReponameFromURL(useLocation().pathname);
-  const [err, setErr] = useState<string>();
+  const [loadingErr, setLoadingErr] = useState<string>();
   return (
     <>
       {currentOrg === null ? <RepoListTitle /> : null}
-      <ErrorBoundary
-        hasError={isErrorString(err)}
-        fallback={<RequestError message={err} />}
-      >
-        <RepoListContent currentOrg={currentOrg} setErr={setErr} />
-      </ErrorBoundary>
+      <Suspense fallback={<LoadingPage />}>
+        <ErrorBoundary
+          hasError={isErrorString(loadingErr)}
+          fallback={
+            <RequestError
+              message={
+                isErrorString(loadingErr)
+                  ? loadingErr
+                  : 'Unable to load repositories'
+              }
+            />
+          }
+        >
+          <RepoListContent
+            currentOrg={currentOrg}
+            setLoadingErr={setLoadingErr}
+          />
+        </ErrorBoundary>
+      </Suspense>
     </>
   );
 }
@@ -83,6 +102,7 @@ function RepoListContent(props: RepoListContentProps) {
   const [loading, setLoading] = useState(true);
   const userOrgs = useRecoilValue(UserOrgs);
   const refreshUser = useRefreshUser();
+  const [err, setErr] = useState<string[]>();
   useEffect(() => {
     // Get latest organizations
     refreshUser();
@@ -156,13 +176,27 @@ function RepoListContent(props: RepoListContentProps) {
   };
 
   const handleRepoDeletion = async (repos: IRepository[]) => {
-    // No error handling here - it's done within the
-    // BulkDeleteModalTemplate to capture and display to
-    // the user
-    await bulkDeleteRepositories(repos);
-    refreshUser();
-    setSelectedRepoNames([]);
-    setDeleteModalOpen(!isDeleteModalOpen);
+    try {
+      await bulkDeleteRepositories(repos);
+    } catch (err) {
+      if (err instanceof BulkOperationError) {
+        const errMessages = [];
+        // TODO: Would like to use for .. of instead of foreach
+        // typescript complains saying we're using version prior to es6?
+        err.getErrors().forEach((error, repo) => {
+          errMessages.push(
+            addDisplayError(`Failed to delete repository ${repo}`, error.error),
+          );
+        });
+        setErr(errMessages);
+      } else {
+        setErr([addDisplayError('Failed to delete repository', err)]);
+      }
+    } finally {
+      refreshUser();
+      setSelectedRepoNames([]);
+      setDeleteModalOpen(!isDeleteModalOpen);
+    }
   };
 
   const kebabItems: ReactElement[] = [
@@ -222,12 +256,12 @@ function RepoListContent(props: RepoListContentProps) {
           last_modified: repo.last_modified,
         }));
         setRepositoryList(formattedRepos);
+        setLoading(false);
       } catch (err) {
         console.error(err);
-        props.setErr(addDisplayError('Unable to get repositores', err));
+        props.setLoadingErr(addDisplayError('Unable to get repositores', err));
       }
     }
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -294,99 +328,98 @@ function RepoListContent(props: RepoListContentProps) {
   }
 
   return (
-    <Page>
-      <PageSection variant={PageSectionVariants.light}>
-        <RepositoryToolBar
-          currentOrg={props.currentOrg}
-          createRepoModal={createRepoModal}
-          isCreateRepoModalOpen={isCreateRepoModalOpen}
-          setCreateRepoModalOpen={setCreateRepoModalOpen}
-          isKebabOpen={isKebabOpen}
-          setKebabOpen={setKebabOpen}
-          kebabItems={kebabItems}
-          selectedRepoNames={selectedRepoNames}
-          deleteModal={deleteRepositoryModal}
-          deleteKebabIsOpen={isDeleteModalOpen}
-          makePublicModalOpen={makePublicModalOpen}
-          toggleMakePublicClick={toggleMakePublicClick}
-          makePrivateModalOpen={makePrivateModalOpen}
-          toggleMakePrivateClick={toggleMakePrivateClick}
-          selectAllRepos={selectAllRepos}
-          repositoryList={repositoryList}
-          perPage={perPage}
-          page={page}
-          setPage={setPage}
-          setPerPage={setPerPage}
-          setSelectedRepoNames={setSelectedRepoNames}
-          paginatedRepositoryList={paginatedRepositoryList}
-          onSelectRepo={onSelectRepo}
-        />
-        <TableComposable aria-label="Selectable table">
-          <Thead>
+    <PageSection variant={PageSectionVariants.light}>
+      <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
+      <RepositoryToolBar
+        currentOrg={props.currentOrg}
+        createRepoModal={createRepoModal}
+        isCreateRepoModalOpen={isCreateRepoModalOpen}
+        setCreateRepoModalOpen={setCreateRepoModalOpen}
+        isKebabOpen={isKebabOpen}
+        setKebabOpen={setKebabOpen}
+        kebabItems={kebabItems}
+        selectedRepoNames={selectedRepoNames}
+        deleteModal={deleteRepositoryModal}
+        deleteKebabIsOpen={isDeleteModalOpen}
+        makePublicModalOpen={makePublicModalOpen}
+        toggleMakePublicClick={toggleMakePublicClick}
+        makePrivateModalOpen={makePrivateModalOpen}
+        toggleMakePrivateClick={toggleMakePrivateClick}
+        selectAllRepos={selectAllRepos}
+        repositoryList={repositoryList}
+        perPage={perPage}
+        page={page}
+        setPage={setPage}
+        setPerPage={setPerPage}
+        setSelectedRepoNames={setSelectedRepoNames}
+        paginatedRepositoryList={paginatedRepositoryList}
+        onSelectRepo={onSelectRepo}
+      />
+      <TableComposable aria-label="Selectable table">
+        <Thead>
+          <Tr>
+            <Th />
+            <Th>{columnNames.repoName}</Th>
+            <Th>{columnNames.visibility}</Th>
+            <Th>{columnNames.tags}</Th>
+            <Th>{columnNames.size}</Th>
+            <Th>{columnNames.pulls}</Th>
+            <Th>{columnNames.lastPull}</Th>
+            <Th>{columnNames.lastModified}</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {repositoryList.length === 0 ? (
+            // Repo table loading icon
             <Tr>
-              <Th />
-              <Th>{columnNames.repoName}</Th>
-              <Th>{columnNames.visibility}</Th>
-              <Th>{columnNames.tags}</Th>
-              <Th>{columnNames.size}</Th>
-              <Th>{columnNames.pulls}</Th>
-              <Th>{columnNames.lastPull}</Th>
-              <Th>{columnNames.lastModified}</Th>
+              <Td>
+                <Spinner size="lg" />
+              </Td>
             </Tr>
-          </Thead>
-          <Tbody>
-            {repositoryList.length === 0 ? (
-              // Repo table loading icon
-              <Tr>
-                <Td>
-                  <Spinner size="lg" />
+          ) : (
+            paginatedRepositoryList.map((repo, rowIndex) => (
+              <Tr key={rowIndex}>
+                <Td
+                  select={{
+                    rowIndex,
+                    onSelect: (_event, isSelecting) =>
+                      onSelectRepo(repo, rowIndex, isSelecting),
+                    isSelected: isRepoSelected(repo),
+                    disable: !isRepoSelectable(repo),
+                  }}
+                />
+                <Td dataLabel={columnNames.repoName}>
+                  {props.currentOrg == null ? (
+                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
+                      {repo.namespace}/{repo.name}
+                    </Link>
+                  ) : (
+                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
+                      {repo.name}
+                    </Link>
+                  )}
+                </Td>
+                <Td dataLabel={columnNames.visibility}>
+                  {' '}
+                  {repo.is_public ? 'public' : 'private'}
+                </Td>
+                <Td dataLabel={columnNames.tags}> - </Td>
+                <Td dataLabel={columnNames.size}> -</Td>
+                <Td dataLabel={columnNames.pulls}> - </Td>
+                <Td dataLabel={columnNames.lastPull}> - </Td>
+                <Td dataLabel={columnNames.lastModified}>
+                  {formatDate(repo.last_modified)}
                 </Td>
               </Tr>
-            ) : (
-              paginatedRepositoryList.map((repo, rowIndex) => (
-                <Tr key={rowIndex}>
-                  <Td
-                    select={{
-                      rowIndex,
-                      onSelect: (_event, isSelecting) =>
-                        onSelectRepo(repo, rowIndex, isSelecting),
-                      isSelected: isRepoSelected(repo),
-                      disable: !isRepoSelectable(repo),
-                    }}
-                  />
-                  <Td dataLabel={columnNames.repoName}>
-                    {props.currentOrg == null ? (
-                      <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
-                        {repo.namespace}/{repo.name}
-                      </Link>
-                    ) : (
-                      <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
-                        {repo.name}
-                      </Link>
-                    )}
-                  </Td>
-                  <Td dataLabel={columnNames.visibility}>
-                    {' '}
-                    {repo.is_public ? 'public' : 'private'}
-                  </Td>
-                  <Td dataLabel={columnNames.tags}> - </Td>
-                  <Td dataLabel={columnNames.size}> -</Td>
-                  <Td dataLabel={columnNames.pulls}> - </Td>
-                  <Td dataLabel={columnNames.lastPull}> - </Td>
-                  <Td dataLabel={columnNames.lastModified}>
-                    {formatDate(repo.last_modified)}
-                  </Td>
-                </Tr>
-              ))
-            )}
-          </Tbody>
-        </TableComposable>
-      </PageSection>
-    </Page>
+            ))
+          )}
+        </Tbody>
+      </TableComposable>
+    </PageSection>
   );
 }
 
 interface RepoListContentProps {
   currentOrg: string;
-  setErr: (message: string) => void;
+  setLoadingErr: (message: string) => void;
 }

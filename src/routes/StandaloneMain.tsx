@@ -14,10 +14,10 @@ import {useEffect, useState} from 'react';
 import {getUser} from 'src/resources/UserResource';
 import {useSetRecoilState} from 'recoil';
 import {CurrentUsernameState} from 'src/atoms/UserState';
-import {isErrorString} from 'src/resources/ErrorHandling';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import PageLoadError from 'src/components/errors/PageLoadError';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import SiteUnavailableError from 'src/components/errors/SiteUnavailableError';
 
 const NavigationRoutes = [
   {
@@ -44,7 +44,7 @@ const NavigationRoutes = [
 
 export function StandaloneMain() {
   const setCurrentUsername = useSetRecoilState(CurrentUsernameState);
-  const [err, setErr] = useState<string>();
+  const [err, setErr] = useState<boolean>();
   const quayConfig = useQuayConfig();
 
   useEffect(() => {
@@ -60,12 +60,12 @@ export function StandaloneMain() {
         setCurrentUsername(user.username);
       } catch (err) {
         console.error(err);
-        setErr('Unable to load page');
+        setErr(true);
       }
     })();
   }, []);
   return (
-    <ErrorBoundary hasError={isErrorString(err)} fallback={<PageLoadError />}>
+    <ErrorBoundary hasError={err} fallback={<SiteUnavailableError />}>
       <Page
         header={<QuayHeader />}
         sidebar={<QuaySidebar />}

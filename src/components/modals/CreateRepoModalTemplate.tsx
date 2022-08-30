@@ -24,6 +24,7 @@ import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import FormError from '../errors/FormError';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
+import {addDisplayError} from 'src/resources/ErrorHandling';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -122,7 +123,7 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
       props.handleModalToggle();
     } catch (error: any) {
       console.error(error);
-      setErr('Unable to create repository');
+      setErr(addDisplayError('Unable to create repository', error));
     }
   };
 

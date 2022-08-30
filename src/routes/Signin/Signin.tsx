@@ -14,6 +14,7 @@ import axios, {getCsrfToken} from 'src/libs/axios';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {AxiosError} from 'axios';
 import './Signin.css';
+import {addDisplayError} from 'src/resources/ErrorHandling';
 
 export function Signin() {
   const [username, setUsername] = useState('');
@@ -45,15 +46,16 @@ export function Signin() {
         setErr('Invalid login credentials');
       }
     } catch (err) {
-      console.error(err);
-      if (
+      const authErr =
         err instanceof AxiosError &&
         err.response &&
-        err.response.status === 403
-      ) {
+        err.response.status === 403;
+      if (authErr && err.response.data.invalidCredentials) {
+        setErr('Invalid login credentials');
+      } else if (authErr) {
         setErr('CSRF token expired - please refresh');
       } else {
-        setErr('Unable to connect to server.');
+        setErr(addDisplayError('Unable to sign in', err));
       }
     }
   };

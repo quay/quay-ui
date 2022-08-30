@@ -80,7 +80,7 @@ export default function Tags(props: TagsProps) {
     loadTags();
   }, []);
 
-  if (!loading && !tags?.length) {
+  if (!loading && !tags?.length && !isErrorString(err)) {
     return (
       <Empty
         title="There are no viewable tags for this repository"

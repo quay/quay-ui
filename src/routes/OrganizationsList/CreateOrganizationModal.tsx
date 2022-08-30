@@ -4,11 +4,7 @@ import {
   Button,
   Form,
   FormGroup,
-  Text,
   TextInput,
-  TextVariants,
-  Slider,
-  Popover,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {createOrg} from 'src/resources/OrganisationResource';
@@ -16,6 +12,7 @@ import {isValidEmail} from 'src/libs/utils';
 import {useState} from 'react';
 import FormError from 'src/components/errors/FormError';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
+import {addDisplayError} from 'src/resources/ErrorHandling';
 
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
@@ -43,7 +40,7 @@ export const CreateOrganizationModal = (
       }
     } catch (err) {
       console.error(err);
-      setErr('Unable to create organization');
+      setErr(addDisplayError('Unable to create organization', err));
     }
   };
 
