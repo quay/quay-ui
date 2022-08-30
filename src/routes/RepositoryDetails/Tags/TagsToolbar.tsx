@@ -1,17 +1,36 @@
-import {Toolbar, ToolbarContent, ToolbarItem} from '@patternfly/react-core';
-import {useState} from 'react';
+import {
+  DropdownItem,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
+} from '@patternfly/react-core';
+import {ReactElement, useState} from 'react';
 import {useRecoilState} from 'recoil';
 import {selectedTagsState} from 'src/atoms/TagListState';
 import {Tag} from 'src/resources/TagResource';
 import {DeleteModal} from './DeleteModal';
 import {FilterByText} from './FilterByText';
-import {KebabDropdown} from './KebabDropdown';
-import {Pagination} from './Pagination';
-import {ToolbarPagination} from '../../../components/toolbar/Pagination';
+import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {Kebab} from 'src/components/toolbar/Kebab';
 
 export function TagsToolbar(props: ToolBarProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
+
+  const [isKebabOpen, setKebabOpen] = useState(false);
+  const kebabItems: ReactElement[] = [
+    <DropdownItem
+      key="delete"
+      onClick={() => {
+        setKebabOpen(!isKebabOpen);
+        setIsModalOpen(!isModalOpen);
+      }}
+      isDisabled={selectedTags.length <= 0}
+    >
+      Delete
+    </DropdownItem>,
+  ];
+
   return (
     <Toolbar>
       <ToolbarContent>
@@ -20,11 +39,13 @@ export function TagsToolbar(props: ToolBarProps) {
         </ToolbarItem>
 
         <ToolbarItem>
-          <KebabDropdown
-            isModalOpen={isModalOpen}
-            setIsModalOpen={setIsModalOpen}
-            isActive={selectedTags.length > 0}
-          />
+          {selectedTags?.length !== 0 ? (
+            <Kebab
+              isKebabOpen={isKebabOpen}
+              setKebabOpen={setKebabOpen}
+              kebabItems={kebabItems}
+            />
+          ) : null}
         </ToolbarItem>
 
         <ToolbarPagination
