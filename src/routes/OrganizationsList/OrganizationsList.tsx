@@ -69,6 +69,7 @@ function PageContent() {
   useEffect(() => {
     // Get latest organizations
     refreshUser();
+    setSelectedOrganization([]);
     setLoading(false);
   }, []);
   // TODO: Using mock values here - remove in the future?
