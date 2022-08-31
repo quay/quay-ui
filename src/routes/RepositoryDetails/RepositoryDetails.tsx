@@ -6,6 +6,8 @@ import {
   Tabs,
   Tab,
   TabTitleText,
+  TabContent,
+  TabContentBody,
 } from '@patternfly/react-core';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import Tags from './Tags/Tags';
@@ -57,16 +59,31 @@ export default function RepositoryDetails(props) {
       </PageSection>
       <PageSection
         variant={PageSectionVariants.light}
+        type="tabs"
         className="no-padding-top"
       >
         <Tabs activeKey={activeTabKey} onSelect={tabsOnSelect}>
           <Tab
             eventKey={TabIndex.Tags}
             title={<TabTitleText>Tags</TabTitleText>}
-          >
-            <Tags organization={organization} repository={repository} />
-          </Tab>
+            tabContentId="Tags"
+          />
         </Tabs>
+      </PageSection>
+      <PageSection
+        variant={PageSectionVariants.light}
+        className="no-padding-top"
+      >
+        <TabContent
+          key={0}
+          eventKey={TabIndex.Tags}
+          id="Tags"
+          activeKey={activeTabKey}
+        >
+          <TabContentBody>
+            <Tags organization={organization} repository={repository} />
+          </TabContentBody>
+        </TabContent>
       </PageSection>
     </Page>
   );
