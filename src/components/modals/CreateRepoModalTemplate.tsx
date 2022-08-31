@@ -9,9 +9,8 @@ import {
   SelectVariant,
   Select,
   SelectOption,
-  Grid,
-  Alert,
-  Divider,
+  Flex,
+  FlexItem,
 } from '@patternfly/react-core';
 import {useRecoilValue} from 'recoil';
 import {UserOrgs} from 'src/atoms/UserState';
@@ -155,56 +154,64 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
     >
       <FormError message={err} setErr={setErr} />
       <Form id="modal-with-form-form" maxWidth="750px">
-        <Grid hasGutter md={4}>
-          <FormGroup
-            isInline
-            label="Namespace"
-            fieldId="modal-with-form-form-name"
-            isRequired
-            helperTextInvalid="Select a namespace"
-            helperTextInvalidIcon={<ExclamationCircleIcon />}
-            validated={validationState.namespace ? 'success' : 'error'}
-          >
-            <Select
-              variant={SelectVariant.single}
-              aria-label="Select Input"
-              onToggle={() =>
-                setCurrentOrganization((prevState) => ({
-                  ...prevState,
-                  isDropdownOpen: !prevState.isDropdownOpen,
-                }))
-              }
-              onSelect={handleNamespaceSelection}
-              isOpen={currentOrganization.isDropdownOpen}
-              width="200px"
-              isDisabled={props.orgName !== null}
-              placeholderText={'Select namespace'}
-              selections={currentOrganization.name}
-            >
-              {userOrgs.map((orgs, idx) => (
-                <SelectOption key={idx} value={orgs.name}></SelectOption>
-              ))}
-            </Select>
-          </FormGroup>
-          <FormGroup
-            label="Repository name"
-            isRequired
-            fieldId="modal-with-form-form-name"
-            isStack
-            helperTextInvalid="Enter a repository name"
-            helperTextInvalidIcon={<ExclamationCircleIcon />}
-            validated={validationState.repoName ? 'success' : 'error'}
-          >
-            <TextInput
+        <Flex>
+          <FlexItem>
+            <FormGroup
+              isInline
+              label="Namespace"
+              fieldId="modal-with-form-form-name"
               isRequired
-              type="text"
-              id="modal-with-form-form-name"
-              value={newRepository.name}
-              onChange={handleNameInputChange}
-              ref={nameInputRef}
-            />
-          </FormGroup>
-        </Grid>
+              helperTextInvalid="Select a namespace"
+              helperTextInvalidIcon={<ExclamationCircleIcon />}
+              validated={validationState.namespace ? 'success' : 'error'}
+            >
+              <Flex>
+                <FlexItem>
+                  <Select
+                    variant={SelectVariant.single}
+                    aria-label="Select Input"
+                    onToggle={() =>
+                      setCurrentOrganization((prevState) => ({
+                        ...prevState,
+                        isDropdownOpen: !prevState.isDropdownOpen,
+                      }))
+                    }
+                    onSelect={handleNamespaceSelection}
+                    isOpen={currentOrganization.isDropdownOpen}
+                    width="200px"
+                    isDisabled={props.orgName !== null}
+                    placeholderText={'Select namespace'}
+                    selections={currentOrganization.name}
+                  >
+                    {userOrgs.map((orgs, idx) => (
+                      <SelectOption key={idx} value={orgs.name}></SelectOption>
+                    ))}
+                  </Select>
+                </FlexItem>
+                <FlexItem> / </FlexItem>
+              </Flex>
+            </FormGroup>
+          </FlexItem>
+          <FlexItem>
+            <FormGroup
+              label="Repository name"
+              isRequired
+              fieldId="modal-with-form-form-name"
+              helperTextInvalid="Enter a repository name"
+              helperTextInvalidIcon={<ExclamationCircleIcon />}
+              validated={validationState.repoName ? 'success' : 'error'}
+            >
+              <TextInput
+                isRequired
+                type="text"
+                id="modal-with-form-form-name"
+                value={newRepository.name}
+                onChange={handleNameInputChange}
+                ref={nameInputRef}
+              />
+            </FormGroup>
+          </FlexItem>
+        </Flex>
         <FormGroup
           label="Repository description"
           fieldId="modal-with-form-form-email"
