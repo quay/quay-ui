@@ -8,15 +8,18 @@ import {
   Text,
   Tooltip,
 } from '@patternfly/react-core';
-import {getDomain} from 'src/routes/NavigationPath';
-import {useState} from 'react';
 import {useRecoilState} from 'recoil';
 import {currentOpenPopoverState} from 'src/atoms/TagListState';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
 export default function TablePopover(props: TablePopoverProps) {
   const [currentOpenPopover, setCurrentOpenPopover] = useRecoilState(
     currentOpenPopoverState,
   );
+
+  const config = useQuayConfig();
+  const domain = config?.config.SERVER_HOSTNAME;
+
   return (
     <Popover
       isVisible={currentOpenPopover === props.tag}
@@ -36,7 +39,7 @@ export default function TablePopover(props: TablePopoverProps) {
             hoverTip="Copy"
             clickTip="Copied"
           >
-            podman pull {getDomain()}/{props.org}/{props.repo}:{props.tag}
+            podman pull {domain}/{props.org}/{props.repo}:{props.tag}
           </ClipboardCopy>
           <br />
           <Text style={{fontWeight: 'bold'}}>Podman Pull (By Digest)</Text>
@@ -46,7 +49,7 @@ export default function TablePopover(props: TablePopoverProps) {
             hoverTip="Copy"
             clickTip="Copied"
           >
-            podman pull {getDomain()}/{props.org}/{props.repo}@{props.digest}
+            podman pull {domain}/{props.org}/{props.repo}@{props.digest}
           </ClipboardCopy>
           <br />
           <Text style={{fontWeight: 'bold'}}>Docker Pull (By Tag)</Text>
@@ -56,7 +59,7 @@ export default function TablePopover(props: TablePopoverProps) {
             hoverTip="Copy"
             clickTip="Copied"
           >
-            docker pull {getDomain()}/{props.org}/{props.repo}:{props.tag}
+            docker pull {domain}/{props.org}/{props.repo}:{props.tag}
           </ClipboardCopy>
           <br />
           <Text style={{fontWeight: 'bold'}}>Docker Pull (By Digest)</Text>
@@ -66,7 +69,7 @@ export default function TablePopover(props: TablePopoverProps) {
             hoverTip="Copy"
             clickTip="Copied"
           >
-            docker pull {getDomain()}/{props.org}/{props.repo}@{props.digest}
+            docker pull {domain}/{props.org}/{props.repo}@{props.digest}
           </ClipboardCopy>
         </div>
       }
