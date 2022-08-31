@@ -135,21 +135,15 @@ function RepoListContent(props: RepoListContentProps) {
   const setRepoSelected = (repo: IRepository, isSelecting = true) =>
     setSelectedRepoNames((prevSelected) => {
       const otherSelectedRepoNames = prevSelected.filter(
-        (r) => r !== r.namespace + '/' + r.name,
+        (r) => r !== repo.namespace + '/' + repo.name,
       );
       return isSelecting && isRepoSelectable(repo)
         ? [...otherSelectedRepoNames, repo.namespace + '/' + repo.name]
         : otherSelectedRepoNames;
     });
 
-  const areAllReposSelected = selectedRepoNames.length === filteredRepos.length;
-
   const isRepoSelected = (repo: IRepository) =>
     selectedRepoNames.includes(repo.namespace + '/' + repo.name);
-
-  const [recentSelectedRowIndex, setRecentSelectedRowIndex] = useState<
-    number | null
-  >(null);
 
   const onSelectRepo = (
     repo: IRepository,
@@ -157,7 +151,6 @@ function RepoListContent(props: RepoListContentProps) {
     isSelecting: boolean,
   ) => {
     setRepoSelected(repo, isSelecting);
-    setRecentSelectedRowIndex(rowIndex);
   };
 
   const toggleMakePublicClick = () => {
@@ -272,9 +265,9 @@ function RepoListContent(props: RepoListContentProps) {
     setRepositoryList((prev) => [...prev, value]);
   };
 
-  /* Mapper object used to render bulk delete table 
+  /* Mapper object used to render bulk delete table
     - keys are actual column names of the table
-    - value is an object type with a "label" which maps to the attributes of <T> 
+    - value is an object type with a "label" which maps to the attributes of <T>
       and an optional "transformFunc" which can be used to modify the value being displayed */
   const mapOfColNamesToTableData = {
     Repository: {label: 'name'},
