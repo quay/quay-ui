@@ -11,8 +11,7 @@ import {
 import prettyBytes from 'pretty-bytes';
 import {useState} from 'react';
 import {Tag, Manifest} from 'src/resources/TagResource';
-import {selectedTagsState} from 'src/atoms/TagListState';
-import {useRecoilState, useResetRecoilState} from 'recoil';
+import {useResetRecoilState} from 'recoil';
 import {Link} from 'react-router-dom';
 import {getTagDetailPath} from 'src/routes/NavigationPath';
 import TablePopover from './TablePopover';
@@ -117,7 +116,7 @@ function Row(props: RowProps) {
           select={{
             rowIndex,
             onSelect: (_event, isSelecting) =>
-              props.selectTag(tag, isSelecting),
+              props.selectTag(tag, rowIndex, isSelecting),
             isSelected: props.selectedTags.includes(tag.name),
           }}
         />
@@ -183,19 +182,6 @@ function Row(props: RowProps) {
 }
 
 export default function Table(props: TableProps) {
-  // Control selected tags
-  const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
-  const selectAllTags = (isSelecting = true) => {
-    setSelectedTags(isSelecting ? props.tags.map((t) => t.name) : []);
-  };
-  const selectTag = (tag: Tag, isSelecting = true) =>
-    setSelectedTags((prevSelected) => {
-      const otherSelectedtagNames = prevSelected.filter((r) => r !== tag.name);
-      return isSelecting
-        ? [...otherSelectedtagNames, tag.name]
-        : otherSelectedtagNames;
-    });
-
   // Control expanded tags
   const [expandedTags, setExpandedTags] = useState<string[]>([]);
   const setTagExpanded = (tag: Tag, isExpanding = true) =>
@@ -211,16 +197,11 @@ export default function Table(props: TableProps) {
 
   return (
     <>
-      <TableComposable variant="compact" aria-label="Expandable table">
+      <TableComposable aria-label="Expandable table">
         <Thead>
           <Tr>
             <Th />
-            <Th
-              select={{
-                onSelect: (_event, isSelecting) => selectAllTags(isSelecting),
-                isSelected: selectedTags.length === props.tags.length,
-              }}
-            />
+            <Th />
             <Th>Tag</Th>
             <Th>Security</Th>
             <Th>Size</Th>
@@ -237,10 +218,10 @@ export default function Table(props: TableProps) {
             repo={props.repo}
             tag={tag}
             rowIndex={rowIndex}
-            selectedTags={selectedTags}
+            selectedTags={props.selectedTags}
             isTagExpanded={isTagExpanded}
             setTagExpanded={setTagExpanded}
-            selectTag={selectTag}
+            selectTag={props.selectTag}
           />
         ))}
       </TableComposable>
@@ -258,6 +239,9 @@ interface TableProps {
   repo: string;
   tags: Tag[];
   loading: boolean;
+  selectAllTags: (isSelecting: boolean) => void;
+  selectedTags: string[];
+  selectTag: (tag: Tag, rowIndex?: number, isSelecting?: boolean) => void;
 }
 
 interface RowProps {
@@ -268,7 +252,7 @@ interface RowProps {
   selectedTags: string[];
   isTagExpanded: (tag: Tag) => boolean;
   setTagExpanded: (tag: Tag, isExpanding?: boolean) => void;
-  selectTag: (tag: Tag, isSelecting?: boolean) => void;
+  selectTag: (tag: Tag, rowIndex?: number, isSelecting?: boolean) => void;
 }
 
 interface SubRowProps {

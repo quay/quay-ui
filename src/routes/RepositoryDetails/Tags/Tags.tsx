@@ -1,12 +1,9 @@
-import {Toolbar} from './Toolbar';
+import {TagsToolbar} from './TagsToolbar';
 import Table from './Table';
 import {useState, useEffect} from 'react';
-import {
-  filterState,
-  paginationState,
-  selectedTagsState,
-} from 'src/atoms/TagListState';
-import {useRecoilValue, useResetRecoilState} from 'recoil';
+import {filterState, selectedTagsState} from 'src/atoms/TagListState';
+import {Page, PageSection, PageSectionVariants} from '@patternfly/react-core';
+import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
 import {
   Tag,
   TagsResponse,
@@ -23,7 +20,6 @@ import {CubesIcon} from '@patternfly/react-icons';
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
   const filter = useRecoilValue(filterState);
-  const pagination = useRecoilValue(paginationState);
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>();
   const resetSelectedTags = useResetRecoilState(selectedTagsState);
@@ -31,10 +27,26 @@ export default function Tags(props: TagsProps) {
   const filteredTags: Tag[] =
     filter !== '' ? tags.filter((tag) => tag.name.includes(filter)) : tags;
 
+  // Pagination related states
+  const [perPage, setPerPage] = useState<number>(10);
+  const [page, setPage] = useState<number>(1);
   const paginatedTags: Tag[] = filteredTags.slice(
-    (pagination.page - 1) * pagination.perPage,
-    pagination.page * pagination.perPage,
+    (page - 1) * perPage,
+    page * perPage,
   );
+
+  // Control selected tags
+  const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
+  const selectAllTags = (isSelecting = true) => {
+    setSelectedTags(isSelecting ? tags.map((t) => t.name) : []);
+  };
+  const selectTag = (tag: Tag, rowIndex = 0, isSelecting = true) =>
+    setSelectedTags((prevSelected) => {
+      const otherSelectedtagNames = prevSelected.filter((r) => r !== tag.name);
+      return isSelecting
+        ? [...otherSelectedtagNames, tag.name]
+        : otherSelectedtagNames;
+    });
 
   const loadTags = async () => {
     const getManifest = async (tag: Tag) => {
@@ -91,25 +103,37 @@ export default function Tags(props: TagsProps) {
   }
 
   return (
-    <>
-      <Toolbar
-        organization={props.organization}
-        repository={props.repository}
-        tagCount={filteredTags.length}
-        loadTags={loadTags}
-      ></Toolbar>
-      <ErrorBoundary
-        hasError={isErrorString(err)}
-        fallback={<RequestError message={err} />}
-      >
-        <Table
-          org={props.organization}
-          repo={props.repository}
-          tags={paginatedTags}
-          loading={loading}
-        />
-      </ErrorBoundary>
-    </>
+    <Page>
+      <PageSection variant={PageSectionVariants.light}>
+        <TagsToolbar
+          organization={props.organization}
+          repository={props.repository}
+          tagCount={filteredTags.length}
+          loadTags={loadTags}
+          TagList={tags}
+          paginatedTags={paginatedTags}
+          perPage={perPage}
+          page={page}
+          setPage={setPage}
+          setPerPage={setPerPage}
+          selectTag={selectTag}
+        ></TagsToolbar>
+        <ErrorBoundary
+          hasError={isErrorString(err)}
+          fallback={<RequestError message={err} />}
+        >
+          <Table
+            org={props.organization}
+            repo={props.repository}
+            tags={paginatedTags}
+            loading={loading}
+            selectAllTags={selectAllTags}
+            selectedTags={selectedTags}
+            selectTag={selectTag}
+          />
+        </ErrorBoundary>
+      </PageSection>
+    </Page>
   );
 }
 
