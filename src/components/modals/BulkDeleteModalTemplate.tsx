@@ -45,10 +45,8 @@ export const BulkDeleteModalTemplate = <T,>(
     } else {
       /* Note: This search filter assumes that the search is always based on the 1st column,
          hence we do "colNames[0]" */
-      const filteredTableRow = itemsMarkedForDelete.filter((item) =>
-        item[props.mapOfColNamesToTableData[colNames[0]].label].startsWith(
-          value,
-        ),
+      const filteredTableRow = props.selectedItems.filter((item) =>
+        item[props.mapOfColNamesToTableData[colNames[0]].label].match(value),
       );
       setItemsMarkedForDelete(filteredTableRow);
     }
@@ -69,9 +67,7 @@ export const BulkDeleteModalTemplate = <T,>(
   else returns the default cell value */
   const applyTransformFuncIfGiven = (item, name) =>
     props.mapOfColNamesToTableData[name].transformFunc
-      ? props.mapOfColNamesToTableData[name].transformFunc(
-          item[props.mapOfColNamesToTableData[name].label],
-        )
+      ? props.mapOfColNamesToTableData[name].transformFunc(item)
       : item[props.mapOfColNamesToTableData[name].label];
 
   return (

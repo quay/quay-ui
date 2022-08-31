@@ -270,10 +270,16 @@ function RepoListContent(props: RepoListContentProps) {
     - value is an object type with a "label" which maps to the attributes of <T>
       and an optional "transformFunc" which can be used to modify the value being displayed */
   const mapOfColNamesToTableData = {
-    Repository: {label: 'name'},
+    Repository: {
+      label: 'name',
+      transformFunc: (item: IRepository) => {
+        return `${item.namespace}/${item.name}`;
+      },
+    },
     Visibility: {
       label: 'is_public',
-      transformFunc: (value) => (value ? 'public' : 'private'),
+      transformFunc: (item: IRepository) =>
+        item.is_public ? 'public' : 'private',
     },
     Size: {label: 'size'},
   };
