@@ -7,7 +7,6 @@ import {
   Td,
 } from '@patternfly/react-table';
 import {
-  Page,
   PageSection,
   PageSectionVariants,
   Title,
@@ -18,7 +17,7 @@ import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
 import {useRecoilState, useRecoilValue} from 'recoil';
 import {filterOrgState, selectedOrgsState, UserOrgs} from 'src/atoms/UserState';
-import {useEffect, useState} from 'react';
+import {Suspense, useEffect, useState} from 'react';
 import {bulkDeleteOrganizations} from 'src/resources/OrganisationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
@@ -29,6 +28,9 @@ import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import Empty from 'src/components/empty/Empty';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
+import {LoadingPage} from 'src/components/LoadingPage';
+import {addDisplayError, BulkOperationError} from 'src/resources/ErrorHandling';
+import ErrorModal from 'src/components/errors/ErrorModal';
 
 // Attempt to render OrganizationsList content,
 // fallback to RequestError on failure
@@ -40,11 +42,13 @@ export default function OrganizationsList() {
           <Title headingLevel="h1">Organizations</Title>
         </div>
       </PageSection>
-      <ErrorBoundary
-        fallback={<RequestError message={'Unable to load organizations.'} />}
-      >
-        <PageContent />
-      </ErrorBoundary>
+      <Suspense fallback={<LoadingPage />}>
+        <ErrorBoundary
+          fallback={<RequestError message={'Unable to load organizations.'} />}
+        >
+          <PageContent />
+        </ErrorBoundary>
+      </Suspense>
     </>
   );
 }
@@ -59,6 +63,7 @@ function PageContent() {
   const filter = useRecoilValue(filterOrgState);
   const [selectedOrganization, setSelectedOrganization] =
     useRecoilState(selectedOrgsState);
+  const [err, setErr] = useState<string[]>();
   const userOrgs = useRecoilValue(UserOrgs);
   const refreshUser = useRefreshUser();
   useEffect(() => {
@@ -190,11 +195,29 @@ function PageContent() {
   const handleOrgDeletion = async () => {
     // Error handling is in BulkDeleteModalTemplate,
     // since that is where it is reported to the user.
-    const orgs = selectedOrganization.map((org) => org.name);
-    await bulkDeleteOrganizations(orgs);
-    refreshUser();
-    setSelectedOrganization([]);
-    setDeleteModalIsOpen(!deleteModalIsOpen);
+    try {
+      const orgs = selectedOrganization.map((org) => org.name);
+      await bulkDeleteOrganizations(orgs);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof BulkOperationError) {
+        const errMessages = [];
+        // TODO: Would like to use for .. of instead of foreach
+        // typescript complains saying we're using version prior to es6?
+        err.getErrors().forEach((error, org) => {
+          errMessages.push(
+            addDisplayError(`Failed to delete org ${org}`, error.error),
+          );
+        });
+        setErr(errMessages);
+      } else {
+        setErr([addDisplayError('Failed to delete orgs', err)]);
+      }
+    } finally {
+      setDeleteModalIsOpen(!deleteModalIsOpen);
+      refreshUser();
+      setSelectedOrganization([]);
+    }
   };
 
   const handleDeleteModalToggle = () => {
@@ -263,8 +286,9 @@ function PageContent() {
   }
 
   return (
-    <Page>
+    <>
       <QuayBreadcrumb />
+      <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
       <PageSection variant={PageSectionVariants.light}>
         <OrganizationToolBar
           createOrgModal={createOrgModal}
@@ -324,7 +348,7 @@ function PageContent() {
           </Tbody>
         </TableComposable>
       </PageSection>
-    </Page>
+    </>
   );
 }
 

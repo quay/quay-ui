@@ -1,6 +1,6 @@
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
-import {assertHttpCode} from './ErrorHandling';
+import {assertHttpCode, BulkOperationError} from './ErrorHandling';
 
 export interface IAvatar {
   name: string;
@@ -26,17 +26,50 @@ export async function getOrg(orgname: string) {
   return response.data;
 }
 
+export class OrgDeleteError extends Error {
+  error: AxiosError;
+  org: string;
+  constructor(message: string, org: string, error: AxiosError) {
+    super(message);
+    this.org = org;
+    this.error = error;
+    Object.setPrototypeOf(this, OrgDeleteError.prototype);
+  }
+}
+
 export async function deleteOrg(orgname: string) {
-  const deleteApiUrl = `/api/v1/organization/${orgname}`;
-  // TODO: Add return type
-  const response: AxiosResponse = await axios.delete(deleteApiUrl);
-  assertHttpCode(response.status, 204);
-  return response.data;
+  try {
+    const deleteApiUrl = `/api/v1/organization/${orgname}`;
+    // TODO: Add return type
+    const response: AxiosResponse = await axios.delete(deleteApiUrl);
+    assertHttpCode(response.status, 204);
+    return response.data;
+  } catch (err) {
+    throw new OrgDeleteError('failed to delete org ', orgname, err);
+  }
 }
 
 export async function bulkDeleteOrganizations(orgs: string[]) {
-  const response = await Promise.all(orgs.map((org) => deleteOrg(org)));
-  return response;
+  const responses = await Promise.allSettled(orgs.map((org) => deleteOrg(org)));
+
+  // Aggregate failed responses
+  const errResponses = responses.filter(
+    (r) => r.status == 'rejected',
+  ) as PromiseRejectedResult[];
+
+  // If errors, collect and throw
+  if (errResponses.length > 0) {
+    const bulkDeleteError = new BulkOperationError<OrgDeleteError>(
+      'error deleting orgs',
+    );
+    for (const response of errResponses) {
+      const reason = response.reason as OrgDeleteError;
+      bulkDeleteError.addError(reason.org, reason);
+    }
+    throw bulkDeleteError;
+  }
+
+  return responses;
 }
 
 interface CreateOrgRequest {

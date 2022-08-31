@@ -1,6 +1,6 @@
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
-import {assertHttpCode} from './ErrorHandling';
+import {assertHttpCode, BulkOperationError} from './ErrorHandling';
 
 export interface TagsResponse {
   page: number;
@@ -154,14 +154,52 @@ interface TagLocation {
 }
 
 export async function bulkDeleteTags(tags: TagLocation[]) {
-  await Promise.all(tags.map((tag) => deleteTag(tag.org, tag.repo, tag.tag)));
+  const responses = await Promise.allSettled(
+    tags.map((tag) => deleteTag(tag.org, tag.repo, tag.tag)),
+  );
+
+  // Filter failed responses
+  const errResponses = responses.filter(
+    (r) => r.status == 'rejected',
+  ) as PromiseRejectedResult[];
+
+  // If errors collect and throw
+  if (errResponses.length > 0) {
+    const bulkDeleteError = new BulkOperationError<TagDeleteError>(
+      'error deleting tags',
+    );
+    for (const response of errResponses) {
+      const reason = response.reason as TagDeleteError;
+      bulkDeleteError.addError(reason.tag, reason);
+    }
+    throw bulkDeleteError;
+  }
+}
+
+export class TagDeleteError extends Error {
+  error: Error;
+  tag: string;
+  constructor(message: string, tag: string, error: AxiosError) {
+    super(message);
+    this.tag = tag;
+    this.error = error;
+    Object.setPrototypeOf(this, TagDeleteError.prototype);
+  }
 }
 
 export async function deleteTag(org: string, repo: string, tag: string) {
-  const response: AxiosResponse = await axios.delete(
-    `/api/v1/repository/${org}/${repo}/tag/${tag}`,
-  );
-  assertHttpCode(response.status, 204);
+  try {
+    const response: AxiosResponse = await axios.delete(
+      `/api/v1/repository/${org}/${repo}/tag/${tag}`,
+    );
+    assertHttpCode(response.status, 204);
+  } catch (err) {
+    throw new TagDeleteError(
+      'failed to delete tag',
+      `${org}/${repo}:${tag}`,
+      err,
+    );
+  }
 }
 
 export async function getManifestByDigest(

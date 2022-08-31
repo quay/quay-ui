@@ -19,6 +19,8 @@ import {useNavigate} from 'react-router-dom';
 import {useRecoilState} from 'recoil';
 import {CurrentUsernameState} from 'src/atoms/UserState';
 import {GlobalAuthState, logoutUser} from 'src/resources/AuthResource';
+import {addDisplayError} from 'src/resources/ErrorHandling';
+import ErrorModal from '../errors/ErrorModal';
 
 import 'src/components/header/HeaderToolbar.css';
 
@@ -26,6 +28,7 @@ export function HeaderToolbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentUsername, setCurrentUsername] =
     useRecoilState(CurrentUsernameState);
+  const [err, setErr] = useState<string>();
 
   const navigate = useNavigate();
 
@@ -42,9 +45,9 @@ export function HeaderToolbar() {
           GlobalAuthState.csrfToken = undefined;
           setCurrentUsername('');
           navigate('/signin');
-        } catch (err: any) {
-          console.error(e);
-          // TODO: Notify user error in signing out
+        } catch (err) {
+          console.error(err);
+          setErr(addDisplayError('Unable to log out', err));
         }
         break;
       default:
@@ -94,34 +97,37 @@ export function HeaderToolbar() {
   };
 
   return (
-    <Toolbar id="toolbar" isFullHeight isStatic>
-      <ToolbarContent>
-        <ToolbarGroup
-          variant="icon-button-group"
-          alignment={{default: 'alignRight'}}
-          spacer={{default: 'spacerNone', md: 'spacerMd'}}
-        >
-          <ToolbarItem spacer={toolbarSpacers}>
-            <Form isHorizontal>
-              <FormGroup
-                label="Current UI"
-                fieldId="horizontal-form-stacked-options"
-              >
-                <Switch
-                  id="header-toolbar-ui-switch"
-                  label="New UI"
-                  labelOff="New UI"
-                  isChecked={isChecked}
-                  onChange={toggleSwitch}
-                />
-              </FormGroup>
-            </Form>
-          </ToolbarItem>
-          <ToolbarItem>
-            {currentUsername ? userDropdown : signInButton}
-          </ToolbarItem>
-        </ToolbarGroup>
-      </ToolbarContent>
-    </Toolbar>
+    <>
+      <ErrorModal error={err} setError={setErr} />
+      <Toolbar id="toolbar" isFullHeight isStatic>
+        <ToolbarContent>
+          <ToolbarGroup
+            variant="icon-button-group"
+            alignment={{default: 'alignRight'}}
+            spacer={{default: 'spacerNone', md: 'spacerMd'}}
+          >
+            <ToolbarItem spacer={toolbarSpacers}>
+              <Form isHorizontal>
+                <FormGroup
+                  label="Current UI"
+                  fieldId="horizontal-form-stacked-options"
+                >
+                  <Switch
+                    id="header-toolbar-ui-switch"
+                    label="New UI"
+                    labelOff="New UI"
+                    isChecked={isChecked}
+                    onChange={toggleSwitch}
+                  />
+                </FormGroup>
+              </Form>
+            </ToolbarItem>
+            <ToolbarItem>
+              {currentUsername ? userDropdown : signInButton}
+            </ToolbarItem>
+          </ToolbarGroup>
+        </ToolbarContent>
+      </Toolbar>
+    </>
   );
 }

@@ -19,8 +19,6 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import {useEffect, useState} from 'react';
-import {addDisplayError} from 'src/resources/ErrorHandling';
-import FormError from '../errors/FormError';
 
 export const BulkDeleteModalTemplate = <T,>(
   props: BulkDeleteModalTemplateProps<T>,
@@ -39,7 +37,6 @@ export const BulkDeleteModalTemplate = <T,>(
     page: 1,
     perPage: 10,
   });
-  const [err, setErr] = useState<string>();
 
   const onSearch = (value: string) => {
     setSearchInput(value);
@@ -60,12 +57,7 @@ export const BulkDeleteModalTemplate = <T,>(
   const bulkDelete = async () => {
     // TODO:(harish) Ask UX for Alert msg in case text entered is invalid
     if (confirmDeletionInput === 'confirm') {
-      try {
-        await props.handleBulkDeletion(props.selectedItems);
-      } catch (err) {
-        console.error(err);
-        setErr(addDisplayError('Unable to delete items', err));
-      }
+      await props.handleBulkDeletion(props.selectedItems);
     }
   };
 
@@ -125,7 +117,6 @@ export const BulkDeleteModalTemplate = <T,>(
             </ToolbarItem>
           </ToolbarContent>
         </Toolbar>
-        <FormError message={err} setErr={setErr} />
         <TableComposable aria-label="Simple table" variant="compact">
           <Thead>
             <Tr>

@@ -1,6 +1,6 @@
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
-import {assertHttpCode} from './ErrorHandling';
+import {assertHttpCode, BulkOperationError} from './ErrorHandling';
 
 export interface IRepository {
   namespace: string;
@@ -22,9 +22,7 @@ export interface RepositoryCreationResponse {
 
 export async function fetchAllRepos(namespaces: string[]) {
   const namespacedRepos = await Promise.all(
-    namespaces.map((ns) => {
-      return getRepositoriesForNamespace(ns);
-    }),
+    namespaces.map((ns) => getRepositoriesForNamespace(ns)),
   );
   // Flatten responses to a single list of all repositories
   const allRepos: IRepository[] = namespacedRepos.reduce(
@@ -84,18 +82,52 @@ export async function setRepositoryVisibility(
 }
 
 export async function bulkDeleteRepositories(repos: IRepository[]) {
-  await Promise.all(
-    repos.map((repo) => {
-      return deleteRepository(repo.namespace, repo.name);
-    }),
+  const responses = await Promise.allSettled(
+    repos.map((repo) => deleteRepository(repo.namespace, repo.name)),
   );
+
+  // Aggregate failed responses
+  const errResponses = responses.filter(
+    (r) => r.status == 'rejected',
+  ) as PromiseRejectedResult[];
+
+  // If errors, collect and throw
+  if (errResponses.length > 0) {
+    const bulkDeleteError = new BulkOperationError<RepoDeleteError>(
+      'error deleting tags',
+    );
+    for (const response of errResponses) {
+      const reason = response.reason as RepoDeleteError;
+      bulkDeleteError.addError(reason.repo, reason);
+    }
+    throw bulkDeleteError;
+  }
+}
+
+export class RepoDeleteError extends Error {
+  error: Error;
+  repo: string;
+  constructor(message: string, repo: string, error: AxiosError) {
+    super(message);
+    this.repo = repo;
+    this.error = error;
+    Object.setPrototypeOf(this, RepoDeleteError.prototype);
+  }
 }
 
 // Not returning response from deleting repository for now as
 // it's not required but may want to add it in the future.
 export async function deleteRepository(ns: string, name: string) {
-  const response: AxiosResponse = await axios.delete(
-    `/api/v1/repository/${ns}/${name}`,
-  );
-  assertHttpCode(response.status, 204);
+  try {
+    const response: AxiosResponse = await axios.delete(
+      `/api/v1/repository/${ns}/${name}`,
+    );
+    assertHttpCode(response.status, 204);
+  } catch (err) {
+    throw new RepoDeleteError(
+      'failed to delete repository',
+      `${ns}/${name}`,
+      err,
+    );
+  }
 }
