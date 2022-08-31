@@ -55,7 +55,10 @@ export default function RepositoryDetails(props) {
           {repository}
         </Title>
       </PageSection>
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection
+        variant={PageSectionVariants.light}
+        className="no-padding-top"
+      >
         <Tabs activeKey={activeTabKey} onSelect={tabsOnSelect}>
           <Tab
             eventKey={TabIndex.Tags}

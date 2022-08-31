@@ -104,7 +104,20 @@ export default function Tags(props: TagsProps) {
 
   return (
     <Page>
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={PageSectionVariants.light} className="no-padding">
+        <TagsToolbar
+          organization={props.organization}
+          repository={props.repository}
+          tagCount={filteredTags.length}
+          loadTags={loadTags}
+          TagList={tags}
+          paginatedTags={paginatedTags}
+          perPage={perPage}
+          page={page}
+          setPage={setPage}
+          setPerPage={setPerPage}
+          selectTag={selectTag}
+        ></TagsToolbar>
         <ErrorBoundary
           hasError={isErrorString(err)}
           fallback={<RequestError message={err} />}
