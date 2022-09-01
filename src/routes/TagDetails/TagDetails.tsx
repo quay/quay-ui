@@ -19,8 +19,10 @@ import {
   ManifestByDigestResponse,
   Manifest,
 } from 'src/resources/TagResource';
-import {addDisplayError} from 'src/resources/ErrorHandling';
+import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
+import ErrorBoundary from 'src/components/errors/ErrorBoundary';
+import RequestError from 'src/components/errors/RequestError';
 
 export default function TagDetails() {
   const [searchParams] = useSearchParams();
@@ -110,14 +112,19 @@ export default function TagDetails() {
           setArch={setArchitecture}
           render={tagDetails.is_manifest_list}
         />
-        <TagTabs
-          org={org}
-          repo={repo}
-          tag={tagDetails}
-          size={size}
-          digest={digest}
-          err={err}
-        />
+        <ErrorBoundary
+          hasError={isErrorString(err)}
+          fallback={<RequestError message={err} />}
+        >
+          <TagTabs
+            org={org}
+            repo={repo}
+            tag={tagDetails}
+            size={size}
+            digest={digest}
+            err={err}
+          />
+        </ErrorBoundary>
       </PageSection>
     </Page>
   );

@@ -8,7 +8,7 @@ import {
 import {isErrorString} from 'src/resources/ErrorHandling';
 import RequestError from 'src/components/errors/RequestError';
 
-export function Packages(props: PackagesProps) {
+export function Packages() {
   const data = useRecoilValue(SecurityDetailsState);
   const error = useRecoilValue(SecurityDetailsErrorState);
 
@@ -30,10 +30,4 @@ export function Packages(props: PackagesProps) {
       <PackagesTable features={features} />
     </>
   );
-}
-
-interface PackagesProps {
-  org: string;
-  repo: string;
-  digest: string;
 }

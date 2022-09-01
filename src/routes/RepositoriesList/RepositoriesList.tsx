@@ -252,7 +252,7 @@ function RepoListContent(props: RepoListContentProps) {
         setLoading(false);
       } catch (err) {
         console.error(err);
-        props.setLoadingErr(addDisplayError('Unable to get repositores', err));
+        props.setLoadingErr(addDisplayError('Unable to get repositories', err));
       }
     }
   }

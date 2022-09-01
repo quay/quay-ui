@@ -8,7 +8,7 @@ import {
 import {isErrorString} from 'src/resources/ErrorHandling';
 import RequestError from 'src/components/errors/RequestError';
 
-export default function SecurityReport(props: SecurityReportProps) {
+export default function SecurityReport() {
   const data = useRecoilValue(SecurityDetailsState);
   const error = useRecoilValue(SecurityDetailsErrorState);
 
@@ -30,10 +30,4 @@ export default function SecurityReport(props: SecurityReportProps) {
       <SecurityReportTable features={features} />
     </>
   );
-}
-
-interface SecurityReportProps {
-  org: string;
-  repo: string;
-  digest: string;
 }
