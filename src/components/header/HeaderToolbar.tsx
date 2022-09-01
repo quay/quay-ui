@@ -44,7 +44,12 @@ export function HeaderToolbar() {
           await logoutUser();
           GlobalAuthState.csrfToken = undefined;
           setCurrentUsername('');
-          navigate('/signin');
+
+          // Ignore client side auth page and use old UI if present
+          // TODO: replace this with navigate('/signin') once new ui supports all auth methods
+          const protocol = window.location.protocol;
+          const host = window.location.host;
+          window.location.replace(`${protocol}//${host}/signin/`);
         } catch (err) {
           console.error(err);
           setErr(addDisplayError('Unable to log out', err));
