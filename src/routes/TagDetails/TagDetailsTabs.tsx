@@ -38,44 +38,25 @@ export default function TagTabs(props: TagTabsProps) {
         eventKey={TabIndex.Details}
         title={<TabTitleText>Details</TabTitleText>}
       >
-        <ErrorBoundary
-          hasError={isErrorString(props.err)}
-          fallback={<RequestError message={props.err} />}
-        >
-          <Details
-            org={props.org}
-            repo={props.repo}
-            tag={props.tag}
-            size={props.size}
-            digest={props.digest}
-          />
-        </ErrorBoundary>
+        <Details
+          org={props.org}
+          repo={props.repo}
+          tag={props.tag}
+          size={props.size}
+          digest={props.digest}
+        />
       </Tab>
       <Tab
         eventKey={TabIndex.SecurityReport}
         title={<TabTitleText>Security Report</TabTitleText>}
       >
-        <ErrorBoundary
-          hasError={isErrorString(props.err)}
-          fallback={<RequestError message={props.err} />}
-        >
-          <SecurityReport
-            org={props.org}
-            repo={props.repo}
-            digest={props.digest}
-          />
-        </ErrorBoundary>
+        <SecurityReport />
       </Tab>
       <Tab
         eventKey={TabIndex.Packages}
         title={<TabTitleText>Packages</TabTitleText>}
       >
-        <ErrorBoundary
-          hasError={isErrorString(props.err)}
-          fallback={<RequestError message={props.err} />}
-        >
-          <Packages org={props.org} repo={props.repo} digest={props.digest} />
-        </ErrorBoundary>
+        <Packages />
       </Tab>
     </Tabs>
   );

@@ -20,7 +20,7 @@ export class BulkOperationError<T> extends Error {
 // Convert error to human readble output
 export function addDisplayError(message: string, error: Error | AxiosError) {
   const errorDetails =
-    error instanceof AxiosError ? getErrorMessage(error) : 'client error';
+    error instanceof AxiosError ? getErrorMessage(error) : error.message;
   return message + ', ' + errorDetails + '.';
 }
 
