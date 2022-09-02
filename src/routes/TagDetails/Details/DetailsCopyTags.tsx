@@ -8,6 +8,10 @@ import {
 } from '@patternfly/react-core';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
+import docker from 'src/assets/docker.svg';
+import podman from 'src/assets/podman.svg';
+import 'src/routes/TagDetails/Details/DetailsCopyTags.css';
+
 export default function CopyTags(props: CopyTagsProps) {
   const config = useQuayConfig();
   const domain = config?.config.SERVER_HOSTNAME;
@@ -17,7 +21,15 @@ export default function CopyTags(props: CopyTagsProps) {
       <Title headingLevel="h3">Fetch Tag</Title>
       <DescriptionList>
         <DescriptionListGroup>
-          <DescriptionListTerm>Podman Pull (by tag)</DescriptionListTerm>
+          <DescriptionListTerm>
+            <img
+              className="pf-u-float-left icon-margin-right"
+              height="20"
+              width="20"
+              src={podman}
+            />
+            Podman Pull (by tag)
+          </DescriptionListTerm>
           <DescriptionListDescription>
             <ClipboardCopy
               data-testid="podman-tag-clipboardcopy"
@@ -30,7 +42,15 @@ export default function CopyTags(props: CopyTagsProps) {
           </DescriptionListDescription>
         </DescriptionListGroup>
         <DescriptionListGroup>
-          <DescriptionListTerm>Docker Pull (by tag)</DescriptionListTerm>
+          <DescriptionListTerm>
+            <img
+              className="pf-u-float-left icon-margin-right"
+              height="20"
+              width="20"
+              src={docker}
+            />
+            Docker Pull (by tag)
+          </DescriptionListTerm>
           <DescriptionListDescription>
             <ClipboardCopy
               data-testid="docker-tag-clipboardcopy"
@@ -43,7 +63,15 @@ export default function CopyTags(props: CopyTagsProps) {
           </DescriptionListDescription>
         </DescriptionListGroup>
         <DescriptionListGroup>
-          <DescriptionListTerm>Podman Pull (by digest)</DescriptionListTerm>
+          <DescriptionListTerm>
+            <img
+              className="pf-u-float-left icon-margin-right"
+              height="20"
+              width="20"
+              src={podman}
+            />
+            Podman Pull (by digest)
+          </DescriptionListTerm>
           <DescriptionListDescription>
             <ClipboardCopy
               data-testid="podman-digest-clipboardcopy"
@@ -56,7 +84,15 @@ export default function CopyTags(props: CopyTagsProps) {
           </DescriptionListDescription>
         </DescriptionListGroup>
         <DescriptionListGroup>
-          <DescriptionListTerm>Docker Pull (by digest)</DescriptionListTerm>
+          <DescriptionListTerm>
+            <img
+              className="pf-u-float-left icon-margin-right"
+              height="20"
+              width="20"
+              src={docker}
+            />
+            Docker Pull (by digest)
+          </DescriptionListTerm>
           <DescriptionListDescription>
             <ClipboardCopy
               data-testid="docker-digest-clipboardcopy"
