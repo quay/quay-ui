@@ -16,7 +16,7 @@ import {
   Td,
 } from '@patternfly/react-table';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import {UserOrgs} from 'src/atoms/UserState';
+import {UserState} from 'src/atoms/UserState';
 import {
   bulkDeleteRepositories,
   fetchAllRepos,
@@ -100,7 +100,7 @@ function RepoListContent(props: RepoListContentProps) {
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
   const [loading, setLoading] = useState(true);
-  const userOrgs = useRecoilValue(UserOrgs);
+  const userState = useRecoilValue(UserState);
   const refreshUser = useRefreshUser();
   const [err, setErr] = useState<string[]>();
   useEffect(() => {
@@ -231,14 +231,28 @@ function RepoListContent(props: RepoListContentProps) {
     setLoading(true);
     setRepositoryList([]);
     setSelectedRepoNames([]);
-    if (userOrgs) {
+    if (userState) {
       // check if view is global vs scoped to a organization
+      // TODO: we inculde username as part of org list
+      // fix this after we have MyQuay page
       const listOfOrgNames: string[] = props.currentOrg
         ? [props.currentOrg]
-        : userOrgs.map((org) => org.name);
+        : userState.organizations
+            .map((org) => org.name)
+            .concat(userState.username);
 
       try {
-        const repos = await fetchAllRepos(listOfOrgNames);
+        const repos = (await fetchAllRepos(
+          listOfOrgNames,
+          true,
+        )) as IRepository[];
+
+        // default sort by last modified
+        // TODO (syahmed): redo this when we have user selectable sorting
+        repos.sort((r1, r2) => {
+          return r1.last_modified > r2.last_modified ? -1 : 1;
+        });
+
         // TODO: Here we're formatting repo's into the correct
         // type. Once we know the return type from the repo's
         // API we should pass 'repos' directly into 'setRepositoryList'
@@ -258,8 +272,9 @@ function RepoListContent(props: RepoListContentProps) {
   }
 
   useEffect(() => {
+    // TODO: error handling
     fetchRepos();
-  }, [userOrgs]);
+  }, [userState]);
 
   const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);

@@ -9,5 +9,8 @@ import './data/tag/labels';
 import './data/tag/manifest';
 import './data/config/config';
 import './data/config/logo';
+import './data/organization/organization';
+import './data/organization/members';
+import './data/organization/robots';
 
 mock.onAny().passThrough();

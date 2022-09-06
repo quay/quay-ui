@@ -20,29 +20,31 @@ export interface RepositoryCreationResponse {
   kind: string;
 }
 
-export async function fetchAllRepos(namespaces: string[]) {
+export async function fetchAllRepos(
+  namespaces: string[],
+  flatten = false,
+): Promise<IRepository[] | Map<string, IRepository[]>> {
   const namespacedRepos = await Promise.all(
-    namespaces.map((ns) => getRepositoriesForNamespace(ns)),
+    namespaces.map((ns) => fetchRepositoriesForNamespace(ns)),
   );
   // Flatten responses to a single list of all repositories
-  const allRepos: IRepository[] = namespacedRepos.reduce(
-    (allRepos, namespacedRepos) =>
-      allRepos.concat(namespacedRepos.repositories),
-    [],
-  );
-
-  return allRepos.sort((r1, r2) => {
-    return r1.last_modified > r2.last_modified ? -1 : 1;
-  });
+  if (flatten) {
+    return namespacedRepos.reduce(
+      (allRepos, namespacedRepos) => allRepos.concat(namespacedRepos),
+      [],
+    );
+  } else {
+    return namespacedRepos;
+  }
 }
 
-export async function getRepositoriesForNamespace(ns: string) {
+export async function fetchRepositoriesForNamespace(ns: string) {
   // TODO: Add return type to AxiosResponse
   const response: AxiosResponse = await axios.get(
     `/api/v1/repository?last_modified=true&namespace=${ns}`,
   );
   assertHttpCode(response.status, 200);
-  return response.data;
+  return response.data?.repositories;
 }
 
 export async function createNewRepository(

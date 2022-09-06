@@ -18,6 +18,10 @@ export function getSeverityColor(severity: VulnerabilitySeverity) {
 }
 
 export function formatDate(date: string | number) {
+  if (date == -1) {
+    return 'N/A';
+  }
+
   return new Date(date).toLocaleString('en-US', {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     timeStyle: 'short',

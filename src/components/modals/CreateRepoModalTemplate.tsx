@@ -13,7 +13,7 @@ import {
   FlexItem,
 } from '@patternfly/react-core';
 import {useRecoilValue} from 'recoil';
-import {UserOrgs} from 'src/atoms/UserState';
+import {UserState} from 'src/atoms/UserState';
 import {
   createNewRepository,
   IRepository,
@@ -24,6 +24,7 @@ import FormError from '../errors/FormError';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
+import {IUserResource} from 'src/resources/UserResource';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -66,7 +67,7 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
   if (!props.isModalOpen) {
     return null;
   }
-  const userOrgs = useRecoilValue(UserOrgs);
+  const userState: IUserResource = useRecoilValue(UserState);
   const [err, setErr] = useState<string>();
   const refreshUser = useRefreshUser();
 
@@ -133,6 +134,18 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
     }));
   };
 
+  // namespace list includes both the orgs list and the user namespace
+  const namespaceSelectionList = () => {
+    const userSelection = (
+      <SelectOption value={userState.username}></SelectOption>
+    );
+    const orgsSelectionList = userState.organizations.map((orgs, idx) => (
+      <SelectOption key={idx} value={orgs.name}></SelectOption>
+    ));
+
+    return [userSelection, ...orgsSelectionList];
+  };
+
   return (
     <Modal
       title="Create repository"
@@ -184,9 +197,7 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
                     placeholderText={'Select namespace'}
                     selections={currentOrganization.name}
                   >
-                    {userOrgs.map((orgs, idx) => (
-                      <SelectOption key={idx} value={orgs.name}></SelectOption>
-                    ))}
+                    {namespaceSelectionList()}
                   </Select>
                 </FlexItem>
                 <FlexItem> / </FlexItem>
