@@ -260,7 +260,6 @@ function PageContent() {
   useEffect(() => {
     // Get latest organizations
     refreshUser();
-    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -289,6 +288,7 @@ function PageContent() {
     return () => {
       const fetchData = async () => {
         try {
+          setLoading(true);
           const orgnames: string[] = userState?.organizations.map(
             (org) => org.name,
           );
@@ -337,6 +337,8 @@ function PageContent() {
         } catch (e) {
           // TODO (syahmed): error handling
           console.error(e);
+        } finally {
+          setLoading(false);
         }
       };
 
