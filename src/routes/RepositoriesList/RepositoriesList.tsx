@@ -1,7 +1,5 @@
 import {
   DropdownItem,
-  DropdownItemProps,
-  Page,
   PageSection,
   PageSectionVariants,
   Spinner,
@@ -27,7 +25,7 @@ import {Link, useLocation} from 'react-router-dom';
 import CreateRepositoryModalTemplate from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
 import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
-import {formatDate} from 'src/libs/utils';
+import {formatDate, formatSize} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
 import {
@@ -44,6 +42,7 @@ import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {LoadingPage} from 'src/components/LoadingPage';
 import ErrorModal from 'src/components/errors/ErrorModal';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -103,6 +102,8 @@ function RepoListContent(props: RepoListContentProps) {
   const userOrgs = useRecoilValue(UserOrgs);
   const refreshUser = useRefreshUser();
   const [err, setErr] = useState<string[]>();
+  const quayConfig = useQuayConfig();
+
   useEffect(() => {
     // Get latest organizations
     refreshUser();
@@ -219,10 +220,7 @@ function RepoListContent(props: RepoListContentProps) {
   const columnNames = {
     repoName: 'Name',
     visibility: 'Visibility',
-    tags: 'Tags',
     size: 'Size',
-    pulls: 'Pulls',
-    lastPull: 'Last Pull',
     lastModified: 'Last Modified',
   };
 
@@ -242,12 +240,15 @@ function RepoListContent(props: RepoListContentProps) {
         // TODO: Here we're formatting repo's into the correct
         // type. Once we know the return type from the repo's
         // API we should pass 'repos' directly into 'setRepositoryList'
-        const formattedRepos = repos.map((repo) => ({
-          namespace: repo.namespace,
-          name: repo.name,
-          is_public: repo.is_public,
-          last_modified: repo.last_modified,
-        }));
+        const formattedRepos: RepoListTableItem[] = repos.map((repo) => {
+          return {
+            namespace: repo.namespace,
+            name: repo.name,
+            is_public: repo.is_public,
+            last_modified: repo.last_modified,
+            size: repo.quota_report?.quota_bytes,
+          } as RepoListTableItem;
+        });
         setRepositoryList(formattedRepos);
         setLoading(false);
       } catch (err) {
@@ -281,7 +282,10 @@ function RepoListContent(props: RepoListContentProps) {
       transformFunc: (item: IRepository) =>
         item.is_public ? 'public' : 'private',
     },
-    Size: {label: 'size'},
+    Size: {
+      label: 'size',
+      transformFunc: (item: IRepository) => formatSize(item.size),
+    },
   };
 
   const createRepoModal = (
@@ -360,10 +364,11 @@ function RepoListContent(props: RepoListContentProps) {
             <Th />
             <Th>{columnNames.repoName}</Th>
             <Th>{columnNames.visibility}</Th>
-            <Th>{columnNames.tags}</Th>
-            <Th>{columnNames.size}</Th>
-            <Th>{columnNames.pulls}</Th>
-            <Th>{columnNames.lastPull}</Th>
+            {quayConfig?.features.QUOTA_MANAGEMENT ? (
+              <Th>{columnNames.size}</Th>
+            ) : (
+              <></>
+            )}
             <Th>{columnNames.lastModified}</Th>
           </Tr>
         </Thead>
@@ -399,13 +404,13 @@ function RepoListContent(props: RepoListContentProps) {
                   )}
                 </Td>
                 <Td dataLabel={columnNames.visibility}>
-                  {' '}
                   {repo.is_public ? 'public' : 'private'}
                 </Td>
-                <Td dataLabel={columnNames.tags}> - </Td>
-                <Td dataLabel={columnNames.size}> -</Td>
-                <Td dataLabel={columnNames.pulls}> - </Td>
-                <Td dataLabel={columnNames.lastPull}> - </Td>
+                {quayConfig?.features.QUOTA_MANAGEMENT ? (
+                  <Td dataLabel={columnNames.size}> {formatSize(repo.size)}</Td>
+                ) : (
+                  <></>
+                )}
                 <Td dataLabel={columnNames.lastModified}>
                   {formatDate(repo.last_modified)}
                 </Td>
@@ -421,4 +426,12 @@ function RepoListContent(props: RepoListContentProps) {
 interface RepoListContentProps {
   currentOrg: string;
   setLoadingErr: (message: string) => void;
+}
+
+interface RepoListTableItem {
+  namespace: string;
+  name: string;
+  is_public: boolean;
+  size: number;
+  last_modified: number;
 }
