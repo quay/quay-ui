@@ -7,7 +7,7 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
-import {createOrg} from 'src/resources/OrganisationResource';
+import {createOrg} from 'src/resources/OrganizationResource';
 import {isValidEmail} from 'src/libs/utils';
 import {useState} from 'react';
 import FormError from 'src/components/errors/FormError';

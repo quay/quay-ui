@@ -1,7 +1,7 @@
 import {AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
 import {assertHttpCode} from './ErrorHandling';
-import {IAvatar, IOrganization} from './OrganisationResource';
+import {IAvatar, IOrganization} from './OrganizationResource';
 
 export interface IUserResource {
   anonymous: boolean;
@@ -34,7 +34,7 @@ export interface IUserResource {
   organizations: IOrganization[];
 }
 
-export async function getUser() {
+export async function fetchUser() {
   const response: AxiosResponse<IUserResource> = await axios.get(
     '/api/v1/user/',
   );

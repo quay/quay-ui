@@ -11,7 +11,7 @@ import RepositoryDetails from 'src/routes/RepositoryDetails/RepositoryDetails';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
 import TagDetails from 'src/routes/TagDetails/TagDetails';
 import {useEffect, useState} from 'react';
-import {getUser} from 'src/resources/UserResource';
+import {fetchUser} from 'src/resources/UserResource';
 import {useSetRecoilState} from 'recoil';
 import {CurrentUsernameState} from 'src/atoms/UserState';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
@@ -56,7 +56,7 @@ export function StandaloneMain() {
   useEffect(() => {
     (async () => {
       try {
-        const user = await getUser();
+        const user = await fetchUser();
         setCurrentUsername(user.username);
       } catch (err) {
         console.error(err);

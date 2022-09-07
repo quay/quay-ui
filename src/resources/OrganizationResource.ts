@@ -1,6 +1,7 @@
 import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
 import {assertHttpCode, BulkOperationError} from './ErrorHandling';
+import {fetchRepositoriesForNamespace, IRepository} from './RepositoryResource';
 
 export interface IAvatar {
   name: string;
@@ -18,12 +19,16 @@ export interface IOrganization {
   preferred_namespace?: boolean;
 }
 
-export async function getOrg(orgname: string) {
-  const getOrgUrl = `/api/v1/organization/${orgname}/`;
+export async function fetchOrg(orgname: string) {
+  const getOrgUrl = `/api/v1/organization/${orgname}`;
   // TODO: Add return type
   const response: AxiosResponse = await axios.get(getOrgUrl);
   assertHttpCode(response.status, 200);
   return response.data;
+}
+
+export async function fetchAllOrgs(orgnames: string[]) {
+  return await Promise.all(orgnames.map((org) => fetchOrg(org)));
 }
 
 export class OrgDeleteError extends Error {
