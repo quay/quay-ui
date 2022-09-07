@@ -11,6 +11,7 @@ import {
   PageSectionVariants,
   Title,
   DropdownItem,
+  Spinner,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
@@ -230,7 +231,6 @@ function PageContent() {
     'Repo Count': {
       label: 'repoCount',
     },
-    Tags: {label: 'tagCount'},
   };
 
   const createOrgModal = (
@@ -285,66 +285,68 @@ function PageContent() {
 
   // Render the table with userState changes
   useEffect(() => {
-    return () => {
-      const fetchData = async () => {
-        try {
-          setLoading(true);
-          const orgnames: string[] = userState?.organizations.map(
-            (org) => org.name,
-          );
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const orgnames: string[] = userState?.organizations.map(
+          (org) => org.name,
+        );
+        console.log('org name', orgnames);
 
-          const orgs = await fetchAllOrgs(orgnames);
-          const repos = (await fetchAllRepos(orgnames, false)) as Map<
-            string,
-            IRepository[]
-          >;
-          const members = await fetchAllMembers(orgnames);
-          const robots = await fetchAllRobots(orgnames);
+        const orgs = await fetchAllOrgs(orgnames);
+        const repos = (await fetchAllRepos(orgnames, false)) as Map<
+          string,
+          IRepository[]
+        >;
+        const members = await fetchAllMembers(orgnames);
+        const robots = await fetchAllRobots(orgnames);
 
-          const newOrgsList: OrganizationsTableItem[] = orgnames.map(
-            (org, idx) => {
-              return {
-                name: org,
-                repoCount: repos[idx].length,
-                membersCount: members[idx].length,
-                robotsCount: robots[idx].length,
-                teamsCount: Object.keys(orgs[idx]?.teams)?.length,
-                lastModified: getLastModifiedRepoTime(repos[idx]),
-              } as OrganizationsTableItem;
-            },
-          );
+        const newOrgsList: OrganizationsTableItem[] = orgnames.map(
+          (org, idx) => {
+            return {
+              name: org,
+              repoCount: repos[idx].length,
+              membersCount: members[idx].length,
+              robotsCount: robots[idx].length,
+              teamsCount: Object.keys(orgs[idx]?.teams)?.length,
+              lastModified: getLastModifiedRepoTime(repos[idx]),
+            } as OrganizationsTableItem;
+          },
+        );
 
-          // Add the user namespace entry
-          const userRepos = await fetchRepositoriesForNamespace(
-            userState.username,
-          );
-          newOrgsList.push({
-            name: userState.username,
-            repoCount: userRepos.length,
-            membersCount: 0,
-            robotsCount: 0,
-            teamsCount: 0,
-            lastModified: getLastModifiedRepoTime(userRepos),
-          });
+        // Add the user namespace entry
+        const userRepos = await fetchRepositoriesForNamespace(
+          userState.username,
+        );
+        newOrgsList.push({
+          name: userState.username,
+          repoCount: userRepos.length,
+          membersCount: 0,
+          robotsCount: 0,
+          teamsCount: 0,
+          lastModified: getLastModifiedRepoTime(userRepos),
+        });
 
-          // sort on last modified
-          // TODO (syahmed): redo this when we have user selectable sorting
-          newOrgsList.sort((r1, r2) => {
-            return r1.lastModified > r2.lastModified ? -1 : 1;
-          });
+        // sort on last modified
+        // TODO (syahmed): redo this when we have user selectable sorting
+        newOrgsList.sort((r1, r2) => {
+          return r1.lastModified > r2.lastModified ? -1 : 1;
+        });
 
-          setOrganizationsList(newOrgsList);
-        } catch (e) {
-          // TODO (syahmed): error handling
-          console.error(e);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchData().catch(console.error);
+        setOrganizationsList(newOrgsList);
+      } catch (e) {
+        // TODO (syahmed): error handling
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchData().catch(console.error);
   }, [userState]);
+
+  if (loading) {
+    return <LoadingPage />;
+  }
 
   if (!loading && !organizationsList?.length) {
     return (
