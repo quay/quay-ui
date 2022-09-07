@@ -92,7 +92,11 @@ export function HeaderToolbar() {
     // Reload page and trigger patternfly cookie removal
     const protocol = window.location.protocol;
     const host = window.location.host;
-    window.location.replace(`${protocol}//${host}/angular`);
+    const path = 'angular';
+
+    // Add a random arg so nginx redirect to / doesn't get cached by browser
+    const randomArg = '?_=' + new Date().getTime();
+    window.location.replace(`${protocol}//${host}/${path}/${randomArg}`);
   };
   const toolbarSpacers = {
     default: 'spacerNone',
