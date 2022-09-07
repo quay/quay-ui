@@ -12,12 +12,18 @@ export interface IRepository {
   last_modified?: number;
   popularity?: number;
   is_starred?: boolean;
+  quota_report?: IQuotaReport;
 }
 
 export interface RepositoryCreationResponse {
   namespace: string;
   name: string;
   kind: string;
+}
+
+export interface IQuotaReport {
+  quota_bytes: number;
+  configured_quota: number;
 }
 
 export async function fetchAllRepos(

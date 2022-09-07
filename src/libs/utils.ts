@@ -29,6 +29,20 @@ export function formatDate(date: string | number) {
   });
 }
 
+export function formatSize(sizeInBytes: number) {
+  if (!sizeInBytes) {
+    // null or undefined
+    return 'N/A';
+  }
+
+  const i = Math.floor(Math.log(sizeInBytes) / Math.log(1024));
+  return (
+    (sizeInBytes / Math.pow(1024, i)).toFixed(2) * 1 +
+    ' ' +
+    ['B', 'kB', 'MB', 'GB', 'TB'][i]
+  );
+}
+
 export function isValidEmail(email: string): boolean {
   const regex = /\S+@\S+\.\S+/;
   return regex.test(email);
