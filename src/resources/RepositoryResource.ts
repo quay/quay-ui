@@ -48,7 +48,6 @@ export async function getRepositoriesForNamespace(ns: string) {
     `/api/v1/repository?last_modified=true&namespace=${ns}`,
   );
   assertHttpCode(response.status, 200);
-  console.log(response.data);
   return response.data;
 }
 

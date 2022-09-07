@@ -17,7 +17,6 @@ export function useQuayConfig() {
       try {
         const config = await fetchQuayConfig();
         setQuayConfig(config);
-        console.log(config);
       } catch (err) {
         console.error('Unable to load Quay config:', err);
       }
