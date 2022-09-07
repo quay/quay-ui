@@ -37,7 +37,7 @@ import ErrorModal from 'src/components/errors/ErrorModal';
 export default function OrganizationsList() {
   return (
     <>
-      <PageSection variant={PageSectionVariants.light} hasShadowBottom>
+      <PageSection variant={PageSectionVariants.light}>
         <div className="co-m-nav-title--row">
           <Title headingLevel="h1">Organizations</Title>
         </div>
