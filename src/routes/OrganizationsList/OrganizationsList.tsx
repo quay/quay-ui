@@ -49,14 +49,14 @@ import {
   fetchMembersForOrg,
 } from 'src/resources/MembersResource';
 import {fetchAllRobots} from 'src/resources/RobotsResource';
-import {formatDate} from '../../libs/utils';
+import {formatDate} from 'src/libs/utils';
 
 interface OrganizationsTableItem {
   name: string;
   repoCount: number;
-  teamsCount: number;
-  membersCount: number;
-  robotsCount: number;
+  teamsCount: number | string;
+  membersCount: number | string;
+  robotsCount: number | string;
   lastModified: number;
 }
 
@@ -291,7 +291,6 @@ function PageContent() {
         const orgnames: string[] = userState?.organizations.map(
           (org) => org.name,
         );
-        console.log('org name', orgnames);
 
         const orgs = await fetchAllOrgs(orgnames);
         const repos = (await fetchAllRepos(orgnames, false)) as Map<
@@ -321,9 +320,9 @@ function PageContent() {
         newOrgsList.push({
           name: userState.username,
           repoCount: userRepos.length,
-          membersCount: 0,
-          robotsCount: 0,
-          teamsCount: 0,
+          membersCount: 'N/A',
+          robotsCount: 'N/A',
+          teamsCount: 'N/A',
           lastModified: getLastModifiedRepoTime(userRepos),
         });
 
