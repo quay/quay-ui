@@ -50,7 +50,7 @@ const response = {
   is_free_account: true,
 };
 
-const orgPathRegex = new RegExp(`/api/v1/organization/(.+)/$`);
+const orgPathRegex = new RegExp(`/api/v1/organization/(.+)$`);
 mock.onGet(orgPathRegex).reply((config) => {
   const orgNameMatch = config.url.match(orgPathRegex);
   if (orgNameMatch && orgNameMatch.length > 1) {

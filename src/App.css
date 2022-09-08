@@ -1,3 +1,5 @@
+/* Global Styles */
+
 html, body, #root,  .App {
   height: 100%;
 }
@@ -8,17 +10,10 @@ html, body, #root,  .App {
   --pf-c-content--hr--BackgroundColor: lemonchiffon; /* changes a <hr> color to lemonchiffon */
 }
 
-.header-logo {
-  height: 2em !important;
-}
 
 .page-sidebar {
   background-color: black;
   color: black;
-}
-
-.pf-c-toolbar__content-section {
-    row-gap: 16px !important;
 }
 
 .pf-c-page__sidebar-body {
@@ -30,16 +25,18 @@ html, body, #root,  .App {
     color: black;
 }
 
-/*TODO: Figure out how to get styling working without `!important` */
 .no-padding-bottom {
-    padding-bottom: 0 !important;
+    padding-bottom: 0;
 }
 
 .no-padding-on-sides {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .pf-c-tabs {
-    padding-left: 24px !important;
+    padding-left: 24px;
 }
+
+
+
