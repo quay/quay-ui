@@ -71,6 +71,7 @@
     "html-webpack-plugin": "^5.5.0",
     "husky": ">=6",
     "lint-staged": ">=10",
+    "null-loader": "^4.0.1",
     "prettier": "^2.1.2",
     "raw-loader": "^4.0.2",
     "react-docgen-typescript-loader": "^3.7.2",
