@@ -4,7 +4,6 @@ import reportWebVitals from './reportWebVitals';
 import {RecoilRoot} from 'recoil';
 import '@patternfly/patternfly/patternfly.css';
 import '@patternfly/patternfly/patternfly-addons.css';
-import App from './App';
 
 // Load App after patternfly so custom CSS that overrides patternfly doesn't require !important
 import App from './App';

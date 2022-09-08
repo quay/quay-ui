@@ -12,7 +12,7 @@
 }
 
 .pf-c-switch {
-  --pf-c-switch--Height: 1rem !important;
+  --pf-c-switch--Height: 1rem;
 }
 
 .pf-c-switch__label {
