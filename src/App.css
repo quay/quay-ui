@@ -29,3 +29,17 @@ html, body, #root,  .App {
     pointer-events: none;
     color: black;
 }
+
+/*TODO: Figure out how to get styling working without `!important` */
+.no-padding-bottom {
+    padding-bottom: 0 !important;
+}
+
+.no-padding-on-sides {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.pf-c-tabs {
+    padding-left: 24px !important;
+}

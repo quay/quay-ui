@@ -50,12 +50,18 @@ export default function RepositoryDetails(props) {
   return (
     <Page>
       <QuayBreadcrumb />
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection
+        variant={PageSectionVariants.light}
+        className="no-padding-bottom"
+      >
         <Title data-testid="repo-title" headingLevel="h1">
           {repository}
         </Title>
       </PageSection>
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection
+        variant={PageSectionVariants.light}
+        className="no-padding-on-sides"
+      >
         <Tabs activeKey={activeTabKey} onSelect={tabsOnSelect}>
           <Tab
             eventKey={TabIndex.Tags}
