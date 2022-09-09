@@ -1,4 +1,3 @@
-const path = require('path');
 const Dotenv = require('dotenv-webpack');
 const {merge} = require('webpack-merge');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -26,6 +25,8 @@ module.exports = merge(common('production'), {
       }),
     ],
     splitChunks: {
+      // groups styles from node_modules (like PatternFly) into vendor.css
+      // all other styles under src will be grouped into main.css
       chunks: 'all',
       cacheGroups: {
         vendor: {

@@ -9,8 +9,10 @@ import './data/tag/labels';
 import './data/tag/manifest';
 import './data/config/config';
 import './data/config/logo';
-import './data/organization/organization';
+
+// Order matters here. We match with more specific API endpoints first
 import './data/organization/members';
 import './data/organization/robots';
+import './data/organization/organization';
 
 mock.onAny().passThrough();

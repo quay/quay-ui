@@ -18,6 +18,7 @@ import {SidebarState} from 'src/atoms/SidebarState';
 import {useRecoilState} from 'recoil';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import axios from 'src/libs/axios';
+import './QuayHeader.css';
 
 export function QuayHeader() {
   const [_sidebarState, setSidebarState] = useRecoilState(SidebarState);

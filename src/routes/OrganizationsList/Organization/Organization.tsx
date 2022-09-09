@@ -9,7 +9,6 @@ import {
 } from '@patternfly/react-core';
 import {useLocation} from 'react-router-dom';
 import {NavigationPath} from 'src/routes/NavigationPath';
-import UsageLogsTab from './Tabs/UsageLogs/UsageLogsTab';
 import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
