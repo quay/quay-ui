@@ -141,7 +141,7 @@ export default function Tags(props: TagsProps) {
         </ErrorBoundary>
         <PanelFooter>
           <ToolbarPagination
-            repositoryList={paginatedTags}
+            repositoryList={tags}
             perPage={perPage}
             page={page}
             setPage={setPage}
