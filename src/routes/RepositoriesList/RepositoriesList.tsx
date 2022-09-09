@@ -4,6 +4,7 @@ import {
   PageSectionVariants,
   Spinner,
   Title,
+  PanelFooter,
 } from '@patternfly/react-core';
 import {
   TableComposable,
@@ -43,6 +44,8 @@ import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {LoadingPage} from 'src/components/LoadingPage';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import * as React from 'react';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -434,6 +437,15 @@ function RepoListContent(props: RepoListContentProps) {
           )}
         </Tbody>
       </TableComposable>
+      <PanelFooter>
+        <ToolbarPagination
+          repositoryList={repositoryList}
+          perPage={perPage}
+          page={page}
+          setPage={setPage}
+          setPerPage={setPerPage}
+        />
+      </PanelFooter>
     </PageSection>
   );
 }
