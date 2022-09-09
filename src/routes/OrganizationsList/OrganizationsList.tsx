@@ -48,7 +48,10 @@ import {
   fetchAllMembers,
   fetchMembersForOrg,
 } from 'src/resources/MembersResource';
-import {fetchAllRobots} from 'src/resources/RobotsResource';
+import {
+  fetchAllRobots,
+  fetchRobotsForNamespace,
+} from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 
 interface OrganizationsTableItem {
@@ -317,11 +320,16 @@ function PageContent() {
         const userRepos = await fetchRepositoriesForNamespace(
           userState.username,
         );
+        const userRobots = await fetchRobotsForNamespace(
+          userState.username,
+          true,
+        );
+
         newOrgsList.push({
           name: userState.username,
           repoCount: userRepos.length,
           membersCount: 'N/A',
-          robotsCount: 'N/A',
+          robotsCount: userRobots.length,
           teamsCount: 'N/A',
           lastModified: getLastModifiedRepoTime(userRepos),
         });
