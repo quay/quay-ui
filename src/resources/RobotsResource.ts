@@ -19,7 +19,8 @@ export async function fetchRobotsForNamespace(
   orgname: string,
   isUser = false,
 ): Promise<IRobot[]> {
-  const getRobotsUrl = `/api/v1/organization/${orgname}/robots?permissions=true&token=false`;
+  const userOrOrgPath = isUser ? 'user' : `organization/${orgname}`;
+  const getRobotsUrl = `/api/v1/${userOrOrgPath}/robots?permissions=true&token=false`;
   const response: AxiosResponse = await axios.get(getRobotsUrl);
   assertHttpCode(response.status, 200);
   return response.data?.robots;
