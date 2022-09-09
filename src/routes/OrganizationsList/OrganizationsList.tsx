@@ -54,7 +54,6 @@ import {
 } from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/Pagination';
-import * as React from 'react';
 
 interface OrganizationsTableItem {
   name: string;
