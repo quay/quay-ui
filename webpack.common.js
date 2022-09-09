@@ -3,9 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const BG_IMAGES_DIRNAME = 'assets';
-const {isPatternFlyStyles} = require('./stylePaths.js');
 const ASSET_PATH = process.env.ASSET_PATH || '/';
-const {isPatternFlyStyles} = require('./stylePaths');
 module.exports = (env) => {
   return {
     module: {
@@ -129,7 +127,6 @@ module.exports = (env) => {
         },
         {
           test: /\.s[ac]ss$/i,
-          include: (stylesheet) => !isPatternFlyStyles(stylesheet),
           use: [
             // Creates `style` nodes from JS strings
             'style-loader',
@@ -138,12 +135,6 @@ module.exports = (env) => {
             // Compiles Sass to CSS
             'sass-loader',
           ],
-        },
-        {
-          test: /\.css$/,
-          include: isPatternFlyStyles,
-          use: ['null-loader'],
-          sideEffects: true,
         },
       ],
     },
