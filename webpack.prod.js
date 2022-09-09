@@ -3,8 +3,8 @@ const Dotenv = require('dotenv-webpack');
 const {merge} = require('webpack-merge');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
-// eslint-disable-next-line import/extensions
-const {stylePaths} = require('./stylePaths');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {stylePaths, isPatternFlyStyles} = require('./stylePaths.js');
 const common = require('./webpack.common.js');
 
 module.exports = merge(common('production'), {
@@ -32,13 +32,18 @@ module.exports = merge(common('production'), {
       systemvars: true,
       silent: true,
     }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[name].bundle.css',
+    }),
   ],
   module: {
     rules: [
       {
         test: /\.css$/,
-        include: [...stylePaths],
-        use: ['style-loader', 'css-loader'],
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        include: (stylesheet) => !isPatternFlyStyles(stylesheet),
+        sideEffects: true,
       },
     ],
   },

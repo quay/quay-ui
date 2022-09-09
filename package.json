@@ -17,6 +17,8 @@
     "@types/react": "^17.0.2",
     "axios": "^0.27.2",
     "js-sha1": "^0.6.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "null-loader": "^4.0.1",
     "react": "^17.0.2",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.0",
