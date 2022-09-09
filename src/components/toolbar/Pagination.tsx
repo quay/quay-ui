@@ -1,4 +1,8 @@
-import {Pagination, ToolbarItem} from '@patternfly/react-core';
+import {
+  Pagination,
+  ToolbarItem,
+  PaginationVariant,
+} from '@patternfly/react-core';
 
 export function ToolbarPagination(props: ToolbarPaginationProps) {
   return (
@@ -14,6 +18,9 @@ export function ToolbarPagination(props: ToolbarPaginationProps) {
           props.setPerPage(perPageNumber);
         }}
         widgetId="pagination-options-menu-top"
+        variant={
+          props.bottom ? PaginationVariant.bottom : PaginationVariant.top
+        }
       />
     </ToolbarItem>
   );
@@ -25,4 +32,5 @@ type ToolbarPaginationProps = {
   page: number;
   setPage: (pageNumber: number) => void;
   setPerPage: (perPageNumber: number) => void;
+  bottom?: boolean;
 };

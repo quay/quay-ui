@@ -443,6 +443,7 @@ function RepoListContent(props: RepoListContentProps) {
           page={page}
           setPage={setPage}
           setPerPage={setPerPage}
+          bottom={true}
         />
       </PanelFooter>
     </PageSection>
