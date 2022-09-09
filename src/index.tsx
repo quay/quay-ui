@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import {RecoilRoot} from 'recoil';
-// import '@patternfly/patternfly/patternfly.css';
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/patternfly/patternfly-addons.css';
 
