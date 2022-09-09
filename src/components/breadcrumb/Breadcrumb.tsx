@@ -61,6 +61,8 @@ export function QuayBreadcrumb() {
       newItem['title'] = urlParams.repositoryName;
     } else if (lastItem.match.route.Component.type.name == 'TagDetails') {
       newItem['title'] = urlParams.tagName;
+    } else {
+      newItem['title'] = newItem['pathname'].split('/').slice(-1)[0];
     }
     newItem['active'] = true;
     return newItem;
