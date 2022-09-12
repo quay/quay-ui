@@ -11,7 +11,7 @@ import {
   PageSectionVariants,
   Title,
   DropdownItem,
-  Spinner,
+  PanelFooter,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
@@ -53,6 +53,7 @@ import {
   fetchRobotsForNamespace,
 } from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
+import {ToolbarPagination} from 'src/components/toolbar/Pagination';
 
 interface OrganizationsTableItem {
   name: string;
@@ -435,6 +436,16 @@ function PageContent() {
             ))}
           </Tbody>
         </TableComposable>
+        <PanelFooter>
+          <ToolbarPagination
+            repositoryList={organizationsList}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+            bottom={true}
+          />
+        </PanelFooter>
       </PageSection>
     </>
   );

@@ -2,7 +2,12 @@ import {TagsToolbar} from './TagsToolbar';
 import Table from './Table';
 import {useState, useEffect} from 'react';
 import {filterState, selectedTagsState} from 'src/atoms/TagListState';
-import {Page, PageSection, PageSectionVariants} from '@patternfly/react-core';
+import {
+  Page,
+  PageSection,
+  PageSectionVariants,
+  PanelFooter,
+} from '@patternfly/react-core';
 import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
 import {
   Tag,
@@ -16,6 +21,7 @@ import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import RequestError from 'src/components/errors/RequestError';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
+import {ToolbarPagination} from 'src/components/toolbar/Pagination';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -132,6 +138,16 @@ export default function Tags(props: TagsProps) {
             selectTag={selectTag}
           />
         </ErrorBoundary>
+        <PanelFooter>
+          <ToolbarPagination
+            repositoryList={tags}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+            bottom={true}
+          />
+        </PanelFooter>
       </PageSection>
     </Page>
   );

@@ -63,7 +63,7 @@ export function TagsToolbar(props: ToolBarProps) {
         </ToolbarItem>
 
         <ToolbarPagination
-          repositoryList={props.paginatedTags}
+          repositoryList={props.TagList}
           perPage={props.perPage}
           page={props.page}
           setPage={props.setPage}

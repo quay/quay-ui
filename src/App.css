@@ -38,5 +38,6 @@ html, body, #root,  .App {
     padding-left: 24px;
 }
 
-
-
+.pf-c-panel__footer {
+    padding: 24px 24px 0 0;
+}
