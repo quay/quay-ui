@@ -27,6 +27,19 @@ export async function fetchOrg(orgname: string) {
   return response.data;
 }
 
+export interface SuperUserOrganizations {
+  organizations: IOrganization[];
+}
+
+export async function fetchOrgsAsSuperUser() {
+  const superUserOrgsUrl = `/api/v1/superuser/organizations/`;
+  const response: AxiosResponse<SuperUserOrganizations> = await axios.get(
+    superUserOrgsUrl,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
+}
+
 export async function fetchAllOrgs(orgnames: string[]) {
   return await Promise.all(orgnames.map((org) => fetchOrg(org)));
 }

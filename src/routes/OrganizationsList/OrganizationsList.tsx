@@ -26,6 +26,8 @@ import {Suspense, useEffect, useState} from 'react';
 import {
   bulkDeleteOrganizations,
   fetchAllOrgs,
+  fetchOrgsAsSuperUser,
+  SuperUserOrganizations,
 } from 'src/resources/OrganizationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
@@ -44,16 +46,14 @@ import {
   fetchRepositoriesForNamespace,
   IRepository,
 } from 'src/resources/RepositoryResource';
-import {
-  fetchAllMembers,
-  fetchMembersForOrg,
-} from 'src/resources/MembersResource';
+import {fetchAllMembers} from 'src/resources/MembersResource';
 import {
   fetchAllRobots,
   fetchRobotsForNamespace,
 } from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
 interface OrganizationsTableItem {
   name: string;
@@ -95,6 +95,7 @@ export default function OrganizationsList() {
 }
 
 function PageContent() {
+  const quayConfig = useQuayConfig();
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [, setOrganizationSearchInput] = useState('Filter by name or ID..');
   const [loading, setLoading] = useState(true);
@@ -292,9 +293,17 @@ function PageContent() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const orgnames: string[] = userState?.organizations.map(
-          (org) => org.name,
-        );
+
+        let orgnames: string[];
+        if (
+          quayConfig?.features.SUPERUSERS_FULL_ACCESS &&
+          userState?.super_user
+        ) {
+          const orgs: SuperUserOrganizations = await fetchOrgsAsSuperUser();
+          orgnames = orgs.organizations.map((org) => org.name);
+        } else {
+          orgnames = userState?.organizations.map((org) => org.name);
+        }
 
         const orgs = await fetchAllOrgs(orgnames);
         const repos = (await fetchAllRepos(orgnames, false)) as Map<
@@ -311,7 +320,9 @@ function PageContent() {
               repoCount: repos[idx].length,
               membersCount: members[idx].length,
               robotsCount: robots[idx].length,
-              teamsCount: Object.keys(orgs[idx]?.teams)?.length,
+              teamsCount: orgs[idx]?.teams
+                ? Object.keys(orgs[idx]?.teams)?.length
+                : 0,
               lastModified: getLastModifiedRepoTime(repos[idx]),
             } as OrganizationsTableItem;
           },

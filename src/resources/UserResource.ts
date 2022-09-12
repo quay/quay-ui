@@ -25,6 +25,7 @@ export interface IUserResource {
   preferred_namespace: boolean;
   tag_expiration_s: number;
   prompts: [];
+  super_user: boolean;
   company: string;
   family_name: string;
   given_name: string;
