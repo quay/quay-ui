@@ -21,7 +21,7 @@ import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import RequestError from 'src/components/errors/RequestError';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
-import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -140,7 +140,7 @@ export default function Tags(props: TagsProps) {
         </ErrorBoundary>
         <PanelFooter>
           <ToolbarPagination
-            repositoryList={tags}
+            itemsList={tags}
             perPage={perPage}
             page={page}
             setPage={setPage}

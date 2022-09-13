@@ -53,7 +53,7 @@ import {
   fetchRobotsForNamespace,
 } from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
-import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 interface OrganizationsTableItem {
   name: string;
@@ -438,7 +438,7 @@ function PageContent() {
         </TableComposable>
         <PanelFooter>
           <ToolbarPagination
-            repositoryList={organizationsList}
+            itemsList={organizationsList}
             perPage={perPage}
             page={page}
             setPage={setPage}

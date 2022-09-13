@@ -6,7 +6,7 @@ import {FilterBar} from 'src/components/toolbar/FilterBar';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {Kebab} from 'src/components/toolbar/Kebab';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
-import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {filterRepoState} from 'src/atoms/RepositoryState';
 import {ReactElement} from 'react';
 
@@ -78,7 +78,7 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
           {props.deleteKebabIsOpen ? props.deleteModal : null}
         </ToolbarItem>
         <ToolbarPagination
-          repositoryList={props.repositoryList}
+          itemsList={props.repositoryList}
           perPage={props.perPage}
           page={props.page}
           setPage={props.setPage}

@@ -9,7 +9,7 @@ import {useRecoilState} from 'recoil';
 import {filterState, selectedTagsState} from 'src/atoms/TagListState';
 import {Tag} from 'src/resources/TagResource';
 import {DeleteModal} from './DeleteModal';
-import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {FilterBar} from 'src/components/toolbar/FilterBar';
 import {Kebab} from 'src/components/toolbar/Kebab';
 import {DropdownFilter} from 'src/components/toolbar/DropdownFilter';
@@ -63,7 +63,7 @@ export function TagsToolbar(props: ToolBarProps) {
         </ToolbarItem>
 
         <ToolbarPagination
-          repositoryList={props.TagList}
+          itemsList={props.TagList}
           perPage={props.perPage}
           page={props.page}
           setPage={props.setPage}

@@ -9,7 +9,7 @@ export function ToolbarPagination(props: ToolbarPaginationProps) {
     <ToolbarItem variant="pagination">
       <Pagination
         perPageComponent="button"
-        itemCount={props.repositoryList.length}
+        itemCount={props.itemsList.length}
         perPage={props.perPage}
         page={props.page}
         onSetPage={(_event, pageNumber) => props.setPage(pageNumber)}
@@ -27,7 +27,7 @@ export function ToolbarPagination(props: ToolbarPaginationProps) {
 }
 
 type ToolbarPaginationProps = {
-  repositoryList: any[];
+  itemsList: any[];
   perPage: number;
   page: number;
   setPage: (pageNumber: number) => void;

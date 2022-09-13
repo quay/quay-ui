@@ -117,15 +117,6 @@ const response = {
   ],
 };
 
-const createOrgSuccessResponse = {
-  success: true,
-};
-
 mock.onGet('/api/v1/user/').reply((request: AxiosRequestConfig) => {
   return [200, response];
-});
-
-mock.onPost('/api/v1/organization/').reply((request: AxiosRequestConfig) => {
-  const {name, email} = JSON.parse(request.data);
-  return [200, createOrgSuccessResponse];
 });
