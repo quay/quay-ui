@@ -123,6 +123,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           color="green"
           style={{
             marginRight: '5px',
+            marginBottom: '4px',
           }}
         />
         <span>None Detected</span>
@@ -142,6 +143,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           color={getSeverityColor(highestSeverity)}
           style={{
             marginRight: '5px',
+            marginBottom: '3px',
           }}
         />
         <span>
@@ -163,6 +165,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
             color={getSeverityColor(severity)}
             style={{
               marginRight: '5px',
+              marginBottom: '4px',
             }}
           />
           <span>
