@@ -118,6 +118,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
         onClick={resetSecurityDetails}
         className={'pf-u-display-inline-flex pf-u-align-items-center'}
+        style={{textDecoration: 'none'}}
       >
         <CheckCircleIcon
           color="green"
@@ -138,6 +139,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
         onClick={resetSecurityDetails}
         className={'pf-u-display-inline-flex pf-u-align-items-center'}
+        style={{textDecoration: 'none'}}
       >
         <ExclamationTriangleIcon
           color={getSeverityColor(highestSeverity)}
@@ -178,6 +180,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     <Link
       to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
       onClick={resetSecurityDetails}
+      style={{textDecoration: 'none'}}
     >
       {counts}
     </Link>
