@@ -1,7 +1,6 @@
 import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
 import {assertHttpCode, BulkOperationError} from './ErrorHandling';
-import {fetchRepositoriesForNamespace, IRepository} from './RepositoryResource';
 
 export interface IAvatar {
   name: string;
@@ -37,7 +36,7 @@ export async function fetchOrgsAsSuperUser() {
     superUserOrgsUrl,
   );
   assertHttpCode(response.status, 200);
-  return response.data;
+  return response.data.organizations;
 }
 
 export async function fetchAllOrgs(orgnames: string[]) {
