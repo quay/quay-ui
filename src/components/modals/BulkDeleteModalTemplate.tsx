@@ -46,14 +46,15 @@ export const BulkDeleteModalTemplate = <T,>(
       /* Note: This search filter assumes that the search is always based on the 1st column,
          hence we do "colNames[0]" */
       const filteredTableRow = props.selectedItems.filter((item) =>
-        item[props.mapOfColNamesToTableData[colNames[0]].label].match(value),
+        item[props.mapOfColNamesToTableData[colNames[0]].label]
+          ?.toLowerCase()
+          .includes(value.toLowerCase()),
       );
       setItemsMarkedForDelete(filteredTableRow);
     }
   };
 
   const bulkDelete = async () => {
-    // TODO:(harish) Ask UX for Alert msg in case text entered is invalid
     if (confirmDeletionInput === 'confirm') {
       await props.handleBulkDeletion(props.selectedItems);
     }
