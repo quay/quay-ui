@@ -143,7 +143,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           color={getSeverityColor(highestSeverity)}
           style={{
             marginRight: '5px',
-            marginBottom: '3px',
+            marginBottom: '4px',
           }}
         />
         <span>
@@ -165,7 +165,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
             color={getSeverityColor(severity)}
             style={{
               marginRight: '5px',
-              marginBottom: '4px',
+              marginBottom: '3px',
             }}
           />
           <span>
