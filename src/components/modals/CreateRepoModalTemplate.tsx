@@ -20,7 +20,7 @@ import {
 } from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
-import FormError from '../errors/FormError';
+import FormError from 'src/components/errors/FormError';
 import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
@@ -158,6 +158,7 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
           variant="primary"
           onClick={createRepositoryHandler}
           form="modal-with-form-form"
+          isDisabled={!currentOrganization.name || !newRepository.name}
         >
           Create
         </Button>,
