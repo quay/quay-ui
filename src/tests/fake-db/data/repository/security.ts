@@ -5409,5 +5409,5 @@ const mockResponseNoVulns = {
 
 mock.onGet(securityUrl).reply((request) => {
   return [200, mockSecurityResponse];
-  // return [200, mockResponseNoVulns];
+  //return [200, mockResponseNoVulns];
 });

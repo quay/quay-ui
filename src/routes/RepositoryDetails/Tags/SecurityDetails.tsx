@@ -117,8 +117,14 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
       <Link
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
         onClick={resetSecurityDetails}
+        className={'pf-u-display-inline-flex pf-u-align-items-center'}
       >
-        <CheckCircleIcon color="green" />
+        <CheckCircleIcon
+          color="green"
+          style={{
+            marginRight: '5px',
+          }}
+        />
         <span>None Detected</span>
       </Link>
     );
@@ -130,18 +136,17 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
       <Link
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
         onClick={resetSecurityDetails}
+        className={'pf-u-display-inline-flex pf-u-align-items-center'}
       >
-        <div>
-          <ExclamationTriangleIcon
-            color={getSeverityColor(highestSeverity)}
-            style={{
-              marginRight: '5px',
-            }}
-          />
-          <span>
-            <b>{vulnCount.get(highestSeverity)}</b> {highestSeverity.toString()}
-          </span>
-        </div>
+        <ExclamationTriangleIcon
+          color={getSeverityColor(highestSeverity)}
+          style={{
+            marginRight: '5px',
+          }}
+        />
+        <span>
+          <b>{vulnCount.get(highestSeverity)}</b> {highestSeverity.toString()}
+        </span>
       </Link>
     );
   }
@@ -150,14 +155,19 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     .filter((severity) => vulnCount.has(severity))
     .map((severity) => {
       return (
-        <div key={severity.toString()}>
+        <div
+          key={severity.toString()}
+          className={'pf-u-display-flex pf-u-align-items-center'}
+        >
           <ExclamationTriangleIcon
             color={getSeverityColor(severity)}
             style={{
               marginRight: '5px',
             }}
           />
-          <b>{vulnCount.get(severity)}</b> {severity.toString()}
+          <span>
+            <b>{vulnCount.get(severity)}</b> {severity.toString()}
+          </span>
         </div>
       );
     });
