@@ -51,5 +51,5 @@ export async function fetchUsersAsSuperUser() {
   const superUserOrgsUrl = `/api/v1/superuser/users/`;
   const response: AxiosResponse<AllUsers> = await axios.get(superUserOrgsUrl);
   assertHttpCode(response.status, 200);
-  return response.data.users;
+  return response.data?.users;
 }

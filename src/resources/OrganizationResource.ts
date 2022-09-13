@@ -36,7 +36,7 @@ export async function fetchOrgsAsSuperUser() {
     superUserOrgsUrl,
   );
   assertHttpCode(response.status, 200);
-  return response.data.organizations;
+  return response.data?.organizations;
 }
 
 export async function fetchAllOrgs(orgnames: string[]) {
