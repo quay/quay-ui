@@ -69,6 +69,7 @@ const response = {
   },
   external_login: [],
   features: {
+    SUPERUSERS_FULL_ACCESS: true,
     ACTION_LOG_ROTATION: false,
     ADVERTISE_V2: true,
     AGGREGATED_LOG_COUNT_RETRIEVAL: true,

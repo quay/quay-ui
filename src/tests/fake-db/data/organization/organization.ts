@@ -69,3 +69,18 @@ mock.onPost('/api/v1/organization/').reply((request: AxiosRequestConfig) => {
   const {name, email} = JSON.parse(request.data);
   return [200, createOrgSuccessResponse];
 });
+
+const superUserOrgsResponse = {
+  organizations: [
+    {
+      name: 'superuserorg1',
+    },
+    {
+      name: 'superuserorg2',
+    },
+  ],
+};
+
+mock.onGet(`/api/v1/superuser/organizations/`).reply((config) => {
+  return [200, superUserOrgsResponse];
+});

@@ -29,6 +29,7 @@ const response = {
   preferred_namespace: false,
   tag_expiration_s: 1209600,
   prompts: [],
+  super_user: true,
   company: '',
   family_name: null,
   given_name: null,
@@ -119,4 +120,25 @@ const response = {
 
 mock.onGet('/api/v1/user/').reply((request: AxiosRequestConfig) => {
   return [200, response];
+});
+
+const superUserUsersResponse = {
+  users: [
+    {
+      username: 'syed',
+    },
+    {
+      username: 'dconnor',
+    },
+    {
+      username: 'jonathankingfc',
+    },
+    {
+      username: 'bcaton',
+    },
+  ],
+};
+
+mock.onGet('/api/v1/superuser/users/').reply((request: AxiosRequestConfig) => {
+  return [200, superUserUsersResponse];
 });
