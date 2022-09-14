@@ -6,19 +6,21 @@ import {
 } from '@patternfly/react-core';
 import {ReactElement, useState} from 'react';
 import {useRecoilState} from 'recoil';
-import {filterState, selectedTagsState} from 'src/atoms/TagListState';
+import {searchTagsState, selectedTagsState} from 'src/atoms/TagListState';
 import {Tag} from 'src/resources/TagResource';
 import {DeleteModal} from './DeleteModal';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {FilterBar} from 'src/components/toolbar/FilterBar';
+import {SearchInput} from 'src/components/toolbar/SearchInput';
 import {Kebab} from 'src/components/toolbar/Kebab';
-import {DropdownFilter} from 'src/components/toolbar/DropdownFilter';
+import {SearchDropdown} from 'src/components/toolbar/SearchDropdown';
 import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
+import ColumnNames from './ColumnNames';
+import {SearchState} from 'src/components/toolbar/SearchTypes';
 
 export function TagsToolbar(props: ToolBarProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedTags, setSelectedTags] = useRecoilState(selectedTagsState);
-  const [filterTags, setFilter] = useRecoilState(filterState);
+  const [search, setSearch] = useRecoilState<SearchState>(searchTagsState);
 
   const [isKebabOpen, setKebabOpen] = useState(false);
   const kebabItems: ReactElement[] = [
@@ -45,12 +47,12 @@ export function TagsToolbar(props: ToolBarProps) {
           onItemSelect={props.selectTag}
         />
 
-        <DropdownFilter />
-        <FilterBar
-          placeholderText="Filter by Tag name"
-          value={filterTags}
-          onChange={setFilter}
+        <SearchDropdown
+          searchState={search}
+          setSearchState={setSearch}
+          items={[ColumnNames.name, ColumnNames.manifest]}
         />
+        <SearchInput searchState={search} onChange={setSearch} />
 
         <ToolbarItem>
           {selectedTags?.length !== 0 ? (

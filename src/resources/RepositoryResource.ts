@@ -9,6 +9,7 @@ export interface IRepository {
   is_public: boolean;
   kind?: string;
   state?: string;
+  size?: number;
   last_modified?: number;
   popularity?: number;
   is_starred?: boolean;

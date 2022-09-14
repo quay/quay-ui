@@ -2,6 +2,8 @@ import {atom, selector} from 'recoil';
 import {IUserResource} from 'src/resources/UserResource';
 import {IOrganization} from 'src/resources/OrganizationResource';
 import {fetchUser} from 'src/resources/UserResource';
+import ColumnNames from 'src/routes/OrganizationsList/ColumnNames';
+import {SearchState} from 'src/components/toolbar/SearchTypes';
 
 // Request ID is used to refresh userState via the API.
 // Updating UserRequestId get's the latest contents of
@@ -29,7 +31,10 @@ export const selectedOrgsState = atom<IOrganization[]>({
   default: [],
 });
 
-export const filterOrgState = atom({
-  key: 'filterOrgState',
-  default: '',
+export const searchOrgsState = atom<SearchState>({
+  key: 'searchOrgsState',
+  default: {
+    query: '',
+    field: ColumnNames.name,
+  },
 });

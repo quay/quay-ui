@@ -14,7 +14,7 @@ import {
   Tbody,
   Td,
 } from '@patternfly/react-table';
-import {useRecoilState, useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
 import {UserState} from 'src/atoms/UserState';
 import {
   bulkDeleteRepositories,
@@ -25,7 +25,7 @@ import {ReactElement, Suspense, useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import CreateRepositoryModalTemplate from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
-import {selectedReposState, filterRepoState} from 'src/atoms/RepositoryState';
+import {selectedReposState, searchRepoState} from 'src/atoms/RepositoryState';
 import {formatDate, formatSize} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
@@ -45,6 +45,7 @@ import {LoadingPage} from 'src/components/LoadingPage';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import ColumnNames from './ColumnNames';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -106,18 +107,20 @@ function RepoListContent(props: RepoListContentProps) {
   const refreshUser = useRefreshUser();
   const [err, setErr] = useState<string[]>();
   const quayConfig = useQuayConfig();
+  const search = useRecoilValue(searchRepoState);
+  const resetSearch = useResetRecoilState(searchRepoState);
 
   useEffect(() => {
     // Get latest organizations
     refreshUser();
     setUserLoaded(true);
+    resetSearch();
   }, []);
 
   // Filtering Repositories after applied filter
-  const filter = useRecoilValue(filterRepoState);
   const filteredRepos =
-    filter !== ''
-      ? repositoryList.filter((repo) => repo.name.includes(filter))
+    search.query !== ''
+      ? repositoryList.filter((repo) => repo.name.includes(search.query))
       : repositoryList;
 
   // Pagination related states
@@ -220,13 +223,6 @@ function RepoListContent(props: RepoListContentProps) {
       Set team permissions
     </DropdownItem>,
   ];
-
-  const columnNames = {
-    repoName: 'Name',
-    visibility: 'Visibility',
-    size: 'Size',
-    lastModified: 'Last Modified',
-  };
 
   async function fetchRepos() {
     // clearing previous states
@@ -383,14 +379,14 @@ function RepoListContent(props: RepoListContentProps) {
         <Thead>
           <Tr>
             <Th />
-            <Th>{columnNames.repoName}</Th>
-            <Th>{columnNames.visibility}</Th>
+            <Th>{ColumnNames.name}</Th>
+            <Th>{ColumnNames.visibility}</Th>
             {quayConfig?.features.QUOTA_MANAGEMENT ? (
-              <Th>{columnNames.size}</Th>
+              <Th>{ColumnNames.size}</Th>
             ) : (
               <></>
             )}
-            <Th>{columnNames.lastModified}</Th>
+            <Th>{ColumnNames.lastModified}</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -413,7 +409,7 @@ function RepoListContent(props: RepoListContentProps) {
                     disable: !isRepoSelectable(repo),
                   }}
                 />
-                <Td dataLabel={columnNames.repoName}>
+                <Td dataLabel={ColumnNames.name}>
                   {props.currentOrg == null ? (
                     <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
                       {repo.namespace}/{repo.name}
@@ -424,15 +420,15 @@ function RepoListContent(props: RepoListContentProps) {
                     </Link>
                   )}
                 </Td>
-                <Td dataLabel={columnNames.visibility}>
+                <Td dataLabel={ColumnNames.visibility}>
                   {repo.is_public ? 'public' : 'private'}
                 </Td>
                 {quayConfig?.features.QUOTA_MANAGEMENT ? (
-                  <Td dataLabel={columnNames.size}> {formatSize(repo.size)}</Td>
+                  <Td dataLabel={ColumnNames.size}> {formatSize(repo.size)}</Td>
                 ) : (
                   <></>
                 )}
-                <Td dataLabel={columnNames.lastModified}>
+                <Td dataLabel={ColumnNames.lastModified}>
                   {formatDate(repo.last_modified)}
                 </Td>
               </Tr>

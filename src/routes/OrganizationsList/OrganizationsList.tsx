@@ -17,9 +17,9 @@ import {
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
-import {useRecoilState, useRecoilValue} from 'recoil';
+import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
 import {
-  filterOrgState,
+  searchOrgsState,
   selectedOrgsState,
   UserState,
 } from 'src/atoms/UserState';
@@ -56,6 +56,7 @@ import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {fetchUsersAsSuperUser, IUserResource} from 'src/resources/UserResource';
+import ColumnNames from './ColumnNames';
 
 interface OrganizationsTableItem {
   name: string;
@@ -65,15 +66,6 @@ interface OrganizationsTableItem {
   robotsCount: number | string;
   lastModified: number;
 }
-
-const columnNames = {
-  name: 'Organization',
-  repoCount: 'Repo Count',
-  teamsCount: 'Teams',
-  membersCount: 'Members',
-  robotsCount: 'Robots',
-  lastModified: 'Last Modified',
-};
 
 // Attempt to render OrganizationsList content,
 // fallback to RequestError on failure
@@ -99,9 +91,9 @@ export default function OrganizationsList() {
 function PageContent() {
   const quayConfig = useQuayConfig();
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
-  const [, setOrganizationSearchInput] = useState('Filter by name or ID..');
   const [loading, setLoading] = useState(true);
-  const filter = useRecoilValue(filterOrgState);
+  const search = useRecoilValue(searchOrgsState);
+  const resetSearch = useResetRecoilState(searchOrgsState);
   const [selectedOrganization, setSelectedOrganization] =
     useRecoilState(selectedOrgsState);
   const [err, setErr] = useState<string[]>();
@@ -118,8 +110,8 @@ function PageContent() {
   const refreshUser = useRefreshUser();
 
   const filteredOrgs =
-    filter !== ''
-      ? organizationsList?.filter((repo) => repo.name.includes(filter))
+    search.query !== ''
+      ? organizationsList?.filter((repo) => repo.name.includes(search.query))
       : organizationsList;
 
   const paginatedOrganizationsList = filteredOrgs?.slice(
@@ -269,6 +261,7 @@ function PageContent() {
     // Get latest organizations
     refreshUser();
     setUserLoaded(true);
+    resetSearch();
   }, []);
 
   useEffect(() => {
@@ -444,12 +437,12 @@ function PageContent() {
           <Thead>
             <Tr>
               <Th />
-              <Th>{columnNames.name}</Th>
-              <Th>{columnNames.repoCount}</Th>
-              <Th>{columnNames.teamsCount}</Th>
-              <Th>{columnNames.membersCount}</Th>
-              <Th>{columnNames.robotsCount}</Th>
-              <Th>{columnNames.lastModified}</Th>
+              <Th>{ColumnNames.name}</Th>
+              <Th>{ColumnNames.repoCount}</Th>
+              <Th>{ColumnNames.teamsCount}</Th>
+              <Th>{ColumnNames.membersCount}</Th>
+              <Th>{ColumnNames.robotsCount}</Th>
+              <Th>{ColumnNames.lastModified}</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -464,38 +457,38 @@ function PageContent() {
                     disable: !isOrgSelectable(org),
                   }}
                 />
-                <Td dataLabel={columnNames.name}>
+                <Td dataLabel={ColumnNames.name}>
                   <Link to={org.name}>{org.name}</Link>
                 </Td>
-                <Td dataLabel={columnNames.repoCount}>
+                <Td dataLabel={ColumnNames.repoCount}>
                   {org.repoCount !== null ? (
                     org.repoCount
                   ) : (
                     <Skeleton width="100%" />
                   )}
                 </Td>
-                <Td dataLabel={columnNames.teamsCount}>
+                <Td dataLabel={ColumnNames.teamsCount}>
                   {org.teamsCount !== null ? (
                     org.teamsCount
                   ) : (
                     <Skeleton width="100%" />
                   )}
                 </Td>
-                <Td dataLabel={columnNames.membersCount}>
+                <Td dataLabel={ColumnNames.membersCount}>
                   {org.membersCount !== null ? (
                     org.membersCount
                   ) : (
                     <Skeleton width="100%" />
                   )}
                 </Td>
-                <Td dataLabel={columnNames.robotsCount}>
+                <Td dataLabel={ColumnNames.robotsCount}>
                   {org.robotsCount !== null ? (
                     org.robotsCount
                   ) : (
                     <Skeleton width="100%" />
                   )}
                 </Td>
-                <Td dataLabel={columnNames.lastModified}>
+                <Td dataLabel={ColumnNames.lastModified}>
                   {org.lastModified !== 0 ? (
                     formatDate(org.lastModified)
                   ) : (
