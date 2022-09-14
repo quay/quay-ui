@@ -26,6 +26,8 @@ import {Suspense, useEffect, useState} from 'react';
 import {
   bulkDeleteOrganizations,
   fetchAllOrgs,
+  fetchOrgsAsSuperUser,
+  IOrganization,
 } from 'src/resources/OrganizationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
@@ -44,16 +46,15 @@ import {
   fetchRepositoriesForNamespace,
   IRepository,
 } from 'src/resources/RepositoryResource';
-import {
-  fetchAllMembers,
-  fetchMembersForOrg,
-} from 'src/resources/MembersResource';
+import {fetchAllMembers} from 'src/resources/MembersResource';
 import {
   fetchAllRobots,
   fetchRobotsForNamespace,
 } from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import {fetchUsersAsSuperUser, IUserResource} from 'src/resources/UserResource';
 
 interface OrganizationsTableItem {
   name: string;
@@ -95,6 +96,7 @@ export default function OrganizationsList() {
 }
 
 function PageContent() {
+  const quayConfig = useQuayConfig();
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [, setOrganizationSearchInput] = useState('Filter by name or ID..');
   const [loading, setLoading] = useState(true);
@@ -289,12 +291,23 @@ function PageContent() {
 
   // Render the table with userState changes
   useEffect(() => {
+    // TODO: Many operations in this function are ran synchronously when
+    // they can be ran async - look into running some of these calls in
+    // parallel in the future
     const fetchData = async () => {
       try {
         setLoading(true);
-        const orgnames: string[] = userState?.organizations.map(
-          (org) => org.name,
-        );
+
+        let orgnames: string[];
+        if (
+          quayConfig?.features.SUPERUSERS_FULL_ACCESS &&
+          userState?.super_user
+        ) {
+          const orgs: IOrganization[] = await fetchOrgsAsSuperUser();
+          orgnames = orgs.map((org) => org.name);
+        } else {
+          orgnames = userState?.organizations.map((org) => org.name);
+        }
 
         const orgs = await fetchAllOrgs(orgnames);
         const repos = (await fetchAllRepos(orgnames, false)) as Map<
@@ -311,29 +324,39 @@ function PageContent() {
               repoCount: repos[idx].length,
               membersCount: members[idx].length,
               robotsCount: robots[idx].length,
-              teamsCount: Object.keys(orgs[idx]?.teams)?.length,
+              teamsCount: orgs[idx]?.teams
+                ? Object.keys(orgs[idx]?.teams)?.length
+                : 0,
               lastModified: getLastModifiedRepoTime(repos[idx]),
             } as OrganizationsTableItem;
           },
         );
 
-        // Add the user namespace entry
-        const userRepos = await fetchRepositoriesForNamespace(
-          userState.username,
-        );
-        const userRobots = await fetchRobotsForNamespace(
-          userState.username,
-          true,
-        );
+        // Add the user namespace. If superuser get all user namespaces
+        // otherwise default to the current user's namespace
+        let usernames: string[];
+        if (
+          quayConfig?.features.SUPERUSERS_FULL_ACCESS &&
+          userState?.super_user
+        ) {
+          const users: IUserResource[] = await fetchUsersAsSuperUser();
+          usernames = users.map((user) => user.username);
+        } else {
+          usernames = [userState.username];
+        }
 
-        newOrgsList.push({
-          name: userState.username,
-          repoCount: userRepos.length,
-          membersCount: 'N/A',
-          robotsCount: userRobots.length,
-          teamsCount: 'N/A',
-          lastModified: getLastModifiedRepoTime(userRepos),
-        });
+        for (const username of usernames) {
+          const userRepos = await fetchRepositoriesForNamespace(username);
+          const userRobots = await fetchRobotsForNamespace(username, true);
+          newOrgsList.push({
+            name: username,
+            repoCount: userRepos.length,
+            membersCount: 'N/A',
+            robotsCount: userRobots.length,
+            teamsCount: 'N/A',
+            lastModified: getLastModifiedRepoTime(userRepos),
+          });
+        }
 
         // sort on last modified
         // TODO (syahmed): redo this when we have user selectable sorting

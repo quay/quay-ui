@@ -25,6 +25,7 @@ export interface IUserResource {
   preferred_namespace: boolean;
   tag_expiration_s: number;
   prompts: [];
+  super_user: boolean;
   company: string;
   family_name: string;
   given_name: string;
@@ -40,4 +41,15 @@ export async function fetchUser() {
   );
   assertHttpCode(response.status, 200);
   return response.data;
+}
+
+export interface AllUsers {
+  users: IUserResource[];
+}
+
+export async function fetchUsersAsSuperUser() {
+  const superUserOrgsUrl = `/api/v1/superuser/users/`;
+  const response: AxiosResponse<AllUsers> = await axios.get(superUserOrgsUrl);
+  assertHttpCode(response.status, 200);
+  return response.data?.users;
 }
