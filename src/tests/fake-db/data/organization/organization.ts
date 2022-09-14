@@ -1,4 +1,5 @@
 import {mock} from '../../MockAxios';
+import {AxiosRequestConfig} from 'axios';
 
 const response = {
   name: 'projectquay',
@@ -50,6 +51,10 @@ const response = {
   is_free_account: true,
 };
 
+const createOrgSuccessResponse = {
+  success: true,
+};
+
 const orgPathRegex = new RegExp(`/api/v1/organization/(.+)$`);
 mock.onGet(orgPathRegex).reply((config) => {
   const orgNameMatch = config.url.match(orgPathRegex);
@@ -58,4 +63,9 @@ mock.onGet(orgPathRegex).reply((config) => {
   }
 
   return [200, response];
+});
+
+mock.onPost('/api/v1/organization/').reply((request: AxiosRequestConfig) => {
+  const {name, email} = JSON.parse(request.data);
+  return [200, createOrgSuccessResponse];
 });

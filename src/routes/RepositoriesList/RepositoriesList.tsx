@@ -44,7 +44,7 @@ import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {LoadingPage} from 'src/components/LoadingPage';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
-import {ToolbarPagination} from 'src/components/toolbar/Pagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -438,7 +438,7 @@ function RepoListContent(props: RepoListContentProps) {
       </TableComposable>
       <PanelFooter>
         <ToolbarPagination
-          repositoryList={repositoryList}
+          itemsList={repositoryList}
           perPage={perPage}
           page={page}
           setPage={setPage}

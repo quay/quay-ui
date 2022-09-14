@@ -5,6 +5,7 @@ import {
   PageSection,
   PageSectionVariants,
   Pagination,
+  PaginationVariant,
   TextInput,
   Toolbar,
   ToolbarContent,
@@ -19,6 +20,7 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import {useEffect, useState} from 'react';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 export const BulkDeleteModalTemplate = <T,>(
   props: BulkDeleteModalTemplateProps<T>,
@@ -33,10 +35,8 @@ export const BulkDeleteModalTemplate = <T,>(
 
   const [searchInput, setSearchInput] = useState<string>('');
 
-  const [paginationForBulkDeletion, setPaginationForBulkDeletion] = useState({
-    page: 1,
-    perPage: 10,
-  });
+  const [bulkModalPerPage, setBulkModalPerPage] = useState<number>(10);
+  const [bulkModalPage, setBulkModalPage] = useState<number>(1);
 
   const onSearch = (value: string) => {
     setSearchInput(value);
@@ -46,14 +46,15 @@ export const BulkDeleteModalTemplate = <T,>(
       /* Note: This search filter assumes that the search is always based on the 1st column,
          hence we do "colNames[0]" */
       const filteredTableRow = props.selectedItems.filter((item) =>
-        item[props.mapOfColNamesToTableData[colNames[0]].label].match(value),
+        item[props.mapOfColNamesToTableData[colNames[0]].label]
+          ?.toLowerCase()
+          .includes(value.toLowerCase()),
       );
       setItemsMarkedForDelete(filteredTableRow);
     }
   };
 
   const bulkDelete = async () => {
-    // TODO:(harish) Ask UX for Alert msg in case text entered is invalid
     if (confirmDeletionInput === 'confirm') {
       await props.handleBulkDeletion(props.selectedItems);
     }
@@ -111,6 +112,13 @@ export const BulkDeleteModalTemplate = <T,>(
                 onChange={onSearch}
               />
             </ToolbarItem>
+            <ToolbarPagination
+              page={bulkModalPage}
+              perPage={bulkModalPerPage}
+              itemsList={props.selectedItems}
+              setPage={setBulkModalPage}
+              setPerPage={setBulkModalPerPage}
+            />
           </ToolbarContent>
         </Toolbar>
         <TableComposable aria-label="Simple table" variant="compact">
@@ -137,23 +145,15 @@ export const BulkDeleteModalTemplate = <T,>(
           </Tbody>
         </TableComposable>
         <Toolbar>
-          <ToolbarItem>
-            <Pagination
-              perPageComponent="button"
-              itemCount={props.selectedItems.length}
-              perPage={paginationForBulkDeletion.perPage}
-              page={paginationForBulkDeletion.page}
-              onSetPage={(e: any, page: number) => {
-                setPaginationForBulkDeletion((old) => ({...old, page}));
-              }}
-              onPerPageSelect={(e: any, perPage: number) => {
-                setPaginationForBulkDeletion((old) => ({...old, perPage}));
-              }}
-              widgetId="pagination-options-menu-bottom"
-            />
-          </ToolbarItem>
+          <ToolbarPagination
+            page={bulkModalPage}
+            perPage={bulkModalPerPage}
+            itemsList={props.selectedItems}
+            setPage={setBulkModalPage}
+            setPerPage={setBulkModalPerPage}
+            bottom={true}
+          />
         </Toolbar>
-
         <p>
           {' '}
           Confirm deletion by typing <b>&quot;confirm&quot;</b> below:{' '}

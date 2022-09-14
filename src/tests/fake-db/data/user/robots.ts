@@ -22,7 +22,7 @@ const response = {
 };
 
 const robotsPathRegex = new RegExp(
-  `/api/v1/user/.+/robots\\?permissions=true&token=false`,
+  `/api/v1/user/robots\\?permissions=true&token=false`,
 );
 mock.onGet(robotsPathRegex).reply(() => {
   return [200, response];
