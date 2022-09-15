@@ -112,6 +112,7 @@ function PageContent() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
+  const [userLoaded, setUserLoaded] = useState(false);
 
   const refreshUser = useRefreshUser();
 
@@ -266,6 +267,7 @@ function PageContent() {
   useEffect(() => {
     // Get latest organizations
     refreshUser();
+    setUserLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -372,8 +374,10 @@ function PageContent() {
         setLoading(false);
       }
     };
-    fetchData().catch(console.error);
-  }, [userState]);
+    if (userLoaded) {
+      fetchData().catch(console.error);
+    }
+  }, [userState, userLoaded]);
 
   if (loading) {
     return <LoadingPage />;
