@@ -101,6 +101,7 @@ function RepoListContent(props: RepoListContentProps) {
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userLoaded, setUserLoaded] = useState(false);
   const userState = useRecoilValue(UserState);
   const refreshUser = useRefreshUser();
   const [err, setErr] = useState<string[]>();
@@ -109,6 +110,7 @@ function RepoListContent(props: RepoListContentProps) {
   useEffect(() => {
     // Get latest organizations
     refreshUser();
+    setUserLoaded(true);
   }, []);
 
   // Filtering Repositories after applied filter
@@ -276,8 +278,10 @@ function RepoListContent(props: RepoListContentProps) {
 
   useEffect(() => {
     // TODO: error handling
-    fetchRepos();
-  }, [userState]);
+    if (userLoaded) {
+      fetchRepos();
+    }
+  }, [userState, userLoaded]);
 
   const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);
