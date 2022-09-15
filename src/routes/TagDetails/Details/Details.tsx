@@ -102,7 +102,7 @@ export default function Details(props: DetailsProps) {
           </DescriptionListGroup>
           <DescriptionListGroup data-testid="labels">
             <DescriptionListTerm>Labels</DescriptionListTerm>
-            <DescriptionListDescription>
+            <DescriptionListDescription className="overflow-scroll">
               {props.digest !== '' ? (
                 <Labels
                   org={props.org}

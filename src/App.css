@@ -41,3 +41,11 @@ html, body, #root,  .App {
 .pf-c-panel__footer {
     padding: 24px 24px 0 0;
 }
+
+.overflow-scroll {
+    overflow: scroll;
+}
+
+.pf-c-label {
+    margin: 2px;
+}
