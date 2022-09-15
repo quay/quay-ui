@@ -18,16 +18,7 @@ import TablePopover from './TablePopover';
 import SecurityDetails from './SecurityDetails';
 import {formatDate} from 'src/libs/utils';
 import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
-
-const columnNames = {
-  Tag: 'Tag',
-  Security: 'Security',
-  Size: 'Size',
-  Expires: 'Expires',
-  LastModified: 'Last Modified',
-  Manifest: 'Manifest',
-  Pull: 'Pull',
-};
+import ColumnNames from './ColumnNames';
 
 function SubRow(props: SubRowProps) {
   return (
@@ -120,7 +111,7 @@ function Row(props: RowProps) {
             isSelected: props.selectedTags.includes(tag.name),
           }}
         />
-        <Td dataLabel={columnNames.Tag}>
+        <Td dataLabel={ColumnNames.name}>
           <Link
             to={getTagDetailPath(props.org, props.repo, tag.name)}
             onClick={resetSecurityDetails}
@@ -128,7 +119,7 @@ function Row(props: RowProps) {
             {tag.name}
           </Link>
         </Td>
-        <Td dataLabel={columnNames.Security}>
+        <Td dataLabel={ColumnNames.security}>
           {tag.is_manifest_list ? (
             'See Child Manifest'
           ) : (
@@ -141,19 +132,19 @@ function Row(props: RowProps) {
             />
           )}
         </Td>
-        <Td dataLabel={columnNames.Size}>
+        <Td dataLabel={ColumnNames.size}>
           {typeof tag.manifest_list != 'undefined'
             ? 'N/A'
             : prettyBytes(tag.size)}
         </Td>
-        <Td dataLabel={columnNames.LastModified}>
+        <Td dataLabel={ColumnNames.lastModified}>
           {formatDate(tag.last_modified)}
         </Td>
-        <Td dataLabel={columnNames.Expires}>{tag.expiration ?? 'Never'}</Td>
-        <Td dataLabel={columnNames.Manifest}>
+        <Td dataLabel={ColumnNames.expires}>{tag.expiration ?? 'Never'}</Td>
+        <Td dataLabel={ColumnNames.manifest}>
           {tag.manifest_digest.substring(0, 19)}
         </Td>
-        <Td dataLabel={columnNames.Pull}>
+        <Td dataLabel={ColumnNames.pull}>
           <TablePopover
             org={props.org}
             repo={props.repo}

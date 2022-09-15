@@ -1,19 +1,17 @@
 import {Toolbar, ToolbarContent, ToolbarItem} from '@patternfly/react-core';
 import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
-import {DropdownFilter} from 'src/components/toolbar/DropdownFilter';
-import {FilterBar} from 'src/components/toolbar/FilterBar';
+import {SearchDropdown} from 'src/components/toolbar/SearchDropdown';
+import {SearchInput} from 'src/components/toolbar/SearchInput';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {Kebab} from 'src/components/toolbar/Kebab';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {filterOrgState} from 'src/atoms/UserState';
+import {searchOrgsState} from 'src/atoms/UserState';
 import {useRecoilState} from 'recoil';
 import * as React from 'react';
+import ColumnNames from './ColumnNames';
 
 export function OrganizationToolBar(props: OrganizationToolBarProps) {
-  const [filterOrg, setOrgFilter] = useRecoilState(filterOrgState);
-  const filterOrgs = (value: string) => {
-    setOrgFilter(value);
-  };
+  const [search, setSearch] = useRecoilState(searchOrgsState);
 
   return (
     <Toolbar>
@@ -25,12 +23,12 @@ export function OrganizationToolBar(props: OrganizationToolBarProps) {
           itemsPerPageList={props.paginatedOrganizationsList}
           onItemSelect={props.onSelectOrganization}
         />
-        <DropdownFilter />
-        <FilterBar
-          placeholderText="Filter by name"
-          value={filterOrg}
-          onChange={filterOrgs}
+        <SearchDropdown
+          items={[ColumnNames.name]}
+          searchState={search}
+          setSearchState={setSearch}
         />
+        <SearchInput searchState={search} onChange={setSearch} />
         <ToolbarButton
           buttonValue="Create Organization"
           Modal={props.createOrgModal}

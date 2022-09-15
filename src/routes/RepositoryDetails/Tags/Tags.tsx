@@ -1,7 +1,11 @@
 import {TagsToolbar} from './TagsToolbar';
 import Table from './Table';
 import {useState, useEffect} from 'react';
-import {filterState, selectedTagsState} from 'src/atoms/TagListState';
+import {
+  searchTagsFilterState,
+  searchTagsState,
+  selectedTagsState,
+} from 'src/atoms/TagListState';
 import {
   Page,
   PageSection,
@@ -25,13 +29,13 @@ import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
-  const filter = useRecoilValue(filterState);
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>();
   const resetSelectedTags = useResetRecoilState(selectedTagsState);
+  const searchFilter = useRecoilValue(searchTagsFilterState);
+  const resetSearch = useResetRecoilState(searchTagsState);
 
-  const filteredTags: Tag[] =
-    filter !== '' ? tags.filter((tag) => tag.name.includes(filter)) : tags;
+  const filteredTags: Tag[] = searchFilter ? tags.filter(searchFilter) : tags;
 
   // Pagination related states
   const [perPage, setPerPage] = useState<number>(10);
@@ -94,6 +98,7 @@ export default function Tags(props: TagsProps) {
   };
 
   useEffect(() => {
+    resetSearch();
     resetSelectedTags();
     loadTags();
   }, []);
