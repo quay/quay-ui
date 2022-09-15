@@ -12,6 +12,7 @@ import {
   Title,
   DropdownItem,
   PanelFooter,
+  Skeleton,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
@@ -311,6 +312,20 @@ function PageContent() {
           orgnames = userState?.organizations.map((org) => org.name);
         }
 
+        // Populate org table temporarily with org names while we wait for org details to return
+        const tempOrgsList: OrganizationsTableItem[] = orgnames.map((org) => {
+          return {
+            name: org,
+            repoCount: null,
+            membersCount: null,
+            robotsCount: null,
+            teamsCount: null,
+            lastModified: 0,
+          } as OrganizationsTableItem;
+        });
+        setOrganizationsList(tempOrgsList);
+        setLoading(false);
+
         const orgs = await fetchAllOrgs(orgnames);
         const repos = (await fetchAllRepos(orgnames, false)) as Map<
           string,
@@ -361,10 +376,10 @@ function PageContent() {
         }
 
         // sort on last modified
-        // TODO (syahmed): redo this when we have user selectable sorting
-        newOrgsList.sort((r1, r2) => {
-          return r1.lastModified > r2.lastModified ? -1 : 1;
-        });
+        // TODO revisit this after API changes, we don't have enough info to sort 2022-09-14
+        // newOrgsList.sort((r1, r2) => {
+        //   return r1.lastModified > r2.lastModified ? -1 : 1;
+        // });
 
         setOrganizationsList(newOrgsList);
       } catch (e) {
@@ -452,12 +467,40 @@ function PageContent() {
                 <Td dataLabel={columnNames.name}>
                   <Link to={org.name}>{org.name}</Link>
                 </Td>
-                <Td dataLabel={columnNames.repoCount}>{org.repoCount}</Td>
-                <Td dataLabel={columnNames.teamsCount}>{org.teamsCount}</Td>
-                <Td dataLabel={columnNames.membersCount}>{org.membersCount}</Td>
-                <Td dataLabel={columnNames.robotsCount}>{org.robotsCount}</Td>
+                <Td dataLabel={columnNames.repoCount}>
+                  {org.repoCount !== null ? (
+                    org.repoCount
+                  ) : (
+                    <Skeleton width="100%" />
+                  )}
+                </Td>
+                <Td dataLabel={columnNames.teamsCount}>
+                  {org.teamsCount !== null ? (
+                    org.teamsCount
+                  ) : (
+                    <Skeleton width="100%" />
+                  )}
+                </Td>
+                <Td dataLabel={columnNames.membersCount}>
+                  {org.membersCount !== null ? (
+                    org.membersCount
+                  ) : (
+                    <Skeleton width="100%" />
+                  )}
+                </Td>
+                <Td dataLabel={columnNames.robotsCount}>
+                  {org.robotsCount !== null ? (
+                    org.robotsCount
+                  ) : (
+                    <Skeleton width="100%" />
+                  )}
+                </Td>
                 <Td dataLabel={columnNames.lastModified}>
-                  {formatDate(org.lastModified)}
+                  {org.lastModified !== 0 ? (
+                    formatDate(org.lastModified)
+                  ) : (
+                    <Skeleton width="100%" />
+                  )}
                 </Td>
               </Tr>
             ))}
