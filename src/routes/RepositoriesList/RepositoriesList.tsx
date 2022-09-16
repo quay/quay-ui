@@ -15,17 +15,20 @@ import {
   Td,
 } from '@patternfly/react-table';
 import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
-import {UserState} from 'src/atoms/UserState';
 import {
   bulkDeleteRepositories,
   fetchAllRepos,
   IRepository,
 } from 'src/resources/RepositoryResource';
-import {ReactElement, Suspense, useEffect, useState} from 'react';
+import {ReactElement, useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import CreateRepositoryModalTemplate from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
-import {selectedReposState, searchRepoState} from 'src/atoms/RepositoryState';
+import {
+  selectedReposState,
+  searchRepoState,
+  refreshPageState,
+} from 'src/atoms/RepositoryState';
 import {formatDate, formatSize} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
@@ -34,88 +37,61 @@ import {
   BulkOperationError,
   isErrorString,
 } from 'src/resources/ErrorHandling';
-import ErrorBoundary from 'src/components/errors/ErrorBoundary';
-import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import RequestError from 'src/components/errors/RequestError';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
-import {LoadingPage} from 'src/components/LoadingPage';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import ColumnNames from './ColumnNames';
+import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
+import {fetchUser, IUserResource} from 'src/resources/UserResource';
+import {LoadingPage} from 'src/components/LoadingPage';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
 }
 
-// Attempt to render RepositoriesList, fallback to RequestError
-// on failure
-export default function RepositoriesList() {
-  const currentOrg = getReponameFromURL(useLocation().pathname);
-  const [loadingErr, setLoadingErr] = useState<string>();
+interface RepoListHeaderProps {
+  shouldRender: boolean;
+}
+function RepoListHeader(props: RepoListHeaderProps) {
+  if (!props.shouldRender) {
+    return null;
+  }
   return (
     <>
-      {currentOrg === null ? <RepoListTitle /> : null}
-      <Suspense fallback={<LoadingPage />}>
-        <ErrorBoundary
-          hasError={isErrorString(loadingErr)}
-          fallback={
-            <RequestError
-              message={
-                isErrorString(loadingErr)
-                  ? loadingErr
-                  : 'Unable to load repositories'
-              }
-            />
-          }
-        >
-          <RepoListContent
-            currentOrg={currentOrg}
-            setLoadingErr={setLoadingErr}
-          />
-        </ErrorBoundary>
-      </Suspense>
-    </>
-  );
-}
-
-function RepoListTitle() {
-  return (
-    <div>
       <QuayBreadcrumb />
       <PageSection variant={PageSectionVariants.light} hasShadowBottom>
         <div className="co-m-nav-title--row">
           <Title headingLevel="h1">Repositories</Title>
         </div>
       </PageSection>
-    </div>
+    </>
   );
 }
 
-function RepoListContent(props: RepoListContentProps) {
+export default function RepositoriesList() {
+  const currentOrg = getReponameFromURL(useLocation().pathname);
+  const [loadingErr, setLoadingErr] = useState<string>();
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
   const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userLoaded, setUserLoaded] = useState(false);
-  const userState = useRecoilValue(UserState);
-  const refreshUser = useRefreshUser();
+  const refresh = useRefreshRepoList();
+  const pageRefreshIndex = useRecoilValue(refreshPageState);
   const [err, setErr] = useState<string[]>();
   const quayConfig = useQuayConfig();
   const search = useRecoilValue(searchRepoState);
   const resetSearch = useResetRecoilState(searchRepoState);
-
-  useEffect(() => {
-    // Get latest organizations
-    refreshUser();
-    setUserLoaded(true);
-    resetSearch();
-  }, []);
+  const [userState, setUserState] = useState<IUserResource>({
+    username: '',
+    organizations: [],
+  } as IUserResource);
 
   // Filtering Repositories after applied filter
   const filteredRepos =
@@ -194,7 +170,7 @@ function RepoListContent(props: RepoListContentProps) {
         setErr([addDisplayError('Failed to delete repository', err)]);
       }
     } finally {
-      refreshUser();
+      refresh();
       setSelectedRepoNames([]);
       setDeleteModalOpen(!isDeleteModalOpen);
     }
@@ -227,57 +203,55 @@ function RepoListContent(props: RepoListContentProps) {
   async function fetchRepos() {
     // clearing previous states
     setLoading(true);
+    resetSearch();
     setRepositoryList([]);
     setSelectedRepoNames([]);
-    if (userState) {
+    try {
+      const user = await fetchUser();
+      setUserState(user);
+
       // check if view is global vs scoped to a organization
       // TODO: we inculde username as part of org list
       // fix this after we have MyQuay page
-      const listOfOrgNames: string[] = props.currentOrg
-        ? [props.currentOrg]
-        : userState.organizations
-            .map((org) => org.name)
-            .concat(userState.username);
+      const listOfOrgNames: string[] = currentOrg
+        ? [currentOrg]
+        : user.organizations.map((org) => org.name).concat(user.username);
 
-      try {
-        const repos = (await fetchAllRepos(
-          listOfOrgNames,
-          true,
-        )) as IRepository[];
+      const repos = (await fetchAllRepos(
+        listOfOrgNames,
+        true,
+      )) as IRepository[];
 
-        // default sort by last modified
-        // TODO (syahmed): redo this when we have user selectable sorting
-        repos.sort((r1, r2) => {
-          return r1.last_modified > r2.last_modified ? -1 : 1;
-        });
+      // default sort by last modified
+      // TODO (syahmed): redo this when we have user selectable sorting
+      repos.sort((r1, r2) => {
+        return r1.last_modified > r2.last_modified ? -1 : 1;
+      });
 
-        // TODO: Here we're formatting repo's into the correct
-        // type. Once we know the return type from the repo's
-        // API we should pass 'repos' directly into 'setRepositoryList'
-        const formattedRepos: RepoListTableItem[] = repos.map((repo) => {
-          return {
-            namespace: repo.namespace,
-            name: repo.name,
-            is_public: repo.is_public,
-            last_modified: repo.last_modified,
-            size: repo.quota_report?.quota_bytes,
-          } as RepoListTableItem;
-        });
-        setRepositoryList(formattedRepos);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        props.setLoadingErr(addDisplayError('Unable to get repositories', err));
-      }
+      // TODO: Here we're formatting repo's into the correct
+      // type. Once we know the return type from the repo's
+      // API we should pass 'repos' directly into 'setRepositoryList'
+      const formattedRepos: RepoListTableItem[] = repos.map((repo) => {
+        return {
+          namespace: repo.namespace,
+          name: repo.name,
+          is_public: repo.is_public,
+          last_modified: repo.last_modified,
+          size: repo.quota_report?.quota_bytes,
+        } as RepoListTableItem;
+      });
+      setRepositoryList(formattedRepos);
+    } catch (err) {
+      console.error(err);
+      setLoadingErr(addDisplayError('Unable to get repositories', err));
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    // TODO: error handling
-    if (userLoaded) {
-      fetchRepos();
-    }
-  }, [userState, userLoaded]);
+    fetchRepos();
+  }, [pageRefreshIndex]);
 
   const updateListHandler = (value: IRepository) => {
     setRepositoryList((prev) => [...prev, value]);
@@ -309,8 +283,10 @@ function RepoListContent(props: RepoListContentProps) {
     <CreateRepositoryModalTemplate
       isModalOpen={isCreateRepoModalOpen}
       handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
-      orgName={props.currentOrg}
+      orgName={currentOrg}
       updateListHandler={updateListHandler}
+      username={userState.username}
+      organizations={userState.organizations}
     />
   );
 
@@ -329,6 +305,27 @@ function RepoListContent(props: RepoListContentProps) {
     />
   );
 
+  // Return component Loading state
+  if (loading) {
+    return (
+      <>
+        <RepoListHeader shouldRender={currentOrg === null} />
+        <LoadingPage />
+      </>
+    );
+  }
+
+  // Return component Error state
+  if (isErrorString(loadingErr)) {
+    return (
+      <>
+        <RepoListHeader shouldRender={currentOrg === null} />
+        <RequestError message={loadingErr} />
+      </>
+    );
+  }
+
+  // Return component Empty state
   if (!loading && !repositoryList?.length) {
     return (
       <Empty
@@ -348,111 +345,112 @@ function RepoListContent(props: RepoListContentProps) {
   }
 
   return (
-    <PageSection variant={PageSectionVariants.light}>
-      <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
-      <RepositoryToolBar
-        currentOrg={props.currentOrg}
-        createRepoModal={createRepoModal}
-        isCreateRepoModalOpen={isCreateRepoModalOpen}
-        setCreateRepoModalOpen={setCreateRepoModalOpen}
-        isKebabOpen={isKebabOpen}
-        setKebabOpen={setKebabOpen}
-        kebabItems={kebabItems}
-        selectedRepoNames={selectedRepoNames}
-        deleteModal={deleteRepositoryModal}
-        deleteKebabIsOpen={isDeleteModalOpen}
-        makePublicModalOpen={makePublicModalOpen}
-        toggleMakePublicClick={toggleMakePublicClick}
-        makePrivateModalOpen={makePrivateModalOpen}
-        toggleMakePrivateClick={toggleMakePrivateClick}
-        selectAllRepos={selectAllRepos}
-        repositoryList={repositoryList}
-        perPage={perPage}
-        page={page}
-        setPage={setPage}
-        setPerPage={setPerPage}
-        setSelectedRepoNames={setSelectedRepoNames}
-        paginatedRepositoryList={paginatedRepositoryList}
-        onSelectRepo={onSelectRepo}
-      />
-      <TableComposable aria-label="Selectable table">
-        <Thead>
-          <Tr>
-            <Th />
-            <Th>{ColumnNames.name}</Th>
-            <Th>{ColumnNames.visibility}</Th>
-            {quayConfig?.features.QUOTA_MANAGEMENT ? (
-              <Th>{ColumnNames.size}</Th>
-            ) : (
-              <></>
-            )}
-            <Th>{ColumnNames.lastModified}</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {repositoryList.length === 0 ? (
-            // Repo table loading icon
-            <Tr>
-              <Td>
-                <Spinner size="lg" />
-              </Td>
-            </Tr>
-          ) : (
-            paginatedRepositoryList.map((repo, rowIndex) => (
-              <Tr key={rowIndex}>
-                <Td
-                  select={{
-                    rowIndex,
-                    onSelect: (_event, isSelecting) =>
-                      onSelectRepo(repo, rowIndex, isSelecting),
-                    isSelected: isRepoSelected(repo),
-                    disable: !isRepoSelectable(repo),
-                  }}
-                />
-                <Td dataLabel={ColumnNames.name}>
-                  {props.currentOrg == null ? (
-                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
-                      {repo.namespace}/{repo.name}
-                    </Link>
-                  ) : (
-                    <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
-                      {repo.name}
-                    </Link>
-                  )}
-                </Td>
-                <Td dataLabel={ColumnNames.visibility}>
-                  {repo.is_public ? 'public' : 'private'}
-                </Td>
-                {quayConfig?.features.QUOTA_MANAGEMENT ? (
-                  <Td dataLabel={ColumnNames.size}> {formatSize(repo.size)}</Td>
-                ) : (
-                  <></>
-                )}
-                <Td dataLabel={ColumnNames.lastModified}>
-                  {formatDate(repo.last_modified)}
-                </Td>
-              </Tr>
-            ))
-          )}
-        </Tbody>
-      </TableComposable>
-      <PanelFooter>
-        <ToolbarPagination
-          itemsList={repositoryList}
+    <>
+      <RepoListHeader shouldRender={currentOrg === null} />
+      <PageSection variant={PageSectionVariants.light}>
+        <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
+        <RepositoryToolBar
+          currentOrg={currentOrg}
+          createRepoModal={createRepoModal}
+          isCreateRepoModalOpen={isCreateRepoModalOpen}
+          setCreateRepoModalOpen={setCreateRepoModalOpen}
+          isKebabOpen={isKebabOpen}
+          setKebabOpen={setKebabOpen}
+          kebabItems={kebabItems}
+          selectedRepoNames={selectedRepoNames}
+          deleteModal={deleteRepositoryModal}
+          deleteKebabIsOpen={isDeleteModalOpen}
+          makePublicModalOpen={makePublicModalOpen}
+          toggleMakePublicClick={toggleMakePublicClick}
+          makePrivateModalOpen={makePrivateModalOpen}
+          toggleMakePrivateClick={toggleMakePrivateClick}
+          selectAllRepos={selectAllRepos}
+          repositoryList={repositoryList}
           perPage={perPage}
           page={page}
           setPage={setPage}
           setPerPage={setPerPage}
-          bottom={true}
+          setSelectedRepoNames={setSelectedRepoNames}
+          paginatedRepositoryList={paginatedRepositoryList}
+          onSelectRepo={onSelectRepo}
         />
-      </PanelFooter>
-    </PageSection>
+        <TableComposable aria-label="Selectable table">
+          <Thead>
+            <Tr>
+              <Th />
+              <Th>{ColumnNames.name}</Th>
+              <Th>{ColumnNames.visibility}</Th>
+              {quayConfig?.features.QUOTA_MANAGEMENT ? (
+                <Th>{ColumnNames.size}</Th>
+              ) : (
+                <></>
+              )}
+              <Th>{ColumnNames.lastModified}</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {repositoryList.length === 0 ? (
+              // Repo table loading icon
+              <Tr>
+                <Td>
+                  <Spinner size="lg" />
+                </Td>
+              </Tr>
+            ) : (
+              paginatedRepositoryList.map((repo, rowIndex) => (
+                <Tr key={rowIndex}>
+                  <Td
+                    select={{
+                      rowIndex,
+                      onSelect: (_event, isSelecting) =>
+                        onSelectRepo(repo, rowIndex, isSelecting),
+                      isSelected: isRepoSelected(repo),
+                      disable: !isRepoSelectable(repo),
+                    }}
+                  />
+                  <Td dataLabel={ColumnNames.name}>
+                    {currentOrg == null ? (
+                      <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
+                        {repo.namespace}/{repo.name}
+                      </Link>
+                    ) : (
+                      <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
+                        {repo.name}
+                      </Link>
+                    )}
+                  </Td>
+                  <Td dataLabel={ColumnNames.visibility}>
+                    {repo.is_public ? 'public' : 'private'}
+                  </Td>
+                  {quayConfig?.features.QUOTA_MANAGEMENT ? (
+                    <Td dataLabel={ColumnNames.size}>
+                      {' '}
+                      {formatSize(repo.size)}
+                    </Td>
+                  ) : (
+                    <></>
+                  )}
+                  <Td dataLabel={ColumnNames.lastModified}>
+                    {formatDate(repo.last_modified)}
+                  </Td>
+                </Tr>
+              ))
+            )}
+          </Tbody>
+        </TableComposable>
+        <PanelFooter>
+          <ToolbarPagination
+            itemsList={repositoryList}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+            bottom={true}
+          />
+        </PanelFooter>
+      </PageSection>
+    </>
   );
-}
-
-interface RepoListContentProps {
-  currentOrg: string;
-  setLoadingErr: (message: string) => void;
 }
 
 interface RepoListTableItem {

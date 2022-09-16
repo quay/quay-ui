@@ -12,64 +12,30 @@ import {
   Flex,
   FlexItem,
 } from '@patternfly/react-core';
-import {useRecoilValue} from 'recoil';
-import {UserState} from 'src/atoms/UserState';
 import {
   createNewRepository,
   IRepository,
 } from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
-import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import FormError from 'src/components/errors/FormError';
-import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
-import {IUserResource} from 'src/resources/UserResource';
+import {IOrganization} from 'src/resources/OrganizationResource';
+import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
   PRIVATE = 'PRIVATE',
 }
 
-// Attempt to render modal content, fallback to error
-// display if failure
 export default function CreateRepositoryModalTemplate(
   props: CreateRepositoryModalTemplateProps,
 ) {
-  return (
-    <ErrorBoundary fallback={ErrorModal}>
-      <CreateRepositoryModal {...props} />
-    </ErrorBoundary>
-  );
-}
-
-function ErrorModal(props: ErrorModalProps) {
-  return (
-    <Modal
-      title="Loading Failure"
-      variant={ModalVariant.large}
-      isOpen={props.isOpen}
-      onClose={props.toggle}
-      actions={[
-        <Button key="cancel" variant="link" onClick={props.toggle}>
-          Cancel
-        </Button>,
-      ]}
-    >
-      <div>
-        Error loading create repository form. Please close and try again.
-      </div>
-    </Modal>
-  );
-}
-
-function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
   if (!props.isModalOpen) {
     return null;
   }
-  const userState: IUserResource = useRecoilValue(UserState);
   const [err, setErr] = useState<string>();
-  const refreshUser = useRefreshUser();
+  const refresh = useRefreshRepoList();
 
   const [currentOrganization, setCurrentOrganization] = useState({
     // For org scoped view, the name is set current org and for Repository list view,
@@ -119,7 +85,7 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
         newRepository.description,
         'image',
       );
-      refreshUser();
+      refresh();
       props.handleModalToggle();
     } catch (error: any) {
       console.error(error);
@@ -137,9 +103,9 @@ function CreateRepositoryModal(props: CreateRepositoryModalTemplateProps) {
   // namespace list includes both the orgs list and the user namespace
   const namespaceSelectionList = () => {
     const userSelection = (
-      <SelectOption value={userState.username}></SelectOption>
+      <SelectOption key={props.username} value={props.username}></SelectOption>
     );
-    const orgsSelectionList = userState.organizations.map((orgs, idx) => (
+    const orgsSelectionList = props.organizations.map((orgs, idx) => (
       <SelectOption key={idx} value={orgs.name}></SelectOption>
     ));
 
@@ -272,6 +238,8 @@ interface CreateRepositoryModalTemplateProps {
   handleModalToggle?: () => void;
   orgName?: string;
   updateListHandler: (value: IRepository) => void;
+  username: string;
+  organizations: IOrganization[];
 }
 
 interface ErrorModalProps {

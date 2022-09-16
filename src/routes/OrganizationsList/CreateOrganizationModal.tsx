@@ -11,8 +11,8 @@ import {createOrg} from 'src/resources/OrganizationResource';
 import {isValidEmail} from 'src/libs/utils';
 import {useState} from 'react';
 import FormError from 'src/components/errors/FormError';
-import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import {addDisplayError} from 'src/resources/ErrorHandling';
+import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
 
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
@@ -21,7 +21,7 @@ export const CreateOrganizationModal = (
   const [organizationEmail, setOrganizationEmail] = useState('');
   const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
   const [err, setErr] = useState<string>();
-  const refreshUser = useRefreshUser();
+  const refresh = userRefreshOrgList();
 
   const handleNameInputChange = (value: any) => {
     setOrganizationName(value);
@@ -36,7 +36,7 @@ export const CreateOrganizationModal = (
       const response = await createOrg(organizationName, organizationEmail);
       props.handleModalToggle();
       if (response === 'Created') {
-        refreshUser();
+        refresh();
       }
     } catch (err) {
       console.error(err);

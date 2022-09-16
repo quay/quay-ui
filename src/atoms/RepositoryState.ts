@@ -14,3 +14,8 @@ export const searchRepoState = atom<SearchState>({
     field: ColumnNames.name,
   },
 });
+
+export const refreshPageState = atom({
+  key: 'refreshRepoPageState',
+  default: 0,
+});
