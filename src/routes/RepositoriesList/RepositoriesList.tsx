@@ -219,9 +219,6 @@ function RepoListContent(props: RepoListContentProps) {
     >
       Make Private
     </DropdownItem>,
-    <DropdownItem key="Set team permissions">
-      Set team permissions
-    </DropdownItem>,
   ];
 
   async function fetchRepos() {
