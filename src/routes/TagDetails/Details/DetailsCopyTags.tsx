@@ -7,6 +7,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import './Details.css';
 
 export default function CopyTags(props: CopyTagsProps) {
   const config = useQuayConfig();
@@ -14,7 +15,9 @@ export default function CopyTags(props: CopyTagsProps) {
 
   return (
     <>
-      <Title headingLevel="h3">Fetch Tag</Title>
+      <Title headingLevel="h3" className="fetch-tags-title">
+        Fetch Tag
+      </Title>
       <DescriptionList>
         <DescriptionListGroup>
           <DescriptionListTerm>Podman Pull (by tag)</DescriptionListTerm>

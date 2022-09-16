@@ -8,6 +8,7 @@ import {
   PageSectionVariants,
   ClipboardCopy,
   Skeleton,
+  Page,
 } from '@patternfly/react-core';
 import prettyBytes from 'pretty-bytes';
 import CopyTags from './DetailsCopyTags';
@@ -18,7 +19,7 @@ import SecurityDetails from 'src/routes/RepositoryDetails/Tags/SecurityDetails';
 
 export default function Details(props: DetailsProps) {
   return (
-    <>
+    <Page>
       <PageSection variant={PageSectionVariants.light}>
         <DescriptionList
           columnModifier={{
@@ -125,7 +126,7 @@ export default function Details(props: DetailsProps) {
           digest={props.digest}
         />
       </PageSection>
-    </>
+    </Page>
   );
 }
 

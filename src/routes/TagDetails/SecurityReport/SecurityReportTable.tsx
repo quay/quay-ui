@@ -128,7 +128,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
     <PageSection variant={PageSectionVariants.light}>
       <TableTitle />
       <SecurityReportFilter />
-      <TableComposable aria-label="Expandable table" variant={'compact'}>
+      <TableComposable aria-label="Expandable table">
         <TableHead />
         {filteredVulnList.length !== 0 ? (
           filteredVulnList.map(
