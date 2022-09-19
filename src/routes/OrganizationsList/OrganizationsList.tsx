@@ -18,12 +18,8 @@ import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {Link} from 'react-router-dom';
 import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
-import {
-  searchOrgsState,
-  selectedOrgsState,
-  UserState,
-} from 'src/atoms/UserState';
-import {Suspense, useEffect, useState} from 'react';
+import {searchOrgsState, selectedOrgsState} from 'src/atoms/UserState';
+import {useEffect, useState} from 'react';
 import {
   bulkDeleteOrganizations,
   fetchAllOrgs,
@@ -31,8 +27,6 @@ import {
   IOrganization,
 } from 'src/resources/OrganizationResource';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
-import ErrorBoundary from 'src/components/errors/ErrorBoundary';
-import {useRefreshUser} from 'src/hooks/UseRefreshUser';
 import RequestError from 'src/components/errors/RequestError';
 import {OrganizationToolBar} from './OrganizationToolBar';
 import {CubesIcon} from '@patternfly/react-icons';
@@ -40,7 +34,11 @@ import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import Empty from 'src/components/empty/Empty';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {LoadingPage} from 'src/components/LoadingPage';
-import {addDisplayError, BulkOperationError} from 'src/resources/ErrorHandling';
+import {
+  addDisplayError,
+  BulkOperationError,
+  isErrorString,
+} from 'src/resources/ErrorHandling';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {
   fetchAllRepos,
@@ -55,8 +53,14 @@ import {
 import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
-import {fetchUsersAsSuperUser, IUserResource} from 'src/resources/UserResource';
+import {
+  fetchUser,
+  fetchUsersAsSuperUser,
+  IUserResource,
+} from 'src/resources/UserResource';
 import ColumnNames from './ColumnNames';
+import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
+import {refreshPageState} from 'src/atoms/OrganizationListState';
 
 interface OrganizationsTableItem {
   name: string;
@@ -67,28 +71,20 @@ interface OrganizationsTableItem {
   lastModified: number;
 }
 
-// Attempt to render OrganizationsList content,
-// fallback to RequestError on failure
-export default function OrganizationsList() {
+function OrgListHeader() {
   return (
     <>
+      <QuayBreadcrumb />
       <PageSection variant={PageSectionVariants.light}>
         <div className="co-m-nav-title--row">
           <Title headingLevel="h1">Organizations</Title>
         </div>
       </PageSection>
-      <Suspense fallback={<LoadingPage />}>
-        <ErrorBoundary
-          fallback={<RequestError message={'Unable to load organizations.'} />}
-        >
-          <PageContent />
-        </ErrorBoundary>
-      </Suspense>
     </>
   );
 }
 
-function PageContent() {
+export default function OrganizationsList() {
   const quayConfig = useQuayConfig();
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -97,7 +93,7 @@ function PageContent() {
   const [selectedOrganization, setSelectedOrganization] =
     useRecoilState(selectedOrgsState);
   const [err, setErr] = useState<string[]>();
-  const userState = useRecoilValue(UserState);
+  const [loadingErr, setLoadingErr] = useState<string>();
   const [organizationsList, setOrganizationsList] = useState<
     OrganizationsTableItem[]
   >([]);
@@ -105,9 +101,8 @@ function PageContent() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const [userLoaded, setUserLoaded] = useState(false);
-
-  const refreshUser = useRefreshUser();
+  const refresh = userRefreshOrgList();
+  const refreshPageIndex = useRecoilValue(refreshPageState);
 
   const filteredOrgs =
     search.query !== ''
@@ -194,7 +189,7 @@ function PageContent() {
       }
     } finally {
       setDeleteModalIsOpen(!deleteModalIsOpen);
-      refreshUser();
+      refresh();
       setSelectedOrganization([]);
     }
   };
@@ -256,14 +251,6 @@ function PageContent() {
       resourceName={'organizations'}
     />
   );
-
-  useEffect(() => {
-    // Get latest organizations
-    refreshUser();
-    setUserLoaded(true);
-    resetSearch();
-  }, []);
-
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Shift') {
@@ -285,7 +272,7 @@ function PageContent() {
     };
   }, []);
 
-  // Render the table with userState changes
+  // Get initial data required for rendering page
   useEffect(() => {
     // TODO: Many operations in this function are ran synchronously when
     // they can be ran async - look into running some of these calls in
@@ -293,16 +280,15 @@ function PageContent() {
     const fetchData = async () => {
       try {
         setLoading(true);
+        resetSearch();
+        const user = await fetchUser();
 
         let orgnames: string[];
-        if (
-          quayConfig?.features.SUPERUSERS_FULL_ACCESS &&
-          userState?.super_user
-        ) {
+        if (quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
           const orgs: IOrganization[] = await fetchOrgsAsSuperUser();
           orgnames = orgs.map((org) => org.name);
         } else {
-          orgnames = userState?.organizations.map((org) => org.name);
+          orgnames = user?.organizations.map((org) => org.name);
         }
 
         // Populate org table temporarily with org names while we wait for org details to return
@@ -345,14 +331,11 @@ function PageContent() {
         // Add the user namespace. If superuser get all user namespaces
         // otherwise default to the current user's namespace
         let usernames: string[];
-        if (
-          quayConfig?.features.SUPERUSERS_FULL_ACCESS &&
-          userState?.super_user
-        ) {
+        if (quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
           const users: IUserResource[] = await fetchUsersAsSuperUser();
           usernames = users.map((user) => user.username);
         } else {
-          usernames = [userState.username];
+          usernames = [user.username];
         }
 
         for (const username of usernames) {
@@ -375,43 +358,62 @@ function PageContent() {
         // });
 
         setOrganizationsList(newOrgsList);
-      } catch (e) {
-        // TODO (syahmed): error handling
-        console.error(e);
+      } catch (err) {
+        console.error(err);
+        setLoadingErr(addDisplayError('Unable to get organizations', err));
       } finally {
         setLoading(false);
       }
     };
-    if (userLoaded) {
-      fetchData().catch(console.error);
-    }
-  }, [userState, userLoaded]);
 
+    fetchData();
+  }, [refreshPageIndex]);
+
+  // Return component Loading state
   if (loading) {
-    return <LoadingPage />;
+    return (
+      <>
+        <OrgListHeader />
+        <LoadingPage />
+      </>
+    );
   }
 
+  // Return component Error state
+  if (isErrorString(loadingErr)) {
+    return (
+      <>
+        <OrgListHeader />
+        <RequestError message={loadingErr} />
+      </>
+    );
+  }
+
+  // Return component Empty state
   if (!loading && !organizationsList?.length) {
     return (
-      <Empty
-        icon={CubesIcon}
-        title="Collaborate and share projects across teams"
-        body="Create a shared space of public and private repositories for your developers to collaborate in. Organizations make it easy to add and manage people and permissions"
-        button={
-          <ToolbarButton
-            buttonValue="Create Organization"
-            Modal={createOrgModal}
-            isModalOpen={isOrganizationModalOpen}
-            setModalOpen={setOrganizationModalOpen}
-          />
-        }
-      />
+      <>
+        <OrgListHeader />
+        <Empty
+          icon={CubesIcon}
+          title="Collaborate and share projects across teams"
+          body="Create a shared space of public and private repositories for your developers to collaborate in. Organizations make it easy to add and manage people and permissions"
+          button={
+            <ToolbarButton
+              buttonValue="Create Organization"
+              Modal={createOrgModal}
+              isModalOpen={isOrganizationModalOpen}
+              setModalOpen={setOrganizationModalOpen}
+            />
+          }
+        />
+      </>
     );
   }
 
   return (
     <>
-      <QuayBreadcrumb />
+      <OrgListHeader />
       <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
       <PageSection variant={PageSectionVariants.light}>
         <OrganizationToolBar

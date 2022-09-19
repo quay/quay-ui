@@ -7,6 +7,8 @@ import {
   Title,
   Spinner,
   Bullseye,
+  PageSectionVariants,
+  PageSection,
 } from '@patternfly/react-core';
 
 export function LoadingPage(props: {
@@ -16,20 +18,22 @@ export function LoadingPage(props: {
   secondaryActions?: React.ReactNode;
 }) {
   return (
-    <Bullseye>
-      <EmptyState>
-        <EmptyStateIcon variant="container" component={Spinner} />
-        <div>
-          <Title size="lg" headingLevel="h4">
-            {props.title ?? 'Loading'}
-          </Title>
-          <EmptyStateBody>{props.message}</EmptyStateBody>
-        </div>
-        {props.primaryAction}
-        <EmptyStateSecondaryActions>
-          {props.secondaryActions}
-        </EmptyStateSecondaryActions>
-      </EmptyState>
-    </Bullseye>
+    <PageSection variant={PageSectionVariants.light}>
+      <Bullseye>
+        <EmptyState>
+          <EmptyStateIcon variant="container" component={Spinner} />
+          <div>
+            <Title size="lg" headingLevel="h4">
+              {props.title ?? 'Loading'}
+            </Title>
+            <EmptyStateBody>{props.message}</EmptyStateBody>
+          </div>
+          {props.primaryAction}
+          <EmptyStateSecondaryActions>
+            {props.secondaryActions}
+          </EmptyStateSecondaryActions>
+        </EmptyState>
+      </Bullseye>
+    </PageSection>
   );
 }

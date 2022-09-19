@@ -3,11 +3,11 @@ import {Modal, ModalVariant, Button} from '@patternfly/react-core';
 import {useState} from 'react';
 import FormError from 'src/components/errors/FormError';
 import {addDisplayError} from 'src/resources/ErrorHandling';
-import {useRefreshUser} from 'src/hooks/UseRefreshUser';
+import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
 
 export function ConfirmationModal(props: ConfirmationModalProps) {
   const [err, setErr] = useState<string>();
-  const refreshUser = useRefreshUser();
+  const refresh = useRefreshRepoList();
 
   const changeVisibility = async () => {
     const visibility = props.makePublic ? 'public' : 'private';
@@ -20,7 +20,7 @@ export function ConfirmationModal(props: ConfirmationModalProps) {
           return setRepositoryVisibility(ls[0], ls[1], visibility);
         }),
       );
-      refreshUser();
+      refresh();
       props.toggleModal();
       props.selectAllRepos(false);
     } catch (error: any) {
