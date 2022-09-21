@@ -30,9 +30,10 @@ export interface IQuotaReport {
 export async function fetchAllRepos(
   namespaces: string[],
   flatten = false,
+  isSuperUser = false,
 ): Promise<IRepository[] | Map<string, IRepository[]>> {
   const namespacedRepos = await Promise.all(
-    namespaces.map((ns) => fetchRepositoriesForNamespace(ns)),
+    namespaces.map((ns) => fetchRepositoriesForNamespace(ns, isSuperUser)),
   );
   // Flatten responses to a single list of all repositories
   if (flatten) {
@@ -45,11 +46,15 @@ export async function fetchAllRepos(
   }
 }
 
-export async function fetchRepositoriesForNamespace(ns: string) {
+export async function fetchRepositoriesForNamespace(
+  ns: string,
+  isSuperUser = false,
+) {
   // TODO: Add return type to AxiosResponse
-  const response: AxiosResponse = await axios.get(
-    `/api/v1/repository?last_modified=true&namespace=${ns}`,
-  );
+  const url = isSuperUser
+    ? `/api/v1/superuser/repositories/?last_modified=true&namespace=${ns}`
+    : `/api/v1/repository?last_modified=true&namespace=${ns}`;
+  const response: AxiosResponse = await axios.get(url);
   assertHttpCode(response.status, 200);
   return response.data?.repositories;
 }

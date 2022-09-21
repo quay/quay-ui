@@ -61,6 +61,7 @@ import {
 import ColumnNames from './ColumnNames';
 import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
 import {refreshPageState} from 'src/atoms/OrganizationListState';
+import {fetchQuayConfig} from 'src/resources/QuayConfig';
 
 interface OrganizationsTableItem {
   name: string;
@@ -85,7 +86,6 @@ function OrgListHeader() {
 }
 
 export default function OrganizationsList() {
-  const quayConfig = useQuayConfig();
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const search = useRecoilValue(searchOrgsState);
@@ -281,10 +281,13 @@ export default function OrganizationsList() {
       try {
         setLoading(true);
         resetSearch();
+        const quayConfig = await fetchQuayConfig();
         const user = await fetchUser();
 
         let orgnames: string[];
-        if (quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
+        const isSuperUser: boolean =
+          quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user;
+        if (isSuperUser) {
           const orgs: IOrganization[] = await fetchOrgsAsSuperUser();
           orgnames = orgs.map((org) => org.name);
         } else {
@@ -306,10 +309,11 @@ export default function OrganizationsList() {
         setLoading(false);
 
         const orgs = await fetchAllOrgs(orgnames);
-        const repos = (await fetchAllRepos(orgnames, false)) as Map<
-          string,
-          IRepository[]
-        >;
+        const repos = (await fetchAllRepos(
+          orgnames,
+          false,
+          isSuperUser,
+        )) as Map<string, IRepository[]>;
         const members = await fetchAllMembers(orgnames);
         const robots = await fetchAllRobots(orgnames);
 
@@ -331,7 +335,7 @@ export default function OrganizationsList() {
         // Add the user namespace. If superuser get all user namespaces
         // otherwise default to the current user's namespace
         let usernames: string[];
-        if (quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
+        if (isSuperUser) {
           const users: IUserResource[] = await fetchUsersAsSuperUser();
           usernames = users.map((user) => user.username);
         } else {
@@ -339,7 +343,10 @@ export default function OrganizationsList() {
         }
 
         for (const username of usernames) {
-          const userRepos = await fetchRepositoriesForNamespace(username);
+          const userRepos = await fetchRepositoriesForNamespace(
+            username,
+            isSuperUser,
+          );
           const userRobots = await fetchRobotsForNamespace(username, true);
           newOrgsList.push({
             name: username,

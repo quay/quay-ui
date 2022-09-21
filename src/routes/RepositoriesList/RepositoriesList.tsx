@@ -43,12 +43,12 @@ import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import ErrorModal from 'src/components/errors/ErrorModal';
-import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import ColumnNames from './ColumnNames';
 import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
 import {fetchUser, IUserResource} from 'src/resources/UserResource';
 import {LoadingPage} from 'src/components/LoadingPage';
+import {fetchQuayConfig} from 'src/resources/QuayConfig';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organizations') ? pathname.split('/')[2] : null;
@@ -85,7 +85,7 @@ export default function RepositoriesList() {
   const refresh = useRefreshRepoList();
   const pageRefreshIndex = useRecoilValue(refreshPageState);
   const [err, setErr] = useState<string[]>();
-  const quayConfig = useQuayConfig();
+  const [config, setConfig] = useState(null);
   const search = useRecoilValue(searchRepoState);
   const resetSearch = useResetRecoilState(searchRepoState);
   const [userState, setUserState] = useState<IUserResource>({
@@ -207,6 +207,9 @@ export default function RepositoriesList() {
       const user = await fetchUser();
       setUserState(user);
 
+      const quayConfig = await fetchQuayConfig();
+      setConfig(quayConfig);
+
       // check if view is global vs scoped to a organization
       // TODO: we inculde username as part of org list
       // fix this after we have MyQuay page
@@ -214,9 +217,12 @@ export default function RepositoriesList() {
         ? [currentOrg]
         : user.organizations.map((org) => org.name).concat(user.username);
 
+      const isSuperUser =
+        quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user;
       const repos = (await fetchAllRepos(
         listOfOrgNames,
         true,
+        isSuperUser,
       )) as IRepository[];
 
       // default sort by last modified
@@ -377,7 +383,7 @@ export default function RepositoriesList() {
               <Th />
               <Th>{ColumnNames.name}</Th>
               <Th>{ColumnNames.visibility}</Th>
-              {quayConfig?.features.QUOTA_MANAGEMENT ? (
+              {config?.features.QUOTA_MANAGEMENT ? (
                 <Th>{ColumnNames.size}</Th>
               ) : (
                 <></>
@@ -419,7 +425,7 @@ export default function RepositoriesList() {
                   <Td dataLabel={ColumnNames.visibility}>
                     {repo.is_public ? 'public' : 'private'}
                   </Td>
-                  {quayConfig?.features.QUOTA_MANAGEMENT ? (
+                  {config?.features.QUOTA_MANAGEMENT ? (
                     <Td dataLabel={ColumnNames.size}>
                       {' '}
                       {formatSize(repo.size)}
