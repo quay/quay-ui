@@ -4,24 +4,27 @@ import {
   EmptyState,
   EmptyStateBody,
   EmptyStateIcon,
+  Page,
   PageSection,
   Title,
 } from '@patternfly/react-core';
 import {ExclamationTriangleIcon} from '@patternfly/react-icons';
 
-function NotFound() {
+export default function NotFound() {
   return (
-    <PageSection>
-      <EmptyState variant="full">
-        <EmptyStateIcon icon={ExclamationTriangleIcon} />
-        <Title headingLevel="h1" size="lg">
-          404 Page not found
-        </Title>
-        <EmptyStateBody>
-          We didn&apos;t find a page that matches the address you navigated to.
-        </EmptyStateBody>
-        <Button title="Home" />
-      </EmptyState>
-    </PageSection>
+    <Page>
+      <PageSection>
+        <EmptyState variant="full">
+          <EmptyStateIcon icon={ExclamationTriangleIcon} />
+          <Title headingLevel="h1" size="lg">
+            404 Page not found
+          </Title>
+          <EmptyStateBody>
+            We didn&apos;t find a page that matches the address you navigated
+            to.
+          </EmptyStateBody>
+        </EmptyState>
+      </PageSection>
+    </Page>
   );
 }

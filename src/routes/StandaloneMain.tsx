@@ -15,9 +15,9 @@ import {fetchUser} from 'src/resources/UserResource';
 import {useSetRecoilState} from 'recoil';
 import {CurrentUsernameState} from 'src/atoms/UserState';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
-import PageLoadError from 'src/components/errors/PageLoadError';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import SiteUnavailableError from 'src/components/errors/SiteUnavailableError';
+import NotFound from 'src/components/errors/404';
 
 const NavigationRoutes = [
   {
@@ -78,6 +78,7 @@ export function StandaloneMain() {
           {NavigationRoutes.map(({path, Component}, key) => (
             <Route path={path} key={key} element={Component} />
           ))}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Outlet />
       </Page>
