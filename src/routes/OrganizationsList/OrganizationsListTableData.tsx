@@ -71,6 +71,8 @@ export default function OrgTableData(props: OrganizationsTableItem) {
         if (!props.isUser) {
           const data = await fetchOrg(props.name);
           teamCountVal = data?.teams ? Object.keys(data?.teams)?.length : 0;
+        } else {
+          teamCountVal = 'N/A';
         }
       } catch (err) {
         console.error(err);
@@ -86,6 +88,8 @@ export default function OrgTableData(props: OrganizationsTableItem) {
         if (!props.isUser) {
           const data = await fetchMembersForOrg(props.name);
           memberCountVal = data.length;
+        } else {
+          memberCountVal = 'N/A';
         }
       } catch (err) {
         console.error(err);
