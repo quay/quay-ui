@@ -31,24 +31,59 @@ export function QuayBreadcrumb() {
     setBrowserHistoryState([]);
   };
 
+  const fetchRepoName = (route) => {
+    const re = new RegExp(urlParams.organizationName + '/(.*)', 'i');
+    const result = route.match(re);
+    return result[1];
+  };
+
+  const buildBreadCrumbFromPrevRoute = (object) => {
+    const prevObj = {};
+    prevObj['pathname'] = object.match.pathname;
+    prevObj['title'] = fetchRepoName(prevObj['pathname']);
+    prevObj['active'] =
+      prevObj['pathname'].localeCompare(window.location.pathname) === 0;
+    return prevObj;
+  };
+
   const buildFromRoute = () => {
     const result = [];
     const history = [];
-    routerBreadcrumbs.map((object, i) => {
+    let prevItem = null;
+
+    for (let i = 0; i < routerBreadcrumbs.length; i++) {
       const newObj = {};
+      const object = routerBreadcrumbs[i];
       newObj['pathname'] = object.match.pathname;
-      newObj['title'] = object.match.pathname.split('/').slice(-1)[0];
-      // if (object.breadcrumb.props.children) {
-      //   newObj['title'] = object.breadcrumb.props.children;
-      // } else {
-      //   newObj['title'] = object.match.route.breadcrumb(object.match);
-      // }
+      if (object.match.route.Component.type.name == 'RepositoryDetails') {
+        prevItem = object;
+        // Continuing till we find the last RepositoryDetails route for nested repo paths
+        continue;
+      } else {
+        newObj['title'] = object.match.pathname.split('/').slice(-1)[0];
+      }
       newObj['active'] =
         object.match.pathname.localeCompare(window.location.pathname) === 0;
+
+      if (prevItem) {
+        const prevObj = buildBreadCrumbFromPrevRoute(prevItem);
+        result.push(prevObj);
+        history.push(prevObj);
+        prevItem = null;
+      }
+
       result.push(newObj);
       history.push(newObj);
-    });
-    console.log('result', result);
+    }
+
+    // If prevItem was not pushed in the for loop
+    if (prevItem) {
+      const prevObj = buildBreadCrumbFromPrevRoute(prevItem);
+      result.push(prevObj);
+      history.push(prevObj);
+      prevItem = null;
+    }
+
     setBreadcrumbItems(result);
     setBrowserHistoryState(history);
   };
@@ -57,15 +92,14 @@ export function QuayBreadcrumb() {
     const newItem = {};
     const lastItem = routerBreadcrumbs[routerBreadcrumbs.length - 1];
 
-    // Form QuayBreadcrumbItem for the current path
     newItem['pathname'] = lastItem.location.pathname;
-    // if (lastItem.match.route.Component.type.name == 'RepositoryDetails') {
-    //   newItem['title'] = urlParams.repositoryName;
-    // } else if (lastItem.match.route.Component.type.name == 'TagDetails') {
-    //   newItem['title'] = urlParams.tagName;
-    // } else {
-    newItem['title'] = newItem['pathname'].split('/').slice(-1)[0];
-    // }
+    // Form QuayBreadcrumbItem for the current path
+    if (lastItem.match.route.Component.type.name == 'RepositoryDetails') {
+      newItem['title'] = fetchRepoName(newItem['pathname']);
+    } else {
+      newItem['title'] = newItem['pathname'].split('/').slice(-1)[0];
+    }
+
     newItem['active'] = true;
     return newItem;
   };
@@ -80,11 +114,7 @@ export function QuayBreadcrumb() {
       newObj['pathname'] = value['pathname'];
       if (typeof value['title'] === 'string') {
         newObj['title'] = value['title'];
-      } else if (
-        value['title'] &&
-        value['title']['props'] &&
-        value['title']['props']['children']
-      ) {
+      } else if (value.title?.props?.children) {
         newObj['title'] = value['title']['props']['children'];
       }
       newObj['active'] =
@@ -98,7 +128,6 @@ export function QuayBreadcrumb() {
     }
     result.push(newItem);
     history.push(newItem);
-
     setBreadcrumbItems(result);
     setBrowserHistoryState(history);
   };
