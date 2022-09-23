@@ -27,7 +27,7 @@ export const CreateOrganizationModal = (
   const handleNameInputChange = (value: any) => {
     const regex = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)$/;
     setValidOrgName(
-      regex.test(organizationName) && organizationName.length < 256,
+      regex.test(value) && value.length < 256 && value.length >= 2,
     );
     setOrganizationName(value);
   };
