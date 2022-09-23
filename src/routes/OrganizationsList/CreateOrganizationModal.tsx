@@ -20,10 +20,13 @@ export const CreateOrganizationModal = (
   const [organizationName, setOrganizationName] = useState('');
   const [organizationEmail, setOrganizationEmail] = useState('');
   const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
+  const [validOrgName, setValidOrgName] = useState(true);
   const [err, setErr] = useState<string>();
   const refresh = userRefreshOrgList();
 
   const handleNameInputChange = (value: any) => {
+    const regex = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)$/;
+    setValidOrgName(regex.test(organizationName));
     setOrganizationName(value);
   };
 
@@ -66,7 +69,7 @@ export const CreateOrganizationModal = (
           variant="primary"
           onClick={createOrganizationHandler}
           form="modal-with-form-form"
-          isDisabled={invalidEmailFlag || !organizationName}
+          isDisabled={invalidEmailFlag || !organizationName || !validOrgName}
         >
           Create
         </Button>,
@@ -90,6 +93,7 @@ export const CreateOrganizationModal = (
             id="modal-with-form-form-name"
             value={organizationName}
             onChange={handleNameInputChange}
+            validated={validOrgName ? 'default' : 'error'}
           />
         </FormGroup>
         <FormGroup
