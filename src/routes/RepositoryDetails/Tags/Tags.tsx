@@ -125,7 +125,7 @@ export default function Tags(props: TagsProps) {
             repository={props.repository}
             tagCount={filteredTags.length}
             loadTags={loadTags}
-            TagList={tags}
+            TagList={filteredTags}
             paginatedTags={paginatedTags}
             perPage={perPage}
             page={page}
@@ -145,7 +145,7 @@ export default function Tags(props: TagsProps) {
         </ErrorBoundary>
         <PanelFooter>
           <ToolbarPagination
-            itemsList={tags}
+            itemsList={filteredTags}
             perPage={perPage}
             page={page}
             setPage={setPage}

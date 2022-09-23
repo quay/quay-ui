@@ -362,7 +362,7 @@ export default function RepositoriesList() {
           makePrivateModalOpen={makePrivateModalOpen}
           toggleMakePrivateClick={toggleMakePrivateClick}
           selectAllRepos={selectAllRepos}
-          repositoryList={repositoryList}
+          repositoryList={filteredRepos}
           perPage={perPage}
           page={page}
           setPage={setPage}
@@ -437,7 +437,7 @@ export default function RepositoriesList() {
         </TableComposable>
         <PanelFooter>
           <ToolbarPagination
-            itemsList={repositoryList}
+            itemsList={filteredRepos}
             perPage={perPage}
             page={page}
             setPage={setPage}

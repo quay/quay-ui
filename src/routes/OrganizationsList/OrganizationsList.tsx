@@ -370,7 +370,7 @@ export default function OrganizationsList() {
           selectedOrganization={selectedOrganization}
           deleteKebabIsOpen={deleteModalIsOpen}
           deleteModal={deleteModal}
-          organizationsList={organizationsList}
+          organizationsList={filteredOrgs}
           perPage={perPage}
           page={page}
           setPage={setPage}
@@ -413,7 +413,7 @@ export default function OrganizationsList() {
         </TableComposable>
         <PanelFooter>
           <ToolbarPagination
-            itemsList={organizationsList}
+            itemsList={filteredOrgs}
             perPage={perPage}
             page={page}
             setPage={setPage}
