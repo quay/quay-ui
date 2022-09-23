@@ -37,16 +37,18 @@ export function QuayBreadcrumb() {
     routerBreadcrumbs.map((object, i) => {
       const newObj = {};
       newObj['pathname'] = object.match.pathname;
-      if (object.breadcrumb.props.children) {
-        newObj['title'] = object.breadcrumb.props.children;
-      } else {
-        newObj['title'] = object.match.route.breadcrumb(object.match);
-      }
+      newObj['title'] = object.match.pathname.split('/').slice(-1)[0];
+      // if (object.breadcrumb.props.children) {
+      //   newObj['title'] = object.breadcrumb.props.children;
+      // } else {
+      //   newObj['title'] = object.match.route.breadcrumb(object.match);
+      // }
       newObj['active'] =
         object.match.pathname.localeCompare(window.location.pathname) === 0;
       result.push(newObj);
       history.push(newObj);
     });
+    console.log('result', result);
     setBreadcrumbItems(result);
     setBrowserHistoryState(history);
   };
@@ -57,13 +59,13 @@ export function QuayBreadcrumb() {
 
     // Form QuayBreadcrumbItem for the current path
     newItem['pathname'] = lastItem.location.pathname;
-    if (lastItem.match.route.Component.type.name == 'RepositoryDetails') {
-      newItem['title'] = urlParams.repositoryName;
-    } else if (lastItem.match.route.Component.type.name == 'TagDetails') {
-      newItem['title'] = urlParams.tagName;
-    } else {
-      newItem['title'] = newItem['pathname'].split('/').slice(-1)[0];
-    }
+    // if (lastItem.match.route.Component.type.name == 'RepositoryDetails') {
+    //   newItem['title'] = urlParams.repositoryName;
+    // } else if (lastItem.match.route.Component.type.name == 'TagDetails') {
+    //   newItem['title'] = urlParams.tagName;
+    // } else {
+    newItem['title'] = newItem['pathname'].split('/').slice(-1)[0];
+    // }
     newItem['active'] = true;
     return newItem;
   };
