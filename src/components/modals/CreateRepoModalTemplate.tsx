@@ -22,6 +22,7 @@ import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import {IOrganization} from 'src/resources/OrganizationResource';
 import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -36,6 +37,7 @@ export default function CreateRepositoryModalTemplate(
   }
   const [err, setErr] = useState<string>();
   const refresh = useRefreshRepoList();
+  const quayConfig = useQuayConfig();
 
   const [currentOrganization, setCurrentOrganization] = useState({
     // For org scoped view, the name is set current org and for Repository list view,
@@ -59,6 +61,15 @@ export default function CreateRepositoryModalTemplate(
   const nameInputRef = useRef();
 
   const handleNameInputChange = (value) => {
+    let regex = /^[a-z0-9][.a-z0-9_-]{0,254}$/;
+    if (quayConfig?.features.EXTENDED_REPOSITORY_NAMES) {
+      // Extended repostitory name regex: allows "/" in repo names
+      regex = /^(?=.{0,255}$)[a-z0-9][.a-z0-9_-]*(?:\/[a-z0-9][.a-z0-9_-]*)*$/;
+    }
+    setValidationState({
+      ...validationState,
+      repoName: regex.test(value) && value.length < 256,
+    });
     setNewRepository({...newRepository, name: value});
   };
 
@@ -124,7 +135,11 @@ export default function CreateRepositoryModalTemplate(
           variant="primary"
           onClick={createRepositoryHandler}
           form="modal-with-form-form"
-          isDisabled={!currentOrganization.name || !newRepository.name}
+          isDisabled={
+            !currentOrganization.name ||
+            !newRepository.name ||
+            !validationState.repoName
+          }
         >
           Create
         </Button>,
@@ -134,7 +149,7 @@ export default function CreateRepositoryModalTemplate(
       ]}
     >
       <FormError message={err} setErr={setErr} />
-      <Form id="modal-with-form-form" maxWidth="750px">
+      <Form id="modal-with-form-form" maxWidth="765px">
         <Flex>
           <FlexItem>
             <FormGroup
@@ -176,7 +191,7 @@ export default function CreateRepositoryModalTemplate(
               label="Repository name"
               isRequired
               fieldId="modal-with-form-form-name"
-              helperTextInvalid="Enter a repository name"
+              helperTextInvalid="Must contain only lowercase alphanumeric and _- characters. Max 255 characters."
               helperTextInvalidIcon={<ExclamationCircleIcon />}
               validated={validationState.repoName ? 'success' : 'error'}
             >
@@ -187,6 +202,7 @@ export default function CreateRepositoryModalTemplate(
                 value={newRepository.name}
                 onChange={handleNameInputChange}
                 ref={nameInputRef}
+                validated={validationState.repoName ? 'default' : 'error'}
               />
             </FormGroup>
           </FlexItem>
