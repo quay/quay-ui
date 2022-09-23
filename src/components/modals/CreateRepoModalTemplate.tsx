@@ -149,7 +149,7 @@ export default function CreateRepositoryModalTemplate(
       ]}
     >
       <FormError message={err} setErr={setErr} />
-      <Form id="modal-with-form-form" maxWidth="750px">
+      <Form id="modal-with-form-form" maxWidth="765px">
         <Flex>
           <FlexItem>
             <FormGroup
@@ -191,7 +191,7 @@ export default function CreateRepositoryModalTemplate(
               label="Repository name"
               isRequired
               fieldId="modal-with-form-form-name"
-              helperTextInvalid="Name must be alphanumeric, all lowercase and at most 255 characters long'"
+              helperTextInvalid="Must contain only lowercase alphanumeric and _- characters. Max 255 characters."
               helperTextInvalidIcon={<ExclamationCircleIcon />}
               validated={validationState.repoName ? 'success' : 'error'}
             >
