@@ -26,7 +26,9 @@ export const CreateOrganizationModal = (
 
   const handleNameInputChange = (value: any) => {
     const regex = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)$/;
-    setValidOrgName(regex.test(organizationName));
+    setValidOrgName(
+      regex.test(organizationName) && organizationName.length < 256,
+    );
     setOrganizationName(value);
   };
 
@@ -86,6 +88,10 @@ export const CreateOrganizationModal = (
           isRequired
           fieldId="modal-with-form-form-name"
           helperText="This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long"
+          helperTextInvalid={
+            'Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long'
+          }
+          validated={validOrgName ? 'default' : 'error'}
         >
           <TextInput
             isRequired
