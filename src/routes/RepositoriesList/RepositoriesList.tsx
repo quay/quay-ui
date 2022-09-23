@@ -95,7 +95,7 @@ export default function RepositoriesList() {
 
   // Filtering Repositories after applied filter
   const filteredRepos =
-    search.query !== ''
+    search.query.length >= 3
       ? repositoryList.filter((repo) => repo.name.includes(search.query))
       : repositoryList;
 
@@ -362,7 +362,7 @@ export default function RepositoriesList() {
           makePrivateModalOpen={makePrivateModalOpen}
           toggleMakePrivateClick={toggleMakePrivateClick}
           selectAllRepos={selectAllRepos}
-          repositoryList={repositoryList}
+          repositoryList={filteredRepos}
           perPage={perPage}
           page={page}
           setPage={setPage}
@@ -437,7 +437,7 @@ export default function RepositoriesList() {
         </TableComposable>
         <PanelFooter>
           <ToolbarPagination
-            itemsList={repositoryList}
+            itemsList={filteredRepos}
             perPage={perPage}
             page={page}
             setPage={setPage}
