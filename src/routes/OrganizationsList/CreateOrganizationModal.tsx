@@ -20,10 +20,15 @@ export const CreateOrganizationModal = (
   const [organizationName, setOrganizationName] = useState('');
   const [organizationEmail, setOrganizationEmail] = useState('');
   const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
+  const [validOrgName, setValidOrgName] = useState(true);
   const [err, setErr] = useState<string>();
   const refresh = userRefreshOrgList();
 
   const handleNameInputChange = (value: any) => {
+    const regex = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)$/;
+    setValidOrgName(
+      regex.test(value) && value.length < 256 && value.length >= 2,
+    );
     setOrganizationName(value);
   };
 
@@ -66,7 +71,7 @@ export const CreateOrganizationModal = (
           variant="primary"
           onClick={createOrganizationHandler}
           form="modal-with-form-form"
-          isDisabled={invalidEmailFlag || !organizationName}
+          isDisabled={invalidEmailFlag || !organizationName || !validOrgName}
         >
           Create
         </Button>,
@@ -83,6 +88,10 @@ export const CreateOrganizationModal = (
           isRequired
           fieldId="modal-with-form-form-name"
           helperText="This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long"
+          helperTextInvalid={
+            'Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long'
+          }
+          validated={validOrgName ? 'default' : 'error'}
         >
           <TextInput
             isRequired
@@ -90,6 +99,7 @@ export const CreateOrganizationModal = (
             id="modal-with-form-form-name"
             value={organizationName}
             onChange={handleNameInputChange}
+            validated={validOrgName ? 'default' : 'error'}
           />
         </FormGroup>
         <FormGroup
