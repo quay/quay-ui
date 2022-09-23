@@ -95,7 +95,7 @@ export default function RepositoriesList() {
 
   // Filtering Repositories after applied filter
   const filteredRepos =
-    search.query !== ''
+    search.query.length >= 3
       ? repositoryList.filter((repo) => repo.name.includes(search.query))
       : repositoryList;
 

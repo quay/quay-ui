@@ -15,7 +15,7 @@ export const searchTagsFilterState = selector({
   key: 'searchFilter',
   get: ({get}) => {
     const search = get(searchTagsState);
-    if (search.query === '') {
+    if (search.query.length < 3) {
       return null;
     }
 
