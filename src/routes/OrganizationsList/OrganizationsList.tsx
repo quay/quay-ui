@@ -52,7 +52,6 @@ import {
 } from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {
   fetchUser,
   fetchUsersAsSuperUser,
@@ -61,6 +60,7 @@ import {
 import ColumnNames from './ColumnNames';
 import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
 import {refreshPageState} from 'src/atoms/OrganizationListState';
+import {fetchQuayConfig} from 'src/resources/QuayConfig';
 
 interface OrganizationsTableItem {
   name: string;
@@ -85,7 +85,6 @@ function OrgListHeader() {
 }
 
 export default function OrganizationsList() {
-  const quayConfig = useQuayConfig();
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const search = useRecoilValue(searchOrgsState);
@@ -281,6 +280,7 @@ export default function OrganizationsList() {
       try {
         setLoading(true);
         resetSearch();
+        const quayConfig = await fetchQuayConfig();
         const user = await fetchUser();
 
         let orgnames: string[];
