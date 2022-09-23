@@ -12,20 +12,18 @@ import {
   Title,
   DropdownItem,
   PanelFooter,
-  Skeleton,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
-import {Link} from 'react-router-dom';
 import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
 import {searchOrgsState, selectedOrgsState} from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
 import {
   bulkDeleteOrganizations,
-  fetchAllOrgs,
   fetchOrgsAsSuperUser,
   IOrganization,
 } from 'src/resources/OrganizationResource';
+import OrgTableData from './OrganizationsListTableData';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import RequestError from 'src/components/errors/RequestError';
 import {OrganizationToolBar} from './OrganizationToolBar';
@@ -40,17 +38,6 @@ import {
   isErrorString,
 } from 'src/resources/ErrorHandling';
 import ErrorModal from 'src/components/errors/ErrorModal';
-import {
-  fetchAllRepos,
-  fetchRepositoriesForNamespace,
-  IRepository,
-} from 'src/resources/RepositoryResource';
-import {fetchAllMembers} from 'src/resources/MembersResource';
-import {
-  fetchAllRobots,
-  fetchRobotsForNamespace,
-} from 'src/resources/RobotsResource';
-import {formatDate} from 'src/libs/utils';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {
   fetchUser,
@@ -62,13 +49,9 @@ import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
 import {refreshPageState} from 'src/atoms/OrganizationListState';
 import {fetchQuayConfig} from 'src/resources/QuayConfig';
 
-interface OrganizationsTableItem {
+export interface OrganizationsTableItem {
   name: string;
-  repoCount: number;
-  teamsCount: number | string;
-  membersCount: number | string;
-  robotsCount: number | string;
-  lastModified: number;
+  isUser: boolean;
 }
 
 function OrgListHeader() {
@@ -198,18 +181,6 @@ export default function OrganizationsList() {
     setDeleteModalIsOpen(!deleteModalIsOpen);
   };
 
-  const getLastModifiedRepoTime = (repos: IRepository[]) => {
-    // get the repo with the most recent last modified
-    if (!repos || !repos.length) {
-      return -1;
-    }
-
-    const recentRepo = repos.reduce((prev, curr) =>
-      prev.last_modified < curr.last_modified ? curr : prev,
-    );
-    return recentRepo.last_modified;
-  };
-
   const kebabItems = [
     <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
       Delete
@@ -295,38 +266,18 @@ export default function OrganizationsList() {
         const tempOrgsList: OrganizationsTableItem[] = orgnames.map((org) => {
           return {
             name: org,
-            repoCount: null,
-            membersCount: null,
-            robotsCount: null,
-            teamsCount: null,
-            lastModified: 0,
+            isUser: false,
           } as OrganizationsTableItem;
         });
         setOrganizationsList(tempOrgsList);
         setLoading(false);
 
-        const orgs = await fetchAllOrgs(orgnames);
-        const repos = (await fetchAllRepos(orgnames, false)) as Map<
-          string,
-          IRepository[]
-        >;
-        const members = await fetchAllMembers(orgnames);
-        const robots = await fetchAllRobots(orgnames);
-
-        const newOrgsList: OrganizationsTableItem[] = orgnames.map(
-          (org, idx) => {
-            return {
-              name: org,
-              repoCount: repos[idx].length,
-              membersCount: members[idx].length,
-              robotsCount: robots[idx].length,
-              teamsCount: orgs[idx]?.teams
-                ? Object.keys(orgs[idx]?.teams)?.length
-                : 0,
-              lastModified: getLastModifiedRepoTime(repos[idx]),
-            } as OrganizationsTableItem;
-          },
-        );
+        const newOrgsList: OrganizationsTableItem[] = orgnames.map((org) => {
+          return {
+            name: org,
+            isUser: false,
+          } as OrganizationsTableItem;
+        });
 
         // Add the user namespace. If superuser get all user namespaces
         // otherwise default to the current user's namespace
@@ -339,15 +290,9 @@ export default function OrganizationsList() {
         }
 
         for (const username of usernames) {
-          const userRepos = await fetchRepositoriesForNamespace(username);
-          const userRobots = await fetchRobotsForNamespace(username, true);
           newOrgsList.push({
             name: username,
-            repoCount: userRepos.length,
-            membersCount: 'N/A',
-            robotsCount: userRobots.length,
-            teamsCount: 'N/A',
-            lastModified: getLastModifiedRepoTime(userRepos),
+            isUser: true,
           });
         }
 
@@ -356,7 +301,6 @@ export default function OrganizationsList() {
         // newOrgsList.sort((r1, r2) => {
         //   return r1.lastModified > r2.lastModified ? -1 : 1;
         // });
-
         setOrganizationsList(newOrgsList);
       } catch (err) {
         console.error(err);
@@ -449,7 +393,7 @@ export default function OrganizationsList() {
           </Thead>
           <Tbody>
             {paginatedOrganizationsList?.map((org, rowIndex) => (
-              <Tr key={rowIndex}>
+              <Tr key={org.name}>
                 <Td
                   select={{
                     rowIndex,
@@ -459,44 +403,10 @@ export default function OrganizationsList() {
                     disable: !isOrgSelectable(org),
                   }}
                 />
-                <Td dataLabel={ColumnNames.name}>
-                  <Link to={org.name}>{org.name}</Link>
-                </Td>
-                <Td dataLabel={ColumnNames.repoCount}>
-                  {org.repoCount !== null ? (
-                    org.repoCount
-                  ) : (
-                    <Skeleton width="100%" />
-                  )}
-                </Td>
-                <Td dataLabel={ColumnNames.teamsCount}>
-                  {org.teamsCount !== null ? (
-                    org.teamsCount
-                  ) : (
-                    <Skeleton width="100%" />
-                  )}
-                </Td>
-                <Td dataLabel={ColumnNames.membersCount}>
-                  {org.membersCount !== null ? (
-                    org.membersCount
-                  ) : (
-                    <Skeleton width="100%" />
-                  )}
-                </Td>
-                <Td dataLabel={ColumnNames.robotsCount}>
-                  {org.robotsCount !== null ? (
-                    org.robotsCount
-                  ) : (
-                    <Skeleton width="100%" />
-                  )}
-                </Td>
-                <Td dataLabel={ColumnNames.lastModified}>
-                  {org.lastModified !== 0 ? (
-                    formatDate(org.lastModified)
-                  ) : (
-                    <Skeleton width="100%" />
-                  )}
-                </Td>
+                <OrgTableData
+                  name={org.name}
+                  isUser={org.isUser}
+                ></OrgTableData>
               </Tr>
             ))}
           </Tbody>
