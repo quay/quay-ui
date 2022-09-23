@@ -35,16 +35,16 @@ export enum NavigationPath {
   organizationDetail = '/organizations/:organizationName',
 
   // Repository detail
-  repositoryDetail = '/repositories/:organizationName/:repositoryName',
+  repositoryDetail = '/repositories/:organizationName/*',
 
   // Tag Detail
-  tagDetail = '/repositories/:organizationName/:repositoryName/:tagName',
+  tagDetail = '/tag/:organizationName/*',
 }
 
 export function getRepoDetailPath(org: string, repo: string) {
   let repoPath = NavigationPath.repositoryDetail.toString();
   repoPath = repoPath.replace(':organizationName', org);
-  repoPath = repoPath.replace(':repositoryName', repo);
+  repoPath = repoPath.replace('*', repo);
   return repoPath;
 }
 
@@ -56,8 +56,7 @@ export function getTagDetailPath(
 ) {
   let tagPath = NavigationPath.tagDetail.toString();
   tagPath = tagPath.replace(':organizationName', org);
-  tagPath = tagPath.replace(':repositoryName', repo);
-  tagPath = tagPath.replace(':tagName', tag);
+  tagPath = tagPath.replace('*', `${repo}/${tag}`);
   if (queryParams) {
     const params = [];
     for (const entry of Array.from(queryParams.entries())) {
