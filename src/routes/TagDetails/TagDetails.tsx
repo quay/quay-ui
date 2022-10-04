@@ -26,7 +26,7 @@ import RequestError from 'src/components/errors/RequestError';
 
 export default function TagDetails() {
   const [searchParams] = useSearchParams();
-  const [architecture, setArchitecture] = useState<string>();
+  const [digest, setDigest] = useState<string>('');
   const [err, setErr] = useState<string>();
   const [tagDetails, setTagDetails] = useState<Tag>({
     name: '',
@@ -65,39 +65,40 @@ export default function TagDetails() {
         }
 
         const tagResp: Tag = resp.tags[0];
-        const archs: string[] = [];
         if (tagResp.is_manifest_list) {
           const manifestResp: ManifestByDigestResponse =
             await getManifestByDigest(org, repo, tagResp.manifest_digest);
           tagResp.manifest_list = JSON.parse(manifestResp.manifest_data);
-          for (const manifest of tagResp.manifest_list.manifests) {
-            archs.push(manifest.platform.architecture);
-          }
         }
 
-        setTagDetails(tagResp);
-        if (archs.length > 0) {
-          setArchitecture(
-            searchParams.get('arch') ? searchParams.get('arch') : archs[0],
-          );
+        // Confirm requested digest exists for this tag
+        const requestedDigest = searchParams.get('digest');
+        if (
+          requestedDigest &&
+          requestedDigest !== tagResp.manifest_digest &&
+          !tagResp.manifest_list?.manifests?.some(
+            (m) => m.digest === requestedDigest,
+          )
+        ) {
+          throw new Error(`Requested digest not found: ${requestedDigest}`);
         }
+
+        let currentDigest =
+          tagResp.is_manifest_list &&
+          tagResp.manifest_list?.manifests?.length > 0
+            ? tagResp.manifest_list.manifests[0].digest
+            : tagResp.manifest_digest;
+        currentDigest = searchParams.get('digest')
+          ? searchParams.get('digest')
+          : currentDigest;
+        setDigest(currentDigest);
+        setTagDetails(tagResp);
       } catch (error: any) {
         console.error(error);
         setErr(addDisplayError('Unable to get details for tag', error));
       }
     })();
   }, []);
-
-  // Pull size and digest from manifest otherwise default to pull from tagDetails
-  let size: number = tagDetails.size;
-  let digest: string = tagDetails.manifest_digest;
-  if (architecture) {
-    const manifest: Manifest = tagDetails.manifest_list?.manifests.filter(
-      (manifest: Manifest) => manifest.platform.architecture === architecture,
-    )[0];
-    size = manifest.size;
-    digest = manifest.digest;
-  }
 
   return (
     <Page>
@@ -108,11 +109,9 @@ export default function TagDetails() {
       >
         <Title headingLevel="h1">{tag}</Title>
         <TagArchSelect
-          arch={architecture}
-          options={tagDetails.manifest_list?.manifests.map(
-            (manifest: Manifest) => manifest.platform.architecture,
-          )}
-          setArch={setArchitecture}
+          digest={digest}
+          options={tagDetails.manifest_list?.manifests}
+          setDigest={setDigest}
           render={tagDetails.is_manifest_list}
         />
       </PageSection>
@@ -128,7 +127,6 @@ export default function TagDetails() {
             org={org}
             repo={repo}
             tag={tagDetails}
-            size={size}
             digest={digest}
             err={err}
           />

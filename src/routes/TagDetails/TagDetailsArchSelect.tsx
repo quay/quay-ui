@@ -6,6 +6,7 @@ import {
   FlexItem,
 } from '@patternfly/react-core';
 import {useState} from 'react';
+import {Manifest} from 'src/resources/TagResource';
 
 export default function ArchSelect(props: ArchSelectProps) {
   if (!props.render) return null;
@@ -22,16 +23,19 @@ export default function ArchSelect(props: ArchSelectProps) {
           onToggle={() => {
             setIsSelectOpen(!isSelectOpen);
           }}
-          onSelect={(e, arch) => {
-            props.setArch(arch as string);
+          onSelect={(e, digest) => {
+            props.setDigest(digest as string);
             setIsSelectOpen(false);
           }}
-          selections={props.arch}
+          selections={props.digest}
           isOpen={isSelectOpen}
           data-testid="arch-select"
         >
-          {props.options.map((arch, index) => (
-            <SelectOption key={index} value={arch} />
+          {props.options.map((manifest, index) => (
+            <SelectOption key={index} value={manifest.digest}>
+              {' '}
+              {`${manifest.platform.os} on ${manifest.platform.architecture}`}{' '}
+            </SelectOption>
           ))}
         </Select>
       </FlexItem>
@@ -40,8 +44,8 @@ export default function ArchSelect(props: ArchSelectProps) {
 }
 
 type ArchSelectProps = {
-  arch: string;
-  options: string[];
-  setArch: (arch: string) => void;
+  digest: string;
+  options: Manifest[];
+  setDigest: (digest: string) => void;
   render: boolean;
 };

@@ -16,6 +16,7 @@ import {Tag} from 'src/resources/TagResource';
 import {formatDate} from 'src/libs/utils';
 import Labels from 'src/components/labels/Labels';
 import SecurityDetails from 'src/routes/RepositoryDetails/Tags/SecurityDetails';
+import ImageSize from 'src/components/Table/ImageSize';
 
 export default function Details(props: DetailsProps) {
   return (
@@ -83,8 +84,12 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="size">
             <DescriptionListTerm>Size</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.size ? (
-                prettyBytes(props.size)
+              {props.digest != '' ? (
+                <ImageSize
+                  org={props.org}
+                  repo={props.repo}
+                  digest={props.digest}
+                />
               ) : (
                 <Skeleton width="100%"></Skeleton>
               )}
@@ -104,11 +109,11 @@ export default function Details(props: DetailsProps) {
           <DescriptionListGroup data-testid="labels">
             <DescriptionListTerm>Labels</DescriptionListTerm>
             <DescriptionListDescription>
-              {props.digest !== '' ? (
+              {props.tag.manifest_digest !== '' ? (
                 <Labels
                   org={props.org}
                   repo={props.repo}
-                  digest={props.digest}
+                  digest={props.tag.manifest_digest}
                 />
               ) : (
                 <Skeleton width="100%"></Skeleton>
@@ -134,6 +139,5 @@ type DetailsProps = {
   tag: Tag;
   org: string;
   repo: string;
-  size: number;
   digest: string;
 };

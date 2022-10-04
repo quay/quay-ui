@@ -42,7 +42,6 @@ export default function TagTabs(props: TagTabsProps) {
           org={props.org}
           repo={props.repo}
           tag={props.tag}
-          size={props.size}
           digest={props.digest}
         />
       </Tab>
@@ -66,7 +65,6 @@ type TagTabsProps = {
   tag: Tag;
   org: string;
   repo: string;
-  size: number;
   digest: string;
   err: string;
 };
