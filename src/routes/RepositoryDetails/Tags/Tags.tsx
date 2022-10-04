@@ -26,9 +26,14 @@ import RequestError from 'src/components/errors/RequestError';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import {
+  fetchRepositoryDetails,
+  RepositoryDetails,
+} from 'src/resources/RepositoryResource';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
+  const [repoDetails, setRepoDetails] = useState<RepositoryDetails>();
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>();
   const resetSelectedTags = useResetRecoilState(selectedTagsState);
@@ -69,8 +74,14 @@ export default function Tags(props: TagsProps) {
     };
     let page = 1;
     let hasAdditional = false;
-    do {
-      try {
+    try {
+      const repoDetails = await fetchRepositoryDetails(
+        props.organization,
+        props.repository,
+      );
+      setRepoDetails(repoDetails);
+
+      do {
         const resp: TagsResponse = await getTags(
           props.organization,
           props.repository,
@@ -89,12 +100,12 @@ export default function Tags(props: TagsProps) {
         hasAdditional = resp.has_additional;
         page++;
         setLoading(false);
-      } catch (error: any) {
-        console.error(error);
-        setLoading(false);
-        setErr(addDisplayError('Unable to get tags', error));
-      }
-    } while (hasAdditional);
+      } while (hasAdditional);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+      setErr(addDisplayError('Unable to get tags', error));
+    }
   };
 
   useEffect(() => {
@@ -132,6 +143,7 @@ export default function Tags(props: TagsProps) {
             setPage={setPage}
             setPerPage={setPerPage}
             selectTag={selectTag}
+            repoDetails={repoDetails}
           />
           <Table
             org={props.organization}

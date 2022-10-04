@@ -16,6 +16,7 @@ import {SearchDropdown} from 'src/components/toolbar/SearchDropdown';
 import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
 import ColumnNames from './ColumnNames';
 import {SearchState} from 'src/components/toolbar/SearchTypes';
+import {RepositoryDetails} from 'src/resources/RepositoryResource';
 
 export function TagsToolbar(props: ToolBarProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -80,6 +81,7 @@ export function TagsToolbar(props: ToolBarProps) {
         org={props.organization}
         repo={props.repository}
         loadTags={props.loadTags}
+        repoDetails={props.repoDetails}
       />
     </Toolbar>
   );
@@ -97,4 +99,5 @@ type ToolBarProps = {
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
   selectTag: (tag: Tag, rowIndex?: number, isSelecting?: boolean) => void;
+  repoDetails: RepositoryDetails;
 };

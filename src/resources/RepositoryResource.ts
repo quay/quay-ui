@@ -54,6 +54,31 @@ export async function fetchRepositoriesForNamespace(ns: string) {
   return response.data?.repositories;
 }
 
+export interface RepositoryDetails {
+  can_admin: boolean;
+  can_write: boolean;
+  description: string | null;
+  is_free_account: boolean;
+  is_organization: boolean;
+  is_public: boolean;
+  is_starred: boolean;
+  kind: string | null;
+  name: string | null;
+  namespace: string | null;
+  state: string | null;
+  status_token: string | null;
+  tag_expiration_s: number | null;
+  trust_enabled: boolean;
+}
+
+export async function fetchRepositoryDetails(org: string, repo: string) {
+  const response: AxiosResponse<RepositoryDetails> = await axios.get(
+    `/api/v1/repository/${org}/${repo}?includeStats=false&includeTags=false`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data;
+}
+
 export async function createNewRepository(
   namespace: string,
   repository: string,
