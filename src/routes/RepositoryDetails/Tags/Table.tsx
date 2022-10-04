@@ -19,6 +19,7 @@ import SecurityDetails from './SecurityDetails';
 import {formatDate} from 'src/libs/utils';
 import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
 import ColumnNames from './ColumnNames';
+import {DownloadIcon} from '@patternfly/react-icons';
 
 function SubRow(props: SubRowProps) {
   return (
@@ -151,7 +152,7 @@ function Row(props: RowProps) {
             tag={tag.name}
             digest={tag.manifest_digest}
           >
-            <i data-testid="pull" className="fa fa-download"></i>
+            <DownloadIcon />
           </TablePopover>
         </Td>
       </Tr>
