@@ -16,6 +16,7 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
   };
 
   const selectPageItems = () => {
+    props.deSelectAll([]);
     props.itemsPerPageList.map((value, index) =>
       props.onItemSelect(value, index, true),
     );
