@@ -1,11 +1,21 @@
-import {Modal, ModalVariant, Button, Label} from '@patternfly/react-core';
+import {
+  Modal,
+  ModalVariant,
+  Button,
+  Label,
+  Alert,
+} from '@patternfly/react-core';
 import {useState} from 'react';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {addDisplayError, BulkOperationError} from 'src/resources/ErrorHandling';
+import {RepositoryDetails} from 'src/resources/RepositoryResource';
 import {bulkDeleteTags} from 'src/resources/TagResource';
+import './Tags.css';
 
 export function DeleteModal(props: ModalProps) {
   const [err, setErr] = useState<string[]>();
+  const isReadonly: boolean = props.repoDetails?.state !== 'NORMAL';
+
   const deleteTags = async () => {
     try {
       const tags = props.selectedTags.map((tag) => ({
@@ -64,11 +74,24 @@ export function DeleteModal(props: ModalProps) {
             key="modal-action-button"
             variant="primary"
             onClick={deleteTags}
+            isDisabled={isReadonly}
           >
             Delete
           </Button>,
         ]}
       >
+        {isReadonly ? (
+          <>
+            <Alert
+              id="form-error-alert"
+              isInline
+              variant="danger"
+              title={`Repository is currently in ${props.repoDetails?.state} state. Deletion is disabled.`}
+            />
+            <div className="delete-modal-readonly-alert" />
+          </>
+        ) : null}
+
         {props.selectedTags.map((tag) => (
           <span key={tag}>
             <Label>{tag}</Label>{' '}
@@ -92,4 +115,5 @@ type ModalProps = {
   loadTags: () => void;
   org: string;
   repo: string;
+  repoDetails: RepositoryDetails;
 };
