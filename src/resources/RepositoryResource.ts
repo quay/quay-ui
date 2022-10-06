@@ -48,7 +48,7 @@ export async function fetchAllRepos(
 export async function fetchRepositoriesForNamespace(ns: string) {
   // TODO: Add return type to AxiosResponse
   const response: AxiosResponse = await axios.get(
-    `/api/v1/repository?last_modified=true&namespace=${ns}`,
+    `/api/v1/repository?last_modified=true&namespace=${ns}&public=true`,
   );
   assertHttpCode(response.status, 200);
   return response.data?.repositories;
