@@ -87,7 +87,7 @@ export default function OrganizationsList() {
   const refreshPageIndex = useRecoilValue(refreshPageState);
 
   const filteredOrgs =
-    search.query.length >= 3
+    search.query !== ''
       ? organizationsList?.filter((repo) => repo.name.includes(search.query))
       : organizationsList;
 
