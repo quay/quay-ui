@@ -14,21 +14,55 @@ import FormError from 'src/components/errors/FormError';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
 
+interface Validation {
+  message: string;
+  isValid: boolean;
+  type: 'default' | 'error' | 'warning';
+}
+
+const defaultMessage: Validation = {
+  message:
+    'This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long',
+  isValid: true,
+  type: 'default',
+};
+
 export const CreateOrganizationModal = (
   props: CreateOrganizationModalProps,
 ): JSX.Element => {
   const [organizationName, setOrganizationName] = useState('');
   const [organizationEmail, setOrganizationEmail] = useState('');
   const [invalidEmailFlag, setInvalidEmailFlag] = useState(false);
-  const [validOrgName, setValidOrgName] = useState(true);
+  const [validation, setValidation] = useState<Validation>(defaultMessage);
   const [err, setErr] = useState<string>();
   const refresh = userRefreshOrgList();
 
   const handleNameInputChange = (value: any) => {
     const regex = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)$/;
-    setValidOrgName(
-      regex.test(value) && value.length < 256 && value.length >= 2,
-    );
+    if (!regex.test(value) || value.length >= 256 || value.length < 2) {
+      setValidation({
+        message:
+          'Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long',
+        isValid: false,
+        type: 'error',
+      });
+    } else if (value.length > 30 || value.length < 4) {
+      setValidation({
+        message:
+          'Namespaces less than 4 or more than 30 characters are only compatible with Docker 1.6+',
+        isValid: true,
+        type: 'warning',
+      });
+    } else if (value.includes('.') || value.includes('-')) {
+      setValidation({
+        message:
+          'Namespaces with dashes or dots are only compatible with Docker 1.9+',
+        isValid: true,
+        type: 'warning',
+      });
+    } else {
+      setValidation(defaultMessage);
+    }
     setOrganizationName(value);
   };
 
@@ -71,7 +105,9 @@ export const CreateOrganizationModal = (
           variant="primary"
           onClick={createOrganizationHandler}
           form="modal-with-form-form"
-          isDisabled={invalidEmailFlag || !organizationName || !validOrgName}
+          isDisabled={
+            invalidEmailFlag || !organizationName || !validation.isValid
+          }
         >
           Create
         </Button>,
@@ -87,11 +123,9 @@ export const CreateOrganizationModal = (
           label="Organization Name"
           isRequired
           fieldId="modal-with-form-form-name"
-          helperText="This will also be the namespace for your repositories. Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long"
-          helperTextInvalid={
-            'Must be alphanumeric, all lowercase, at least 2 characters long and at most 255 characters long'
-          }
-          validated={validOrgName ? 'default' : 'error'}
+          helperText={validation.message}
+          helperTextInvalid={validation.message}
+          validated={validation.type}
         >
           <TextInput
             isRequired
@@ -99,7 +133,7 @@ export const CreateOrganizationModal = (
             id="modal-with-form-form-name"
             value={organizationName}
             onChange={handleNameInputChange}
-            validated={validOrgName ? 'default' : 'error'}
+            validated={validation.type}
           />
         </FormGroup>
         <FormGroup
