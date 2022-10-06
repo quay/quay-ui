@@ -13,6 +13,7 @@ import {fetchRobotsForNamespace} from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import ColumnNames from './ColumnNames';
 import {OrganizationsTableItem} from './OrganizationsList';
+import {AxiosError} from 'axios';
 
 interface CountProps {
   count: string | number;
@@ -93,7 +94,10 @@ export default function OrgTableData(props: OrganizationsTableItem) {
         }
       } catch (err) {
         console.error(err);
-        memberCountVal = 'Error';
+        memberCountVal =
+          err instanceof AxiosError && err.response?.status === 403
+            ? 'N/A'
+            : 'Error';
       } finally {
         setMemberCount(memberCountVal);
       }
