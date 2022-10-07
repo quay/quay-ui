@@ -96,7 +96,11 @@ export default function RepositoriesList() {
   // Filtering Repositories after applied filter
   const filteredRepos =
     search.query !== ''
-      ? repositoryList.filter((repo) => repo.name.includes(search.query))
+      ? repositoryList.filter((repo) => {
+          const repoName =
+            currentOrg == null ? `${repo.namespace}/${repo.name}` : repo.name;
+          return repoName.includes(search.query);
+        })
       : repositoryList;
 
   // Pagination related states
