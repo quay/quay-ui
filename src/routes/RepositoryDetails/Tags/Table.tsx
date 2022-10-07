@@ -20,10 +20,14 @@ import {formatDate} from 'src/libs/utils';
 import {SecurityDetailsState} from 'src/atoms/SecurityDetailsState';
 import ColumnNames from './ColumnNames';
 import {DownloadIcon} from '@patternfly/react-icons';
+import ImageSize from 'src/components/Table/ImageSize';
 
 function SubRow(props: SubRowProps) {
   return (
-    <Tr key={props.rowIndex} isExpanded={props.isTagExpanded(props.tag)}>
+    <Tr
+      key={`${props.manifest.platform.os}-${props.manifest.platform.architecture}-${props.rowIndex}`}
+      isExpanded={props.isTagExpanded(props.tag)}
+    >
       <Td />
       {props.manifest.platform ? (
         <Td dataLabel="platform" noPadding={false} colSpan={2}>
@@ -33,7 +37,7 @@ function SubRow(props: SubRowProps) {
                 props.org,
                 props.repo,
                 props.tag.name,
-                new Map([['arch', props.manifest.platform.architecture]]),
+                new Map([['digest', props.manifest.digest]]),
               )}
             >
               {`${props.manifest.platform.os} on ${props.manifest.platform.architecture}`}
@@ -48,22 +52,21 @@ function SubRow(props: SubRowProps) {
           <SecurityDetails
             org={props.org}
             repo={props.repo}
-            digest={props.tag.manifest_digest}
+            digest={props.manifest.digest}
             tag={props.tag.name}
-            arch={props.manifest.platform.architecture}
             variant="condensed"
           />
         </ExpandableRowContent>
       </Td>
-      {props.manifest.size ? (
-        <Td dataLabel="size" noPadding={false} colSpan={3}>
-          <ExpandableRowContent>
-            {prettyBytes(props.manifest.size)}
-          </ExpandableRowContent>
-        </Td>
-      ) : (
-        <Td />
-      )}
+      <Td dataLabel="size" noPadding={false} colSpan={3}>
+        <ExpandableRowContent>
+          <ImageSize
+            org={props.org}
+            repo={props.repo}
+            digest={props.manifest.digest}
+          />
+        </ExpandableRowContent>
+      </Td>
       {props.manifest.digest ? (
         <Td dataLabel="digest" noPadding={false} colSpan={1}>
           <ExpandableRowContent>
@@ -80,6 +83,13 @@ function SubRow(props: SubRowProps) {
 function Row(props: RowProps) {
   const tag = props.tag;
   const rowIndex = props.rowIndex;
+  let size =
+    typeof tag.manifest_list != 'undefined' ? 'N/A' : prettyBytes(tag.size);
+
+  // Behavior taken from previous UI
+  if (tag.size === 0) {
+    size = 'Uknown';
+  }
 
   // Reset SecurityDetailsState so that loading skeletons appear when viewing report
   const emptySecurityDetails = useResetRecoilState(SecurityDetailsState);
@@ -122,7 +132,7 @@ function Row(props: RowProps) {
         </Td>
         <Td dataLabel={ColumnNames.security}>
           {tag.is_manifest_list ? (
-            'See Child Manifest'
+            'See Child Manifests'
           ) : (
             <SecurityDetails
               org={props.org}
@@ -133,11 +143,7 @@ function Row(props: RowProps) {
             />
           )}
         </Td>
-        <Td dataLabel={ColumnNames.size}>
-          {typeof tag.manifest_list != 'undefined'
-            ? 'N/A'
-            : prettyBytes(tag.size)}
-        </Td>
+        <Td dataLabel={ColumnNames.size}>{size}</Td>
         <Td dataLabel={ColumnNames.lastModified}>
           {formatDate(tag.last_modified)}
         </Td>

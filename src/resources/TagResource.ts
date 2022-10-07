@@ -25,17 +25,26 @@ export interface ManifestList {
   mediaType: string;
   manifests: Manifest[];
 }
+
 export interface Manifest {
   mediaType: string;
   size: number;
   digest: string;
   platform: Platform;
   security: SecurityDetailsResponse;
+  layers: Layer[];
 }
+
+export interface Layer {
+  size: number;
+}
+
 export interface Platform {
   architecture: string;
   os: string;
-  features: string[];
+  features?: string[];
+  variant?: string;
+  'os.version'?: string;
 }
 
 export interface LabelsResponse {

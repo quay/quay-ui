@@ -2,10 +2,9 @@ import {useEffect, useState} from 'react';
 import {
   SecurityDetailsResponse,
   getSecurityDetails,
-  Data,
 } from 'src/resources/TagResource';
 import {Link} from 'react-router-dom';
-import {Skeleton, Spinner} from '@patternfly/react-core';
+import {Skeleton} from '@patternfly/react-core';
 import {getTagDetailPath} from 'src/routes/NavigationPath';
 import {TabIndex} from 'src/routes/TagDetails/Types';
 import {VulnerabilitySeverity} from 'src/resources/TagResource';
@@ -18,7 +17,7 @@ import {
   SecurityDetailsErrorState,
   SecurityDetailsState,
 } from 'src/atoms/SecurityDetailsState';
-import {useRecoilState, useResetRecoilState} from 'recoil';
+import {useResetRecoilState, useSetRecoilState} from 'recoil';
 import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 
 enum Variant {
@@ -28,11 +27,13 @@ enum Variant {
 
 export default function SecurityDetails(props: SecurityDetailsProps) {
   const [status, setStatus] = useState<string>();
+  const [hasFeatures, setHasFeatures] = useState<boolean>(false);
   const [vulnCount, setVulnCount] =
     useState<Map<VulnerabilitySeverity, number>>();
   const [loading, setLoading] = useState<boolean>(true);
-  const [err, setErr] = useRecoilState(SecurityDetailsErrorState);
-  const [data, setData] = useRecoilState(SecurityDetailsState);
+  const [err, setErr] = useState<string>();
+  const setGlobalErr = useSetRecoilState(SecurityDetailsErrorState);
+  const setGlobalData = useSetRecoilState(SecurityDetailsState);
 
   // Reset SecurityDetailsState so that loading skeletons appear when viewing report
   const emptySecurityDetails = useResetRecoilState(SecurityDetailsState);
@@ -59,11 +60,13 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     if (props.digest !== '') {
       (async () => {
         try {
+          setLoading(true);
           const securityDetails: SecurityDetailsResponse =
             await getSecurityDetails(props.org, props.repo, props.digest);
           const vulns = new Map<VulnerabilitySeverity, number>();
           if (securityDetails.data) {
-            setData(securityDetails);
+            setGlobalData(securityDetails);
+            setHasFeatures(securityDetails.data.Layer.Features.length > 0);
             for (const feature of securityDetails.data.Layer.Features) {
               if (feature.Vulnerabilities) {
                 for (const vuln of feature.Vulnerabilities) {
@@ -83,7 +86,12 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
           setLoading(false);
         } catch (error: any) {
           console.error(error);
-          setErr(addDisplayError('Unable to get security details', error));
+          const message = addDisplayError(
+            'Unable to get security details',
+            error,
+          );
+          setGlobalErr(message);
+          setErr(message);
           setLoading(false);
         }
       })();
@@ -91,10 +99,8 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
   }, [props.digest]);
   const queryParams = new Map<string, string>([
     ['tab', TabIndex.SecurityReport],
+    ['digest', props.digest],
   ]);
-  if (props.arch) {
-    queryParams.set('arch', props.arch);
-  }
 
   if (loading) {
     return <Skeleton width="50%"></Skeleton>;
@@ -108,7 +114,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     return <div>Queued</div>;
   } else if (status === 'failed') {
     return <div>Failed</div>;
-  } else if (status === 'unsupported') {
+  } else if (status === 'unsupported' || !hasFeatures) {
     return <div>Unsupported</div>;
   }
 
@@ -192,6 +198,5 @@ export interface SecurityDetailsProps {
   repo: string;
   tag: string;
   digest: string;
-  arch?: string;
   variant?: Variant | 'condensed' | 'full';
 }
