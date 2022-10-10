@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {Vulnerability, Feature} from 'src/resources/TagResource';
 import React from 'react';
 import {
@@ -16,13 +16,9 @@ import {
   PageSectionVariants,
   Spinner,
   Title,
+  Toolbar,
+  ToolbarContent,
 } from '@patternfly/react-core';
-import {useRecoilState} from 'recoil';
-import {
-  filteredVulnListState,
-  VulnerabilityListItem,
-  vulnListState,
-} from 'src/atoms/VulnerabilityReportState';
 import {SecurityReportFilter} from './SecurityReportFilter';
 import sha1 from 'js-sha1';
 import {
@@ -33,6 +29,8 @@ import {
 import {getSeverityColor} from 'src/libs/utils';
 
 import './SecurityReportTable.css';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import {VulnerabilityListItem} from './Types';
 
 const columnNames = {
   advisory: 'Advisory',
@@ -71,10 +69,17 @@ function TableHead() {
 }
 
 export default function SecurityReportTable({features}: SecurityDetailsProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [vulnList, setVulnList] = useRecoilState(vulnListState);
-  const [filteredVulnList, setFilteredVulnList] = useRecoilState(
-    filteredVulnListState,
+  const [vulnList, setVulnList] = useState<VulnerabilityListItem[]>([]);
+  const [filteredVulnList, setFilteredVulnList] = useState<
+    VulnerabilityListItem[]
+  >([]);
+
+  // Pagination state
+  const [page, setPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(10);
+  const paginatedVulns: VulnerabilityListItem[] = filteredVulnList.slice(
+    (page - 1) * perPage,
+    page * perPage,
   );
 
   const [expandedVulnKeys, setExpandedVulnKeys] = React.useState<string[]>([]);
@@ -121,20 +126,35 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       });
       setVulnList(vulnList);
       setFilteredVulnList(vulnList);
+    } else {
+      setVulnList([]);
+      setFilteredVulnList([]);
     }
   }, [features]);
 
   return (
     <PageSection variant={PageSectionVariants.light}>
       <TableTitle />
-      <SecurityReportFilter />
-      <TableComposable
-        data-testid="vulnerability-table"
-        aria-label="Expandable table"
-      >
+      <Toolbar>
+        <ToolbarContent>
+          <SecurityReportFilter
+            setPage={setPage}
+            vulnList={vulnList}
+            setFilteredVulnList={setFilteredVulnList}
+          />
+          <ToolbarPagination
+            itemsList={filteredVulnList}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+          />
+        </ToolbarContent>
+      </Toolbar>
+      <TableComposable data-testid="vulnerability-table" aria-label="Expandable table">
         <TableHead />
-        {filteredVulnList.length !== 0 ? (
-          filteredVulnList.map(
+        {paginatedVulns.length !== 0 ? (
+          paginatedVulns.map(
             (vulnerability: VulnerabilityListItem, rowIndex) => {
               const uniqueKey = generateUniqueKey(vulnerability);
               return (
@@ -216,11 +236,28 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
         ) : (
           <Tbody>
             <Tr>
-              <Td>{!features ? <Spinner size="lg" /> : <div></div>}</Td>
+              <Td>
+                {!features ? (
+                  <Spinner size="lg" />
+                ) : (
+                  <div>No Vulnerabilities Found</div>
+                )}
+              </Td>
             </Tr>
           </Tbody>
         )}
       </TableComposable>
+      <Toolbar>
+        <ToolbarContent>
+          <ToolbarPagination
+            itemsList={filteredVulnList}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+          />
+        </ToolbarContent>
+      </Toolbar>
     </PageSection>
   );
 }

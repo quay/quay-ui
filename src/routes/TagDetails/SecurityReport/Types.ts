@@ -1,18 +1,7 @@
-import {atom} from 'recoil';
 import {
   VulnerabilityMetadata,
   VulnerabilitySeverity,
 } from 'src/resources/TagResource';
-
-export const vulnListState = atom<VulnerabilityListItem[]>({
-  key: 'vulnListState',
-  default: [],
-});
-
-export const filteredVulnListState = atom<VulnerabilityListItem[]>({
-  key: 'filteredVulnListState',
-  default: [],
-});
 
 export interface VulnerabilityListItem {
   PackageName: string;
