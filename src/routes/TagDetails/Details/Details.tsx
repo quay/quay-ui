@@ -10,7 +10,6 @@ import {
   Skeleton,
   Page,
 } from '@patternfly/react-core';
-import prettyBytes from 'pretty-bytes';
 import CopyTags from './DetailsCopyTags';
 import {Tag} from 'src/resources/TagResource';
 import {formatDate} from 'src/libs/utils';
@@ -103,6 +102,7 @@ export default function Details(props: DetailsProps) {
                 repo={props.repo}
                 digest={props.digest}
                 tag={props.tag.name}
+                cacheResults={true}
               />
             </DescriptionListDescription>
           </DescriptionListGroup>
