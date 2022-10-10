@@ -38,6 +38,11 @@ export const BulkDeleteModalTemplate = <T,>(
   const [bulkModalPerPage, setBulkModalPerPage] = useState<number>(10);
   const [bulkModalPage, setBulkModalPage] = useState<number>(1);
 
+  const paginatedBulkItemsList = itemsMarkedForDelete.slice(
+    bulkModalPage * bulkModalPerPage - bulkModalPerPage,
+    bulkModalPage * bulkModalPerPage - bulkModalPerPage + bulkModalPerPage,
+  );
+
   const onSearch = (value: string) => {
     setSearchInput(value);
     if (value === '') {
@@ -115,7 +120,7 @@ export const BulkDeleteModalTemplate = <T,>(
             <ToolbarPagination
               page={bulkModalPage}
               perPage={bulkModalPerPage}
-              itemsList={props.selectedItems}
+              itemsList={paginatedBulkItemsList}
               setPage={setBulkModalPage}
               setPerPage={setBulkModalPerPage}
             />
@@ -130,7 +135,7 @@ export const BulkDeleteModalTemplate = <T,>(
             </Tr>
           </Thead>
           <Tbody>
-            {itemsMarkedForDelete.map((item, idx) => (
+            {paginatedBulkItemsList.map((item, idx) => (
               <Tr key={idx}>
                 {colNames.map((name, index) => (
                   <Td
@@ -148,7 +153,7 @@ export const BulkDeleteModalTemplate = <T,>(
           <ToolbarPagination
             page={bulkModalPage}
             perPage={bulkModalPerPage}
-            itemsList={props.selectedItems}
+            itemsList={paginatedBulkItemsList}
             setPage={setBulkModalPage}
             setPerPage={setBulkModalPerPage}
             bottom={true}
