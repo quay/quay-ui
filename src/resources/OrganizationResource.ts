@@ -54,9 +54,11 @@ export class OrgDeleteError extends Error {
   }
 }
 
-export async function deleteOrg(orgname: string) {
+export async function deleteOrg(orgname: string, isSuperUser = false) {
   try {
-    const deleteApiUrl = `/api/v1/organization/${orgname}`;
+    const deleteApiUrl = isSuperUser
+      ? `/api/v1/superuser/organizations/${orgname}`
+      : `/api/v1/organization/${orgname}`;
     // TODO: Add return type
     const response: AxiosResponse = await axios.delete(deleteApiUrl);
     assertHttpCode(response.status, 204);
@@ -66,8 +68,13 @@ export async function deleteOrg(orgname: string) {
   }
 }
 
-export async function bulkDeleteOrganizations(orgs: string[]) {
-  const responses = await Promise.allSettled(orgs.map((org) => deleteOrg(org)));
+export async function bulkDeleteOrganizations(
+  orgs: string[],
+  isSuperUser = false,
+) {
+  const responses = await Promise.allSettled(
+    orgs.map((org) => deleteOrg(org, isSuperUser)),
+  );
 
   // Aggregate failed responses
   const errResponses = responses.filter(
