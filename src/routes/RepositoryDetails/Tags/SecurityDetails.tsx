@@ -35,10 +35,6 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
   const setGlobalErr = useSetRecoilState(SecurityDetailsErrorState);
   const setGlobalData = useSetRecoilState(SecurityDetailsState);
 
-  // Reset SecurityDetailsState so that loading skeletons appear when viewing report
-  const emptySecurityDetails = useResetRecoilState(SecurityDetailsState);
-  const resetSecurityDetails = () => emptySecurityDetails();
-
   const severityOrder = [
     VulnerabilitySeverity.Critical,
     VulnerabilitySeverity.High,
@@ -65,7 +61,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
             await getSecurityDetails(props.org, props.repo, props.digest);
           const vulns = new Map<VulnerabilitySeverity, number>();
           if (securityDetails.data) {
-            setGlobalData(securityDetails);
+            if (props.cacheResults) setGlobalData(securityDetails);
             setHasFeatures(securityDetails.data.Layer.Features.length > 0);
             for (const feature of securityDetails.data.Layer.Features) {
               if (feature.Vulnerabilities) {
@@ -90,7 +86,7 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
             'Unable to get security details',
             error,
           );
-          setGlobalErr(message);
+          if (props.cacheResults) setGlobalErr(message);
           setErr(message);
           setLoading(false);
         }
@@ -122,7 +118,6 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     return (
       <Link
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
-        onClick={resetSecurityDetails}
         className={'pf-u-display-inline-flex pf-u-align-items-center'}
         style={{textDecoration: 'none'}}
       >
@@ -143,7 +138,6 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
     return (
       <Link
         to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
-        onClick={resetSecurityDetails}
         className={'pf-u-display-inline-flex pf-u-align-items-center'}
         style={{textDecoration: 'none'}}
       >
@@ -185,7 +179,6 @@ export default function SecurityDetails(props: SecurityDetailsProps) {
   return (
     <Link
       to={getTagDetailPath(props.org, props.repo, props.tag, queryParams)}
-      onClick={resetSecurityDetails}
       style={{textDecoration: 'none'}}
     >
       {counts}
@@ -199,4 +192,5 @@ export interface SecurityDetailsProps {
   tag: string;
   digest: string;
   variant?: Variant | 'condensed' | 'full';
+  cacheResults?: boolean;
 }
