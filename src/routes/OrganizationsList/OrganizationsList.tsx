@@ -83,6 +83,8 @@ export default function OrganizationsList() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
+  const [userData, setUserData] = useState<IUserResource>();
+  const [quayConfig, setQuayConfig] = useState(null);
   const refresh = userRefreshOrgList();
   const refreshPageIndex = useRecoilValue(refreshPageState);
 
@@ -152,8 +154,10 @@ export default function OrganizationsList() {
     // Error handling is in BulkDeleteModalTemplate,
     // since that is where it is reported to the user.
     try {
+      const isSuperUser =
+        quayConfig?.features.SUPERUSERS_FULL_ACCESS && userData?.super_user;
       const orgs = selectedOrganization.map((org) => org.name);
-      await bulkDeleteOrganizations(orgs);
+      await bulkDeleteOrganizations(orgs, isSuperUser);
     } catch (err) {
       console.error(err);
       if (err instanceof BulkOperationError) {
@@ -251,11 +255,13 @@ export default function OrganizationsList() {
       try {
         setLoading(true);
         resetSearch();
-        const quayConfig = await fetchQuayConfig();
-        const user = await fetchUser();
+        const config = await fetchQuayConfig();
+        const user: IUserResource = await fetchUser();
+        setQuayConfig(config);
+        setUserData(user);
 
         let orgnames: string[];
-        if (quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
+        if (config?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
           const orgs: IOrganization[] = await fetchOrgsAsSuperUser();
           orgnames = orgs.map((org) => org.name);
         } else {
@@ -282,7 +288,7 @@ export default function OrganizationsList() {
         // Add the user namespace. If superuser get all user namespaces
         // otherwise default to the current user's namespace
         let usernames: string[];
-        if (quayConfig?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
+        if (config?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
           const users: IUserResource[] = await fetchUsersAsSuperUser();
           usernames = users.map((user) => user.username);
         } else {
