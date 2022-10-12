@@ -10,7 +10,7 @@ export function Kebab(props: KebabProps) {
           onToggle={() => props.setKebabOpen(!props.isKebabOpen)}
           id="toggle-id-6"
         >
-          More Actions
+          Actions
         </DropdownToggle>
       }
       isOpen={props.isKebabOpen}

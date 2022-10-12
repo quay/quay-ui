@@ -255,6 +255,7 @@ export default function OrganizationsList() {
       try {
         setLoading(true);
         resetSearch();
+        setSelectedOrganization([]);
         const config = await fetchQuayConfig();
         const user: IUserResource = await fetchUser();
         setQuayConfig(config);
