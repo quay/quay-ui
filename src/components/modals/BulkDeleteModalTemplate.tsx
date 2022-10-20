@@ -176,7 +176,7 @@ export const BulkDeleteModalTemplate = <T,>(
 
 type BulkDeleteModalTemplateProps<T> = {
   mapOfColNamesToTableData: {
-    [key: string]: {label: string; transformFunc?: (value) => any};
+    [key: string]: {label?: string; transformFunc?: (value) => any};
   };
   isModalOpen: boolean;
   handleModalToggle?: () => void;
