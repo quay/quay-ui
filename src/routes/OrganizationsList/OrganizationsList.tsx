@@ -48,6 +48,7 @@ import ColumnNames from './ColumnNames';
 import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
 import {refreshPageState} from 'src/atoms/OrganizationListState';
 import {fetchQuayConfig} from 'src/resources/QuayConfig';
+import RepoCount from 'src/components/Table/RepoCount';
 
 export interface OrganizationsTableItem {
   name: string;
@@ -198,7 +199,7 @@ export default function OrganizationsList() {
   const mapOfColNamesToTableData = {
     Organization: {label: 'name'},
     'Repo Count': {
-      label: 'repoCount',
+      transformFunc: (org: IOrganization) => <RepoCount name={org.name} />,
     },
   };
 
