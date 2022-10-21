@@ -30,6 +30,7 @@ export function OrganizationToolBar(props: OrganizationToolBarProps) {
         />
         <SearchInput searchState={search} onChange={setSearch} />
         <ToolbarButton
+          id="create-organization-button"
           buttonValue="Create Organization"
           Modal={props.createOrgModal}
           isModalOpen={props.isOrganizationModalOpen}

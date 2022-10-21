@@ -52,7 +52,7 @@ describe('Repository Details Page', () => {
         'have.text',
         'See Child Manifests',
       );
-      cy.get(`[data-label="Size"]`).should('have.text', 'N/A');
+      cy.get(`[data-label="Size"]`).should('have.text', 'Unknown');
       cy.get(`[data-label="Last Modified"]`).should(
         'have.text',
         formatDate('Thu, 04 Nov 2022 19:15:15 -0000'),

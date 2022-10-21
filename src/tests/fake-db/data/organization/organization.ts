@@ -67,7 +67,7 @@ mock.onGet(orgPathRegex).reply((config) => {
 
 mock.onPost('/api/v1/organization/').reply((request: AxiosRequestConfig) => {
   const {name, email} = JSON.parse(request.data);
-  return [200, createOrgSuccessResponse];
+  return [201, createOrgSuccessResponse];
 });
 
 const superUserOrgsResponse = {

@@ -60,6 +60,7 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
         />
         <SearchInput searchState={search} onChange={setSearch} />
         <ToolbarButton
+          id="create-repository-button"
           buttonValue="Create Repository"
           Modal={props.createRepoModal}
           isModalOpen={props.isCreateRepoModalOpen}

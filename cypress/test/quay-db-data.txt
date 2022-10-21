@@ -5359,6 +5359,8 @@ COPY public.buildtriggerservice (id, name) FROM stdin;
 --
 
 COPY public.deletednamespace (id, namespace_id, marked, original_username, original_email, queue_id) FROM stdin;
+1	2	2022-11-21 18:50:59.961607	quay	3a264858-3459-4996-adf8-21c7ed5c6bc4	1
+2	3	2022-11-21 18:51:08.104177	clair	33fc4ec1-a667-44f5-b1e1-c5a9c464ac85	2
 \.
 
 
@@ -5592,6 +5594,8 @@ COPY public.logentry3 (id, kind_id, account_id, performer_id, repository_id, dat
 5	27	1	1	1	2022-11-14 20:13:33.423321	172.18.0.1	{"id": "402a92ff-64e7-4880-ac61-b47b7d279020", "key": "vendor", "value": "Redhat", "manifest_digest": "sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4", "media_type": "text/plain", "namespace": "user1", "repo": "hello-world"}
 6	41	1	1	1	2022-11-15 13:35:39.092369	172.18.0.1	{"repo": "hello-world", "namespace": "user1", "user-agent": "docker/20.10.14 go/go1.16.15 git-commit/87a90dc kernel/5.10.104-linuxkit os/linux arch/amd64 UpstreamClient(Docker-Client/20.10.14 \\\\(darwin\\\\))", "tag": "manifestlist", "username": "user1", "resolved_ip": {"provider": "internet", "service": null, "sync_token": "1645662201", "country_iso_code": null, "aws_region": null}}
 7	41	1	1	1	2022-11-15 13:35:43.687829	172.18.0.1	{"repo": "hello-world", "namespace": "user1", "user-agent": "docker/20.10.14 go/go1.16.15 git-commit/87a90dc kernel/5.10.104-linuxkit os/linux arch/amd64 UpstreamClient(Docker-Client/20.10.14 \\\\(darwin\\\\))", "tag": "latest", "username": "user1", "resolved_ip": {"provider": "internet", "service": null, "sync_token": "1645662201", "country_iso_code": null, "aws_region": null}}
+8	14	2	1	3	2022-11-21 18:50:13.652958	172.18.0.1	{"repo": "alpine", "namespace": "quay"}
+9	14	4	1	4	2022-11-21 18:51:52.359274	172.18.0.1	{"repo": "clair-jwt", "namespace": "projectquay"}
 \.
 
 
@@ -5707,7 +5711,7 @@ COPY public.manifest (id, repository_id, digest, media_type_id, manifest_bytes, 
 7	1	sha256:b836bb24a270b9cc935962d8228517fde0f16990e88893d935efcb1b14c0017a	16	{\n   "schemaVersion": 2,\n   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",\n   "config": {\n      "mediaType": "application/vnd.docker.container.image.v1+json",\n      "size": 1471,\n      "digest": "sha256:61fff98d5ca765a4351964c8f4b5fb1a0d2c48458026f5452a389eb52d146fe8"\n   },\n   "layers": [\n      {\n         "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",\n         "size": 3929,\n         "digest": "sha256:33450689bfb495ed64ead935c9933f1d6b3e42fe369b8de9680cf4ff9d89ce5c"\n      }\n   ]\n}	application/vnd.docker.container.image.v1+json	3929
 8	1	sha256:98c9722322be649df94780d3fbe594fce7996234b259f27eac9428b84050c849	16	{\n   "schemaVersion": 2,\n   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",\n   "config": {\n      "mediaType": "application/vnd.docker.container.image.v1+json",\n      "size": 1471,\n      "digest": "sha256:b3593dab05491cdf5ee88c29bee36603c0df0bc34798eed5067f6e1335a9d391"\n   },\n   "layers": [\n      {\n         "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",\n         "size": 3000,\n         "digest": "sha256:3caa6dc69d0b73f21d29bfa75356395f2695a7abad34f010656740e90ddce399"\n      }\n   ]\n}	application/vnd.docker.container.image.v1+json	3000
 9	1	sha256:c7b6944911848ce39b44ed660d95fb54d69bbd531de724c7ce6fc9f743c0b861	16	{\n   "schemaVersion": 2,\n   "mediaType": "application/vnd.docker.distribution.manifest.v2+json",\n   "config": {\n      "mediaType": "application/vnd.docker.container.image.v1+json",\n      "size": 1469,\n      "digest": "sha256:df5477cea5582b0ae6a31de2d1c9bbacb506091f42a3b0fe77a209006f409fd8"\n   },\n   "layers": [\n      {\n         "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",\n         "size": 3276,\n         "digest": "sha256:abc70fcc95b2f52b325d69cc5c259dd9babb40a9df152e88b286fada1d3248bd"\n      }\n   ]\n}	application/vnd.docker.container.image.v1+json	3276
-10	1	sha256:7693efac53eb85ff1afb03f7f2560015c57ac2175707f1f141f31161634c9dba	15	{"manifests":[{"digest":"sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"amd64","os":"linux"},"size":525},{"digest":"sha256:7b8b7289d0536a08eabdf71c20246e23f7116641db7e1d278592236ea4dcb30c","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm","os":"linux","variant":"v5"},"size":525},{"digest":"sha256:f130bd2d67e6e9280ac6d0a6c83857bfaf70234e8ef4236876eccfbd30973b1c","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm","os":"linux","variant":"v7"},"size":525},{"digest":"sha256:432f982638b3aefab73cc58ab28f5c16e96fdb504e8c134fc58dff4bae8bf338","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm64","os":"linux","variant":"v8"},"size":525},{"digest":"sha256:995efde2e81b21d1ea7066aa77a59298a62a9e9fbb4b77f36c189774ec9b1089","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"386","os":"linux"},"size":525},{"digest":"sha256:eb11b1a194ff8e236a01eff392c4e1296a53b0fb4780d8b0382f7996a15d5392","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"mips64le","os":"linux"},"size":525},{"digest":"sha256:b836bb24a270b9cc935962d8228517fde0f16990e88893d935efcb1b14c0017a","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"ppc64le","os":"linux"},"size":525},{"digest":"sha256:98c9722322be649df94780d3fbe594fce7996234b259f27eac9428b84050c849","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"riscv64","os":"linux"},"size":525},{"digest":"sha256:c7b6944911848ce39b44ed660d95fb54d69bbd531de724c7ce6fc9f743c0b861","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"s390x","os":"linux"},"size":525}],"mediaType":"application\\/vnd.docker.distribution.manifest.list.v2+json","schemaVersion":2}	\N	\N
+10	1	sha256:7693efac53eb85ff1afb03f7f2560015c57ac2175707f1f141f31161634c9dba	15	{"manifests":[{"digest":"sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"amd64","os":"linux"},"size":525},{"digest":"sha256:7b8b7289d0536a08eabdf71c20246e23f7116641db7e1d278592236ea4dcb30c","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm","os":"linux","variant":"v5"},"size":525},{"digest":"sha256:f130bd2d67e6e9280ac6d0a6c83857bfaf70234e8ef4236876eccfbd30973b1c","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm","os":"linux","variant":"v7"},"size":525},{"digest":"sha256:432f982638b3aefab73cc58ab28f5c16e96fdb504e8c134fc58dff4bae8bf338","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"arm64","os":"linux","variant":"v8"},"size":525},{"digest":"sha256:995efde2e81b21d1ea7066aa77a59298a62a9e9fbb4b77f36c189774ec9b1089","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"386","os":"linux"},"size":525},{"digest":"sha256:eb11b1a194ff8e236a01eff392c4e1296a53b0fb4780d8b0382f7996a15d5392","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"mips64le","os":"linux"},"size":525},{"digest":"sha256:b836bb24a270b9cc935962d8228517fde0f16990e88893d935efcb1b14c0017a","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"ppc64le","os":"linux"},"size":525},{"digest":"sha256:98c9722322be649df94780d3fbe594fce7996234b259f27eac9428b84050c849","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"riscv64","os":"linux"},"size":525},{"digest":"sha256:c7b6944911848ce39b44ed660d95fb54d69bbd531de724c7ce6fc9f743c0b861","mediaType":"application\\/vnd.docker.distribution.manifest.v2+json","platform":{"architecture":"s390x","os":"linux"},"size":525}],"mediaType":"application\\/vnd.docker.distribution.manifest.list.v2+json","schemaVersion":2}	\N	0
 \.
 
 
@@ -5777,6 +5781,7 @@ COPY public.manifestlegacyimage (id, repository_id, manifest_id, image_id) FROM 
 --
 
 COPY public.manifestsecuritystatus (id, manifest_id, repository_id, index_status, error_json, last_indexed, indexer_hash, indexer_version, metadata_json) FROM stdin;
+1	10	1	-2	{}	2022-11-21 18:28:16.803292	none	4	{}
 \.
 
 
@@ -5925,6 +5930,8 @@ COPY public.quayservice (id, name) FROM stdin;
 --
 
 COPY public.queueitem (id, queue_name, body, available_after, available, processing_expires, retries_remaining, state_id) FROM stdin;
+1	namespacegc/2/	{"marker_id": 1, "original_username": "quay"}	2022-11-21 19:08:59.907435	t	2022-11-21 22:03:59.822106	5	d16ca6ff-78c0-41f7-a0cd-3cbc34c4ce86
+2	namespacegc/3/	{"marker_id": 2, "original_username": "clair"}	2022-11-21 19:09:05.093576	t	2022-11-21 22:04:04.940845	5	14e73adf-53a7-4fc3-8be8-1458b2edbd6e
 \.
 
 
@@ -5969,6 +5976,8 @@ COPY public.repomirrorrule (id, uuid, repository_id, creation_date, rule_type, r
 COPY public.repository (id, namespace_user_id, name, visibility_id, description, badge_token, kind_id, trust_enabled, state) FROM stdin;
 1	1	hello-world	2	\N	b6c6a402-af02-4cc1-a4a9-48155b049f19	1	f	0
 2	1	nested/repo	2		637a151b-62db-4c26-a160-0ba01d1c96d4	1	f	0
+3	2	alpine	1		9d24b211-b0af-47e2-9a88-543483b68461	1	f	0
+4	4	clair-jwt	1		cc957b5d-c4f8-4359-9bc9-f6e667a216da	1	f	0
 \.
 
 
@@ -5979,6 +5988,8 @@ COPY public.repository (id, namespace_user_id, name, visibility_id, description,
 COPY public.repositoryactioncount (id, repository_id, count, date) FROM stdin;
 1	1	0	2022-11-03
 2	2	0	2022-11-13
+3	3	0	2022-11-20
+4	4	0	2022-11-20
 \.
 
 
@@ -6031,6 +6042,8 @@ COPY public.repositorynotification (id, uuid, repository_id, event_id, method_id
 COPY public.repositorypermission (id, team_id, user_id, repository_id, role_id) FROM stdin;
 1	\N	1	1	1
 2	\N	1	2	1
+3	\N	1	3	1
+4	\N	1	4	1
 \.
 
 
@@ -6041,6 +6054,8 @@ COPY public.repositorypermission (id, team_id, user_id, repository_id, role_id) 
 COPY public.repositorysearchscore (id, repository_id, score, last_updated) FROM stdin;
 1	1	0	\N
 2	2	0	\N
+3	3	0	\N
+4	4	0	\N
 \.
 
 
@@ -6050,7 +6065,9 @@ COPY public.repositorysearchscore (id, repository_id, score, last_updated) FROM 
 
 COPY public.repositorysize (id, repository_id, size_bytes) FROM stdin;
 1	1	2479
+3	3	0
 2	2	0
+4	4	0
 \.
 
 
@@ -6095,6 +6112,9 @@ COPY public.role (id, name) FROM stdin;
 
 COPY public.servicekey (id, name, kid, service, jwk, metadata, created_date, expiration_date, rotation_duration, approval_id) FROM stdin;
 3	http://localhost:8080	wymy28RvVXS0McHaIj1wHjC1EyhlDczyo4gw0etqOX0	quay	{"n": "vjW8tgIpHoHptN3RslleeLDBbGeQmh_Usp5TvKWDOKJZFOQboxaqXCnFVsB_Ua_HX0Qxz5Rk1LnO1s0rWHwDenoHG_Yt_ph5gd97H2zLQdSt6oZ2dGFYvBIK8-MbZ-vzk5vN7Vgg7BQleIEl-pmeHBhlv9jzAnoFCToEgsSvT72FU0MNM1bx_cKdMdHDxp8mCbFxgwxfecHznf50MJVm9SdDedtFvJ8gUf_QjWdhxQ5JxqwmwYNqp5-h4RyPKySuTXtcwb2-tIIr0Rux3IS4DCnWEykM3BeD_grQMRkysS_kwsMWuGPOk72hRk3Q9Ug01tV5wD4XzzuuTdGFinzKrQ", "e": "AQAB", "kty": "RSA", "kid": "wymy28RvVXS0McHaIj1wHjC1EyhlDczyo4gw0etqOX0"}	{"created_by": "CLI tool"}	2022-11-15 13:34:27.001785	2022-11-15 15:34:26.969059	\N	3
+4	http://localhost:8080	ZN_lSn1MoxnNCzytTOzLMWCk-orZMuADii9Sq-8x-IY	quay	{"n": "nl6bWQNChlr6m7uK2h7fSwAHwYKrGLNdX8SvqHkvtNknxKCIsEpFIr7a_Fe3ZTk-vyB4aT-m32LiL8XXvptI25BnpZ2zCPhZDAM4rtH0E8AyJ0C31JpNNhUtq_fjFhgnxkCiO_zDdBtUP8r-TafHxL9nb9NmsgYblXQY4JGNtCUbF_r5OmJZQ7VHzUveDP15af62hKMeIVt9BmHHqozrKgac_EKlh1JAAckQrpJHhHt77OUw08hFDXmjS6Kbqi8y99unwPdMCKi4fHC-cRN5Rav02JLTFy8CpT8C10P-elgVykaHWWyb-IJtXKfP3brgfFvTFJmm33N6UhINr_lf6Q", "e": "AQAB", "kty": "RSA", "kid": "ZN_lSn1MoxnNCzytTOzLMWCk-orZMuADii9Sq-8x-IY"}	{"created_by": "CLI tool"}	2022-11-21 18:40:02.350605	2022-11-21 20:40:02.300317	\N	4
+5	http://localhost:8080	W5XCs7v0wlWNdxINw__qqEGaaHA1REQDheowzey_mwk	quay	{"n": "1TPNyRNsQQgOc0Mb2uFJRbWn_a--Tfl62zYDtXS5X1C45S5PSwqnKQalLPudSaCvjV9E4Ez53OgEFLmq7At3r-6zuIfWsSnpDjYAjcH7yMCmreJ45b1TWOxOXLUpNj7XS4Lh1akVaHgJ12kfIztwqIYm2f4GGmKdzwXoOMvPEY-3ph7vmGfOdURZLM9hT-0mx5tjFCeC1oh1GOdwLn5i0UJd3yXyt0kWC6xV5nksUCr01QOg8wSyxyCelR2-ohVr40H5znsgHfPIQe6jhL6o9yCzoYSVDmD5vRmBdvTlAIP1DGhhWxFVGHGGPNw_Qnzlib3Iui2NbHUHBDbt2G0Ezw", "e": "AQAB", "kty": "RSA", "kid": "W5XCs7v0wlWNdxINw__qqEGaaHA1REQDheowzey_mwk"}	{"created_by": "CLI tool"}	2022-11-21 18:43:45.386442	2022-11-21 20:43:45.335226	\N	5
+6	http://localhost:8080	tRXwIjs2xAQHUZ3Qu0Akdj94ghiGT0SC0uiztOQKV0k	quay	{"n": "vMUcyTKhjv7fJY5CBsodDchHfdMV6hxprj4uoGV-0FWnRR4ZAH4-csSzlkIihMvRY095YbHgi9bJJp03Mkcz9juMHN7tvA_Ew328f6hP6aExEBfTFbB49Ky2cuKrDL0hi0waqYOfm35JVb2xY4yHTdXPaMa9IvcEqsaM4ih2T5GRfKneCC35ffdufqBYvmVBrM0jAXLGvi7K2_UFBcH2pjm_aEJ0EzNhQEqgig2z6mbb-w77CQYjDfrrwPIMfsY4fIyCkQjzAe-7Yt5Cuf_TH7BkPv1ZNnCfo4kPSOeV6MY7tygaZXxkvKINU24YXLgETmHPasqZ7fttPR5P6VimNw", "e": "AQAB", "kty": "RSA", "kid": "tRXwIjs2xAQHUZ3Qu0Akdj94ghiGT0SC0uiztOQKV0k"}	{"created_by": "CLI tool"}	2022-11-21 18:47:59.573251	2022-11-21 20:47:59.495676	\N	6
 \.
 
 
@@ -6105,6 +6125,9 @@ COPY public.servicekey (id, name, kid, service, jwk, metadata, created_date, exp
 COPY public.servicekeyapproval (id, approver_id, approval_type, approved_date, notes) FROM stdin;
 1	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-04 18:57:09.109963	
 3	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-15 13:34:27.009874	
+4	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-21 18:40:02.364779	
+5	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-21 18:43:45.399899	
+6	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-21 18:47:59.585515	
 \.
 
 
@@ -6188,6 +6211,30 @@ COPY public.tagtorepositorytag (id, repository_id, tag_id, repository_tag_id) FR
 --
 
 COPY public.team (id, name, organization_id, role_id, description) FROM stdin;
+3	owners	4	1	
+4	owners	5	1	
+5	owners	6	1	
+6	owners	7	1	
+7	owners	8	1	
+8	owners	9	1	
+9	owners	10	1	
+10	owners	11	1	
+11	owners	12	1	
+12	owners	13	1	
+13	owners	14	1	
+14	owners	15	1	
+15	owners	16	1	
+16	owners	17	1	
+17	owners	18	1	
+18	owners	19	1	
+19	owners	20	1	
+20	owners	21	1	
+21	owners	22	1	
+22	owners	23	1	
+23	owners	24	1	
+24	owners	25	1	
+25	owners	26	1	
+26	owners	27	1	
 \.
 
 
@@ -6196,6 +6243,30 @@ COPY public.team (id, name, organization_id, role_id, description) FROM stdin;
 --
 
 COPY public.teammember (id, user_id, team_id) FROM stdin;
+3	1	3
+4	1	4
+5	1	5
+6	1	6
+7	1	7
+8	1	8
+9	1	9
+10	1	10
+11	1	11
+12	1	12
+13	1	13
+14	1	14
+15	1	15
+16	1	16
+17	1	17
+18	1	18
+19	1	19
+20	1	20
+21	1	21
+22	1	22
+23	1	23
+24	1	24
+25	1	25
+26	1	26
 \.
 
 
@@ -6265,7 +6336,33 @@ COPY public.uploadedblob (id, repository_id, blob_id, uploaded_at, expires_at) F
 --
 
 COPY public."user" (id, uuid, username, password_hash, email, verified, stripe_id, organization, robot, invoice_email, invalid_login_attempts, last_invalid_login, removed_tag_expiration_s, enabled, invoice_email_address, company, family_name, given_name, location, maximum_queued_builds_count, creation_date, last_accessed) FROM stdin;
-1	a25d6484-cf99-46d4-9e2e-e2e1f1d769fa	user1	$2b$12$c4u19A/x6a.6Ihm2pAin7.nXUCIqI0vtf7miS7tZ.oXhHtsKVS.Bq	user1@redhat.com	t	\N	f	f	f	0	2022-10-31 18:50:36.685961	1209600	t	\N	\N	\N	\N	\N	\N	2022-10-31 18:50:36.685976	\N
+1	5a177ae4-b114-4557-ab6a-c6947f618b55	user1	$2b$12$c4u19A/x6a.6Ihm2pAin7.nXUCIqI0vtf7miS7tZ.oXhHtsKVS.Bq	user1@redhat.com	t	\N	f	f	f	0	2022-10-31 18:50:36.685961	1209600	t	\N	\N	\N	\N	\N	\N	2022-10-31 18:50:36.685976	\N
+2	478983be-9239-479c-9ca6-86d85eb5bcae	89aced10-1ceb-4fa0-a21d-eea28b821060	\N	eba37a66-0b41-4352-86c5-438a1875d5e5	f	\N	t	f	f	0	2022-11-21 18:49:53.667717	1209600	f	\N	\N	\N	\N	\N	\N	2022-11-21 18:49:53.667738	\N
+3	b72c9d43-eb51-4dee-996a-ef6e78c92db7	aee7990b-975d-42f2-b9be-b357a5aa3f3f	\N	33b3d332-b72f-4754-b9d3-816aca5261b3	f	\N	t	f	f	0	2022-11-21 18:50:35.411588	1209600	f	\N	\N	\N	\N	\N	\N	2022-11-21 18:50:35.411606	\N
+4	ec029590-9f7f-4886-9bec-d11925542ed6	projectquay	\N	4e003156-02a9-4d51-8c22-a110e7c86aa9	f	\N	t	f	f	0	2022-11-21 18:51:23.259811	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:51:23.259828	\N
+5	06cedae8-05d2-4449-8f66-1624493f3fd7	openshift-release-dev	\N	1616e6db-a68c-48ef-a1ce-7bfec0ebdc70	f	\N	t	f	f	0	2022-11-21 18:52:21.603187	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:52:21.6032	\N
+6	481e82b1-6bda-48c8-af55-2772bdfa0dae	prometheus	\N	02a65677-c97e-4998-ad50-6097a7608d10	f	\N	t	f	f	0	2022-11-21 18:52:35.747294	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:52:35.747312	\N
+7	1e388f93-d292-4936-ab7a-b10eaac270cc	jetstack	\N	fb58e839-d4e0-42fc-b1bc-7d9d1fb09646	f	\N	t	f	f	0	2022-11-21 18:52:44.887303	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:52:44.887318	\N
+8	0df740c0-f0e2-42da-8773-e72c17483a7c	unleash	\N	5aea0114-13bc-4d55-a4c7-49e69823598c	f	\N	t	f	f	0	2022-11-21 18:52:51.961513	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:52:51.961532	\N
+9	3000a186-4c7a-4bfd-8c0b-e8e9a6546bd9	calico	\N	8f6e0877-e1a8-4e13-a93c-1c62a5b575b3	f	\N	t	f	f	0	2022-11-21 18:53:03.702691	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:53:03.702753	\N
+10	49428d6a-d491-4929-9e9b-3b6bb15c0795	coreos	\N	9b2418ff-f146-499b-a04a-ace3b039298a	f	\N	t	f	f	0	2022-11-21 18:53:13.316536	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:53:13.316553	\N
+11	36865adb-12f6-454f-93ef-9838cbef753f	openshift	\N	22bdcc81-2635-4cc2-8386-62382fc0eafa	f	\N	t	f	f	0	2022-11-21 18:53:27.566407	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:53:27.566425	\N
+12	3102af81-a22c-48a3-b388-7b9c86231bc0	oauth2-proxy	\N	0c98c50a-cfa6-4c69-a220-848558b2e8ba	f	\N	t	f	f	0	2022-11-21 18:53:38.461308	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:53:38.461324	\N
+13	13c26785-7939-4bb2-9492-4e3335a3b4f5	wildfly	\N	9f5dddee-46f3-4885-ba12-1e45b90d4bbb	f	\N	t	f	f	0	2022-11-21 18:53:49.695342	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:53:49.695355	\N
+14	31622f50-696f-4e5e-8312-95fddc734328	rhacs-eng	\N	d7a6a611-3f49-434e-9dcb-6527fc217474	f	\N	t	f	f	0	2022-11-21 18:54:05.199793	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:54:05.199809	\N
+15	69561fa8-d9dd-4939-82e3-7ccd6d8798b5	vexxhost	\N	7996a4c6-cd3e-45bf-bb25-6b62abaf6096	f	\N	t	f	f	0	2022-11-21 18:54:10.484561	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:54:10.484579	\N
+16	50101a53-1c86-494e-8f3a-e6de3ed3ec3c	keycloak	\N	bfb04280-1c35-406b-9696-b3e72e78c330	f	\N	t	f	f	0	2022-11-21 18:54:30.650272	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:54:30.650291	\N
+17	61573646-ae87-418c-9834-074aa8f27a13	operatorhubio	\N	394b7971-c584-4c5c-b627-9c4d0a9711ce	f	\N	t	f	f	0	2022-11-21 18:54:54.010609	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:54:54.010631	\N
+18	3889f8f9-6034-42a8-bcde-f4860f5924aa	sysdig	\N	4871d033-c213-4402-a42a-d87445b8e8a7	f	\N	t	f	f	0	2022-11-21 18:55:02.038662	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:55:02.038677	\N
+19	496a28f1-4d2a-4805-9f99-d069b17e3548	operator-framework	\N	1e0a2dbd-1790-40a8-892b-8e099fb12878	f	\N	t	f	f	0	2022-11-21 18:55:10.277329	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:55:10.277349	\N
+20	4ef770b1-850d-46c0-ae24-372f83c06145	cillium	\N	2a4ba114-0f01-4003-9910-49834f783267	f	\N	t	f	f	0	2022-11-21 18:55:22.699958	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:55:22.699975	\N
+21	181aa9b9-78b9-4c25-945d-bb71fffb8c1b	kubernetes-ingress-controller	\N	10d98c47-06f1-4f89-a4cb-3f33afcd17f8	f	\N	t	f	f	0	2022-11-21 18:55:33.516279	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:55:33.516296	\N
+22	13473b47-0aec-4977-9618-bc82d05ff6fd	metallb	\N	83efaa01-2a76-4545-bf9c-e50ad2059929	f	\N	t	f	f	0	2022-11-21 18:55:43.990124	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:55:43.990137	\N
+23	8f48d189-e992-4f2c-bfd3-13226dc56383	gitlab	\N	f91d8923-5c70-4662-b253-0e2345bc0b01	f	\N	t	f	f	0	2022-11-21 18:55:57.342883	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:55:57.342897	\N
+24	0f3f6fd1-b1b6-42cd-bfd3-85bda8e87f0a	fairwinds	\N	fac885ae-a5a5-4cc7-9053-dd07ad807a27	f	\N	t	f	f	0	2022-11-21 18:56:06.898168	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:56:06.898189	\N
+25	ce824049-c743-463a-a15b-5dacdbdd9174	minio	\N	9b2204ea-0cbf-46f5-b9e9-43fd0c28117e	f	\N	t	f	f	0	2022-11-21 18:56:21.537146	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:56:21.537163	\N
+26	df00c09a-f39b-4afe-b676-91d5bee4e507	centos	\N	ae63b4ec-f66a-48b2-a5fb-5f46d8a3e953	f	\N	t	f	f	0	2022-11-21 18:56:36.90184	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:56:36.901869	\N
+27	06580557-80cb-4b69-83cd-09b9c538330b	ceph	\N	3260450e-c0b6-4cf6-90ca-ce31c882fa80	f	\N	t	f	f	0	2022-11-21 18:56:42.081825	1209600	t	\N	\N	\N	\N	\N	\N	2022-11-21 18:56:42.081839	\N
 \.
 
 
@@ -6416,7 +6513,7 @@ SELECT pg_catalog.setval('public.buildtriggerservice_id_seq', 4, true);
 -- Name: deletednamespace_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.deletednamespace_id_seq', 1, false);
+SELECT pg_catalog.setval('public.deletednamespace_id_seq', 2, true);
 
 
 --
@@ -6542,7 +6639,7 @@ SELECT pg_catalog.setval('public.logentry2_id_seq', 1, false);
 -- Name: logentry3_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.logentry3_id_seq', 7, true);
+SELECT pg_catalog.setval('public.logentry3_id_seq', 9, true);
 
 
 --
@@ -6605,7 +6702,7 @@ SELECT pg_catalog.setval('public.manifestlegacyimage_id_seq', 1, false);
 -- Name: manifestsecuritystatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.manifestsecuritystatus_id_seq', 1, false);
+SELECT pg_catalog.setval('public.manifestsecuritystatus_id_seq', 1, true);
 
 
 --
@@ -6703,7 +6800,7 @@ SELECT pg_catalog.setval('public.quayservice_id_seq', 1, false);
 -- Name: queueitem_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.queueitem_id_seq', 1, false);
+SELECT pg_catalog.setval('public.queueitem_id_seq', 2, true);
 
 
 --
@@ -6738,14 +6835,14 @@ SELECT pg_catalog.setval('public.repomirrorrule_id_seq', 1, false);
 -- Name: repository_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repository_id_seq', 2, true);
+SELECT pg_catalog.setval('public.repository_id_seq', 4, true);
 
 
 --
 -- Name: repositoryactioncount_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repositoryactioncount_id_seq', 2, true);
+SELECT pg_catalog.setval('public.repositoryactioncount_id_seq', 4, true);
 
 
 --
@@ -6787,21 +6884,21 @@ SELECT pg_catalog.setval('public.repositorynotification_id_seq', 1, false);
 -- Name: repositorypermission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repositorypermission_id_seq', 2, true);
+SELECT pg_catalog.setval('public.repositorypermission_id_seq', 4, true);
 
 
 --
 -- Name: repositorysearchscore_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repositorysearchscore_id_seq', 2, true);
+SELECT pg_catalog.setval('public.repositorysearchscore_id_seq', 4, true);
 
 
 --
 -- Name: repositorysize_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repositorysize_id_seq', 2, true);
+SELECT pg_catalog.setval('public.repositorysize_id_seq', 4, true);
 
 
 --
@@ -6836,14 +6933,14 @@ SELECT pg_catalog.setval('public.role_id_seq', 3, true);
 -- Name: servicekey_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.servicekey_id_seq', 3, true);
+SELECT pg_catalog.setval('public.servicekey_id_seq', 6, true);
 
 
 --
 -- Name: servicekeyapproval_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.servicekeyapproval_id_seq', 3, true);
+SELECT pg_catalog.setval('public.servicekeyapproval_id_seq', 6, true);
 
 
 --
@@ -6906,14 +7003,14 @@ SELECT pg_catalog.setval('public.tagtorepositorytag_id_seq', 1, false);
 -- Name: team_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.team_id_seq', 1, false);
+SELECT pg_catalog.setval('public.team_id_seq', 26, true);
 
 
 --
 -- Name: teammember_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.teammember_id_seq', 1, false);
+SELECT pg_catalog.setval('public.teammember_id_seq', 26, true);
 
 
 --
@@ -6955,7 +7052,7 @@ SELECT pg_catalog.setval('public.uploadedblob_id_seq', 18, true);
 -- Name: user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.user_id_seq', 1, true);
+SELECT pg_catalog.setval('public.user_id_seq', 27, true);
 
 
 --
