@@ -50,6 +50,14 @@ npm test
 Launches the test runner in the interactive watch mode.\
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
+### Integration Tests
+
+Integration tests are ran via [Cypress](https://docs.cypress.io/). The URL under test defaults to `http://localhost:9000` and can be overriden with the `baseUrl` parameter in the `cypress.config.ts` file.
+
+To run tests locally:
+- Start the application with `npm start`
+- When application has started run the tests with `npm run test:integration`
+
 ## Building for Production
 
 ```bash
