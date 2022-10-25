@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Signin page', () => {
   it('Succesful signin', () => {
     cy.visit(`/signin`);

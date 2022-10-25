@@ -3,9 +3,9 @@ import {mock} from 'src/tests/fake-db/MockAxios';
 
 const response = {
   anonymous: false,
-  username: 'syahmed',
+  username: 'user1',
   avatar: {
-    name: 'syed',
+    name: 'user1',
     hash: 'd27382531c5b7ec00bbec3865cea775',
     color: '#17becf',
     kind: 'user',
@@ -13,14 +13,14 @@ const response = {
   can_create_repo: true,
   is_me: true,
   verified: true,
-  email: 'syahmed@redhat.com',
+  email: 'user1@redhat.com',
   logins: [
     {
       service: 'rhsso',
       service_identifier:
-        'f:9f97392e-a27f-4e15-91ae-81da814b530f:syahmed@redhat.com',
+        'f:9f97392e-a27f-4e15-91ae-81da814b530f:user1@redhat.com',
       metadata: {
-        service_username: 'syahmed',
+        service_username: 'user1',
       },
     },
   ],
@@ -29,7 +29,7 @@ const response = {
   preferred_namespace: false,
   tag_expiration_s: 1209600,
   prompts: [],
-  super_user: true,
+  super_user: false,
   company: '',
   family_name: null,
   given_name: null,
@@ -64,48 +64,9 @@ const response = {
       preferred_namespace: false,
     },
     {
-      name: 'redhat_emp1',
+      name: 'testorg',
       avatar: {
-        name: 'redhat_emp1',
-        hash: 'c14d7c707b2e793ce37f63440593e308',
-        color: '#aec7e8',
-        kind: 'org',
-      },
-      can_create_repo: true,
-      public: false,
-      is_org_admin: true,
-      preferred_namespace: true,
-    },
-    {
-      name: 'syedorg',
-      avatar: {
-        name: 'syedorg',
-        hash: 'f1b1a80e240c78db3eb6ead7a10f4647',
-        color: '#1f77b4',
-        kind: 'org',
-      },
-      can_create_repo: true,
-      public: false,
-      is_org_admin: true,
-      preferred_namespace: false,
-    },
-    {
-      name: 'syedorg3',
-      avatar: {
-        name: 'syedorg3',
-        hash: '8f043a0e130eb1b9b291f3c8e51230da',
-        color: '#c7c7c7',
-        kind: 'org',
-      },
-      can_create_repo: true,
-      public: false,
-      is_org_admin: true,
-      preferred_namespace: false,
-    },
-    {
-      name: 'testorg1234',
-      avatar: {
-        name: 'testorg1234',
+        name: 'testorg',
         hash: '80d7b15766626006f56d6dbbcb831767',
         color: '#969696',
         kind: 'org',

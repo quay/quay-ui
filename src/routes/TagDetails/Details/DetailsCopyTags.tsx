@@ -18,7 +18,7 @@ export default function CopyTags(props: CopyTagsProps) {
       <Title headingLevel="h3" className="fetch-tags-title">
         Fetch Tag
       </Title>
-      <DescriptionList>
+      <DescriptionList data-testid="copy-pull-commands">
         <DescriptionListGroup>
           <DescriptionListTerm>Podman Pull (by tag)</DescriptionListTerm>
           <DescriptionListDescription>

@@ -79,6 +79,7 @@ export const BulkDeleteModalTemplate = <T,>(
   return (
     <Modal
       title={`Permanently delete ${props.resourceName}?`}
+      id="bulk-delete-modal"
       titleIconVariant="warning"
       aria-label={`Permanently delete ${props.resourceName}?`}
       variant={ModalVariant.medium}
@@ -164,6 +165,7 @@ export const BulkDeleteModalTemplate = <T,>(
           Confirm deletion by typing <b>&quot;confirm&quot;</b> below:{' '}
         </p>
         <TextInput
+          id="delete-confirmation-input"
           value={confirmDeletionInput}
           type="text"
           onChange={(value) => setConfirmDeletionInput(value)}

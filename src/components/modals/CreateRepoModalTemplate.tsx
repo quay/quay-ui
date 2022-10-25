@@ -126,6 +126,7 @@ export default function CreateRepositoryModalTemplate(
   return (
     <Modal
       title="Create repository"
+      id="create-repository-modal"
       variant={ModalVariant.large}
       isOpen={props.isModalOpen}
       onClose={props.handleModalToggle}
@@ -198,7 +199,7 @@ export default function CreateRepositoryModalTemplate(
               <TextInput
                 isRequired
                 type="text"
-                id="modal-with-form-form-name"
+                id="repository-name-input"
                 value={newRepository.name}
                 onChange={handleNameInputChange}
                 ref={nameInputRef}
@@ -213,7 +214,7 @@ export default function CreateRepositoryModalTemplate(
         >
           <TextInput
             type="text"
-            id="modal-with-form-form-name"
+            id="repository-description-input"
             name="modal-with-form-form-name"
             value={newRepository.description}
             onChange={handleRepoDescriptionChange}

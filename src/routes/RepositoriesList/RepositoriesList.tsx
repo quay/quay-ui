@@ -389,7 +389,7 @@ export default function RepositoriesList() {
               <Th>{ColumnNames.lastModified}</Th>
             </Tr>
           </Thead>
-          <Tbody>
+          <Tbody data-testid="repository-list-table">
             {repositoryList.length === 0 ? (
               // Repo table loading icon
               <Tr>

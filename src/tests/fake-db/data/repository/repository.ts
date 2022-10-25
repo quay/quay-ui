@@ -1,173 +1,128 @@
 import {AxiosRequestConfig} from 'axios';
+import {IRepository} from 'src/resources/RepositoryResource';
 import {mock} from 'src/tests/fake-db/MockAxios';
 
-const syahmedResponse = {
-  repositories: [
-    {
-      namespace: 'syahmed',
-      name: 'postgres',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 132459661,
-        configured_quota: 104857600,
+const responses = {
+  user1: {
+    repositories: [
+      {
+        namespace: 'user1',
+        name: 'postgres',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656432090,
+        popularity: 0.0,
+        is_starred: false,
       },
-      last_modified: 1656432090,
-      popularity: 0.0,
-      is_starred: false,
-    },
-  ],
-};
-
-const quayResponse = {
-  repositories: [
-    {
-      namespace: 'quay',
-      name: 'postgres',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 132459661,
-        configured_quota: 104857600,
+      {
+        namespace: 'user1',
+        name: 'nested/repository',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656432090,
+        popularity: 0.0,
+        is_starred: false,
       },
-      last_modified: 1656428008,
-      popularity: 0.0,
-      is_starred: false,
-    },
-  ],
-};
-
-const projectquayResponse = {
-  repositories: [],
-};
-
-const redhatemp1Response = {
-  repositories: [
-    {
-      namespace: 'redhatemp1',
-      name: 'redis',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 42329739,
-        configured_quota: 1073741824,
+    ],
+  },
+  quay: {
+    repositories: [
+      {
+        namespace: 'quay',
+        name: 'postgres',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656428008,
+        popularity: 0.0,
+        is_starred: false,
       },
-      last_modified: 1653495945,
-      popularity: 0.0,
-      is_starred: false,
-    },
-  ],
-};
-
-const syedorgResponse = {
-  repositories: [
-    {
-      namespace: 'syedorg',
-      name: 'nginx',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 56737142,
-        configured_quota: 104857600,
+      {
+        namespace: 'quay',
+        name: 'python',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656428008,
+        popularity: 0.0,
+        is_starred: false,
       },
-      last_modified: 1656433701,
-      popularity: 7.0,
-      is_starred: false,
-    },
-    {
-      namespace: 'syedorg',
-      name: 'python',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 0,
-        configured_quota: 104857600,
+      {
+        namespace: 'quay',
+        name: 'busybox',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656428008,
+        popularity: 0.0,
+        is_starred: false,
       },
-      last_modified: null,
-      popularity: 2.0,
-      is_starred: false,
-    },
-  ],
-};
-
-const syedorg3Response = {
-  repositories: [
-    {
-      namespace: 'syedorg3',
-      name: 'postgres',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 132459661,
-        configured_quota: 104857600,
+    ],
+  },
+  projectquay: {
+    repositories: [],
+  },
+  testorg: {
+    repositories: [
+      {
+        namespace: 'testorg',
+        name: 'redis',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 0,
+          configured_quota: 104857600,
+        },
+        last_modified: null,
+        popularity: 1.0,
+        is_starred: false,
       },
-      last_modified: 1656433136,
-      popularity: 2.0,
-      is_starred: false,
-    },
-  ],
-};
-
-const testorg1234Response = {
-  repositories: [
-    {
-      namespace: 'testorg1234',
-      name: 'redis',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 0,
-        configured_quota: 104857600,
+      {
+        namespace: 'testorg',
+        name: 'postgres',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656426723,
+        popularity: 1.0,
+        is_starred: false,
       },
-      last_modified: null,
-      popularity: 1.0,
-      is_starred: false,
-    },
-    {
-      namespace: 'testorg1234',
-      name: 'postgres',
-      description: null,
-      is_public: false,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 132459661,
-        configured_quota: 104857600,
-      },
-      last_modified: 1656426723,
-      popularity: 1.0,
-      is_starred: false,
-    },
-    {
-      namespace: 'testorg1234',
-      name: 'blah-blah12',
-      description: 'blah-blah',
-      is_public: true,
-      kind: 'image',
-      state: 'NORMAL',
-      quota_report: {
-        quota_bytes: 0,
-        configured_quota: 104857600,
-      },
-      last_modified: null,
-      popularity: 1.0,
-      is_starred: false,
-    },
-  ],
+    ],
+  },
 };
 
 const response = {
@@ -180,52 +135,79 @@ const successResponse = {
   success: true,
 };
 
-mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=syahmed')
-  .reply((request: AxiosRequestConfig) => {
-    return [200, syahmedResponse];
-  });
+const repoDetailsResponse = {
+  state: 'NORMAL',
+};
 
 mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=quay')
+  .onGet('/api/v1/repository?last_modified=true&namespace=quay&public=true')
+  .reply(200, responses.quay);
+mock
+  .onGet(
+    '/api/v1/repository?last_modified=true&namespace=projectquay&public=true',
+  )
+  .reply(200, responses.projectquay);
+mock
+  .onGet('/api/v1/repository?last_modified=true&namespace=testorg&public=true')
+  .reply(200, responses.testorg);
+mock
+  .onGet('/api/v1/repository?last_modified=true&namespace=user1&public=true')
+  .reply(200, responses.user1);
+mock
+  .onGet('/api/v1/repository?last_modified=true&namespace=&public=true')
+  .reply(200, {repositories: []});
+mock
+  .onGet(
+    '/api/v1/repository?last_modified=true&namespace=manyrepositories&public=true',
+  )
   .reply((request: AxiosRequestConfig) => {
-    return [200, quayResponse];
+    const repos = [];
+    for (let i = 0; i < 50; i++) {
+      const repo: IRepository = {
+        namespace: 'manyrepositories',
+        name: '',
+        description: null,
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656432090,
+        popularity: 0.0,
+        is_starred: false,
+      };
+      repo.name = `repo${i}`;
+      repos.push(repo);
+    }
+    return [200, {repositories: repos}];
   });
 
-mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=projectquay')
-  .reply((request: AxiosRequestConfig) => {
-    return [200, projectquayResponse];
-  });
-
-mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=redhat_emp1')
-  .reply((request: AxiosRequestConfig) => {
-    return [200, redhatemp1Response];
-  });
-
-mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=syedorg')
-  .reply((request: AxiosRequestConfig) => {
-    return [200, syedorgResponse];
-  });
-
-mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=syedorg3')
-  .reply((request: AxiosRequestConfig) => {
-    return [200, syedorg3Response];
-  });
-
-mock
-  .onGet('/api/v1/repository?last_modified=true&namespace=testorg1234')
-  .reply((request: AxiosRequestConfig) => {
-    return [200, testorg1234Response];
-  });
+const repoDetailsPathRegex = new RegExp(
+  `/api/v1/repository/.+/.+?includeStats=false&includeTags=false`,
+);
+mock.onGet(repoDetailsPathRegex).reply(200, repoDetailsResponse);
 
 mock.onPost('/api/v1/repository').reply((request: AxiosRequestConfig) => {
   const {namespace, repository, visibility, description, repo_kind} =
     JSON.parse(request.data);
-  return [200, successResponse];
+  responses[namespace].repositories.push({
+    namespace: namespace,
+    name: repository,
+    description: description,
+    is_public: visibility == 'public',
+    kind: repo_kind,
+    state: 'NORMAL',
+    quota_report: {
+      quota_bytes: 132459661,
+      configured_quota: 104857600,
+    },
+    last_modified: 1656426723,
+    popularity: 1.0,
+    is_starred: false,
+  });
+  return [201, successResponse];
 });
 
 const visibilityPathRegex = new RegExp(
@@ -233,10 +215,27 @@ const visibilityPathRegex = new RegExp(
 );
 mock.onPost(visibilityPathRegex).reply((request: AxiosRequestConfig) => {
   const {visibility} = JSON.parse(request.data);
+  const splitUrl = request.url.split('/');
+  const org = splitUrl[4];
+  const requestedRepo = splitUrl.slice(5, splitUrl.length - 1).join('/');
+  console.log('org', org);
+  console.log('request.url', request.url);
+  console.log('requestedRepo', requestedRepo);
+
+  const repoIndex = responses[org].repositories.findIndex(
+    (repo) => repo.name === requestedRepo,
+  );
+  responses[org].repositories[repoIndex].is_public = visibility === 'public';
   return [200, successResponse];
 });
 
 const deleteRepoRegex = new RegExp(`/api/v1/repository/.+/.+`);
 mock.onDelete(deleteRepoRegex).reply((request: AxiosRequestConfig) => {
-  return [200, successResponse];
+  const splitUrl = request.url.split('/');
+  const org = splitUrl[4];
+  const requestedRepo = splitUrl.slice(5, splitUrl.length).join('/');
+  responses[org].repositories = responses[org].repositories.filter(
+    (repo) => repo.name !== requestedRepo,
+  );
+  return [204, successResponse];
 });
