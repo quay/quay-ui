@@ -1,15 +1,17 @@
 /// <reference types="cypress" />
 
+import {formatDate} from '../../src/libs/utils';
+
 describe('Tag Details Page', () => {
-  it('renders details', () => {
+  it.only('renders details', () => {
     cy.visit('/tag/user1/postgres/latest');
     cy.get('[data-testid="name"]').contains('latest').should('exist');
     cy.get('[data-testid="creation"]')
-      .contains('Jan 19, 1970, 10:29 PM')
+      .contains(formatDate('Jan 19, 1970, 10:29 PM'))
       .should('exist');
     cy.get('[data-testid="repository"]').contains('postgres').should('exist');
     cy.get('[data-testid="modified"]')
-      .contains('Jun 2, 2022, 3:12 PM')
+      .contains(formatDate('Jun 2, 2022, 3:12 PM'))
       .should('exist');
     cy.get('[data-testid="digest-clipboardcopy"]')
       .contains(
