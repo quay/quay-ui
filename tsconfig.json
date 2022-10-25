@@ -11,10 +11,9 @@
     "outDir": "dist",
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "types": ["cypress"],
   },
   "include": [
     "src"
   ],
-  "exclude": [ "node_modules", "cypress" ],
+  "exclude": [ "node_modules" ]
 }
