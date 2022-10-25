@@ -183,7 +183,7 @@ export default function PackagesTable({features}: PackagesProps) {
     <PageSection variant={PageSectionVariants.light}>
       <TableTitle />
       <PackagesFilter />
-      <TableComposable aria-label="packages table">
+      <TableComposable data-testid="packages-table" aria-label="packages table">
         <TableHead />
         {filteredPackagesList.length !== 0 ? (
           filteredPackagesList.map((pkg: PackagesListItem) => {

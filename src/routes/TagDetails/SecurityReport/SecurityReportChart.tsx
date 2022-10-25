@@ -146,7 +146,7 @@ export function SecurityReportChart(props: SecurityDetailsChartProps) {
   return (
     <PageSection variant={PageSectionVariants.light}>
       <Split>
-        <SplitItem>
+        <SplitItem data-testid="vulnerability-chart">
           <VulnerabilityChart
             stats={stats}
             total={total}

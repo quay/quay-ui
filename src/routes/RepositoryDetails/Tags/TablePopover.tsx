@@ -22,6 +22,7 @@ export default function TablePopover(props: TablePopoverProps) {
 
   return (
     <Popover
+      data-testid="pull-popover"
       isVisible={currentOpenPopover === props.tag}
       shouldClose={() => {
         setCurrentOpenPopover('');

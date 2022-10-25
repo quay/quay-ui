@@ -25,6 +25,7 @@ export default function Details(props: DetailsProps) {
           columnModifier={{
             default: '2Col',
           }}
+          data-testid="tag-details"
         >
           <DescriptionListGroup data-testid="name">
             <DescriptionListTerm>Name</DescriptionListTerm>

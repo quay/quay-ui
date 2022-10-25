@@ -170,7 +170,7 @@ export function PackagesChart(props: PackageChartProps) {
   return (
     <PageSection variant={PageSectionVariants.light}>
       <Split>
-        <SplitItem>
+        <SplitItem data-testid="packages-chart">
           <PackagesDonutChart
             stats={stats}
             total={totalPackagesPerSeverity}

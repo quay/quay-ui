@@ -40,6 +40,7 @@ export function SecurityReportFilter() {
     <Flex className="pf-u-mt-md">
       <FlexItem>
         <SearchInput
+          name="vulnerability-search"
           placeholder="Filter Vulnerabilities..."
           value={searchTerm}
           onChange={onSearchTermChanged}

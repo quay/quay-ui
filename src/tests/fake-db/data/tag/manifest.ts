@@ -8,7 +8,7 @@ const manifest = {
   manifests: [
     {
       digest:
-        'sha256:3a8221b6b7780a7d5211f826dd35a24e31eadb507111deae66b0cfea7c52a824',
+        'sha256:ppc64lesubmanifest11f826dd35a24e31eadb507111deae66b0cfea7c52a824',
       size: 1000,
       platform: {
         architecture: 'ppc64le',
@@ -17,7 +17,7 @@ const manifest = {
     },
     {
       digest:
-        'sha256:6854f4ba26f34d1029d481024d3e03d87aaa2635389e6e38d8557e69184546f1',
+        'sha256:amd64submanifest11f34826dd35a24e31eadb507111deae66b0cfea7c52a824',
       size: 2000,
       platform: {
         architecture: 'amd64',
