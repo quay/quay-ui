@@ -109,7 +109,7 @@ describe('Repositories List Page', () => {
     cy.contains('Create Repository');
   });
 
-  // TODO: pre page currently does not work
+  // TODO: per page currently does not work
   // https://issues.redhat.com/browse/PROJQUAY-4663
   // it('deletes repositories pagination', () => {
   //     cy.visit('/organizations/manyrepositories');
