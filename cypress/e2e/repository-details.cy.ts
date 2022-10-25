@@ -3,7 +3,7 @@
 import {formatDate} from '../../src/libs/utils';
 
 describe('Repository Details Page', () => {
-  it('renders tag', () => {
+  it.only('renders tag', () => {
     cy.visit('/repositories/user1/postgres');
     const firstRow = cy.get('tbody').first();
     firstRow.within(() => {
@@ -12,7 +12,7 @@ describe('Repository Details Page', () => {
       cy.get(`[data-label="Size"]`).should('have.text', '100 B');
       cy.get(`[data-label="Last Modified"]`).should(
         'have.text',
-        formatDate('Jun 2, 2022, 3:12 PM'),
+        formatDate('Thu, 02 Jun 2022 19:12:32 -0000'),
       );
       cy.get(`[data-label="Expires"]`).should('have.text', 'Never');
       cy.get(`[data-label="Manifest"]`).should(
@@ -22,7 +22,7 @@ describe('Repository Details Page', () => {
     });
   });
 
-  it('renders manifest list tag', () => {
+  it.only('renders manifest list tag', () => {
     cy.visit('/repositories/user1/postgres');
     const secondRow = cy.get('tbody').eq(1);
     secondRow.within(() => {
@@ -35,7 +35,7 @@ describe('Repository Details Page', () => {
       cy.get(`[data-label="Size"]`).should('have.text', 'N/A');
       cy.get(`[data-label="Last Modified"]`).should(
         'have.text',
-        formatDate('Jun 2, 2022, 3:12 PM'),
+        formatDate('Thu, 02 Jun 2022 19:12:32 -0000'),
       );
       cy.get(`[data-label="Expires"]`).should('have.text', 'Never');
       cy.get(`[data-label="Manifest"]`).should(

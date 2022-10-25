@@ -7,11 +7,11 @@ describe('Tag Details Page', () => {
     cy.visit('/tag/user1/postgres/latest');
     cy.get('[data-testid="name"]').contains('latest').should('exist');
     cy.get('[data-testid="creation"]')
-      .contains(formatDate('Jan 19, 1970, 10:29 PM'))
+      .contains(formatDate(1654197152))
       .should('exist');
     cy.get('[data-testid="repository"]').contains('postgres').should('exist');
     cy.get('[data-testid="modified"]')
-      .contains(formatDate('Jun 2, 2022, 3:12 PM'))
+      .contains(formatDate('Thu, 02 Jun 2022 19:12:32 -0000'))
       .should('exist');
     cy.get('[data-testid="digest-clipboardcopy"]')
       .contains(
