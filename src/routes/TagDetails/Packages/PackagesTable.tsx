@@ -204,10 +204,11 @@ export default function PackagesTable({features}: PackagesProps) {
             page={page}
             setPage={setPage}
             setPerPage={setPerPage}
+            id="packages-table-pagination"
           />
         </ToolbarContent>
       </Toolbar>
-      <TableComposable aria-label="packages table">
+      <TableComposable aria-label="packages table" data-testid="packages-table">
         <TableHead />
         {paginatedPackagList.length !== 0 ? (
           paginatedPackagList.map((pkg: PackagesListItem) => {
