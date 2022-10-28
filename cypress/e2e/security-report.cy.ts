@@ -82,7 +82,7 @@ describe('Security Report Page', () => {
   it('render unsupported state', () => {
     cy.visit('/tag/quay/postgres/securityreportunsupported?tab=securityreport');
     cy.contains('Security scan is not supported.');
-    cy.contains('Image is not in a scannable format.');
+    cy.contains('Image does not have content the scanner recognizes.');
   });
 
   it('render failed state', () => {

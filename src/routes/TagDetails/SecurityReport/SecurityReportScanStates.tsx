@@ -50,7 +50,9 @@ export function UnsupportedState() {
       <Title headingLevel="h1" size="lg">
         Security scan is not supported.
       </Title>
-      <EmptyStateBody>Image is not in a scannable format.</EmptyStateBody>
+      <EmptyStateBody>
+        Image does not have content the scanner recognizes.
+      </EmptyStateBody>
     </EmptyState>
   );
 }
