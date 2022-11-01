@@ -9,7 +9,7 @@ export function ToolbarPagination(props: ToolbarPaginationProps) {
     <ToolbarItem variant="pagination">
       <Pagination
         perPageComponent="button"
-        itemCount={props.itemsList.length}
+        itemCount={props.total}
         perPage={props.perPage}
         page={props.page}
         onSetPage={(_event, pageNumber) => props.setPage(pageNumber)}
@@ -33,4 +33,5 @@ type ToolbarPaginationProps = {
   setPage: (pageNumber: number) => void;
   setPerPage: (perPageNumber: number) => void;
   bottom?: boolean;
+  total: number;
 };
