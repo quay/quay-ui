@@ -7,38 +7,38 @@ import {
   TabTitleText,
   Title,
 } from '@patternfly/react-core';
-import {useLocation} from 'react-router-dom';
-import {NavigationPath} from 'src/routes/NavigationPath';
+import {useLocation, useSearchParams} from 'react-router-dom';
 import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
+import Settings from './Tabs/Settings/Settings';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 
 export default function Organization() {
   const location = useLocation();
   const repositoryName = location.pathname.split('/')[2];
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeTabKey, setActiveTabKey] = useState<string | number>(0);
+  const [activeTabKey, setActiveTabKey] = useState<string>(
+    searchParams.get('tab') || 'Repositories',
+  );
 
   const onTabSelect = useCallback(
-    (
-      _event: React.MouseEvent<HTMLElement, MouseEvent>,
-      tabIndex: string | number,
-    ) => setActiveTabKey(tabIndex),
+    (_event: React.MouseEvent<HTMLElement, MouseEvent>, tabKey: string) => {
+      setSearchParams({tab: tabKey});
+      setActiveTabKey(tabKey);
+    },
     [],
   );
 
   const repositoriesSubNav = [
     {
-      href: NavigationPath.organizationDetail,
       name: 'Repositories',
       component: <RepositoriesList />,
     },
-    // Commenting till needed.
-    // {
-    //   href: NavigationPath.orgDetailUsageLogsTab,
-    //   name: 'Usage Logs',
-    //   component: <UsageLogsTab />,
-    // },
+    {
+      name: 'Settings',
+      component: <Settings />,
+    },
   ];
 
   return (
@@ -54,13 +54,13 @@ export default function Organization() {
       </PageSection>
       <PageSection
         variant={PageSectionVariants.light}
-        className="no-padding-on-sides"
+        padding={{default: 'noPadding'}}
       >
         <Tabs activeKey={activeTabKey} onSelect={onTabSelect}>
-          {repositoriesSubNav.map((nav, idx) => (
+          {repositoriesSubNav.map((nav) => (
             <Tab
-              key={idx}
-              eventKey={idx}
+              key={nav.name}
+              eventKey={nav.name}
               title={<TabTitleText>{nav.name}</TabTitleText>}
             >
               {nav.component}
