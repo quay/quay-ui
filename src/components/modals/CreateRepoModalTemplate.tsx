@@ -12,17 +12,14 @@ import {
   Flex,
   FlexItem,
 } from '@patternfly/react-core';
-import {
-  createNewRepository,
-  IRepository,
-} from 'src/resources/RepositoryResource';
+import {IRepository} from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
 import FormError from 'src/components/errors/FormError';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import {IOrganization} from 'src/resources/OrganizationResource';
-import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import {useRepositories} from 'src/hooks/UseRepositories';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -36,7 +33,6 @@ export default function CreateRepositoryModalTemplate(
     return null;
   }
   const [err, setErr] = useState<string>();
-  const refresh = useRefreshRepoList();
   const quayConfig = useQuayConfig();
 
   const [currentOrganization, setCurrentOrganization] = useState({
@@ -45,6 +41,8 @@ export default function CreateRepositoryModalTemplate(
     name: props.orgName !== null ? props.orgName : null,
     isDropdownOpen: false,
   });
+
+  const {createRepository} = useRepositories();
 
   const [validationState, setValidationState] = useState({
     repoName: true,
@@ -89,16 +87,15 @@ export default function CreateRepositoryModalTemplate(
       return;
     }
     try {
-      await createNewRepository(
-        currentOrganization.name,
-        newRepository.name,
-        repoVisibility.toLowerCase(),
-        newRepository.description,
-        'image',
-      );
-      refresh();
+      await createRepository({
+        namespace: currentOrganization.name,
+        repository: newRepository.name,
+        visibility: repoVisibility.toLowerCase(),
+        description: newRepository.description,
+        repo_kind: 'image',
+      });
       props.handleModalToggle();
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
       setErr(addDisplayError('Unable to create repository', error));
     }
@@ -257,9 +254,4 @@ interface CreateRepositoryModalTemplateProps {
   updateListHandler: (value: IRepository) => void;
   username: string;
   organizations: IOrganization[];
-}
-
-interface ErrorModalProps {
-  isOpen: boolean;
-  toggle?: () => void;
 }
