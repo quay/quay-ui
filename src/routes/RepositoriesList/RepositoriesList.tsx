@@ -397,6 +397,7 @@ export default function RepositoriesList() {
         </TableComposable>
         <PanelFooter>
           <ToolbarPagination
+            total={totalResults}
             itemsList={filteredRepos}
             perPage={perPage}
             page={page}
