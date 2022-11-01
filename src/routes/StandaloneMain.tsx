@@ -10,14 +10,12 @@ import Organization from './OrganizationsList/Organization/Organization';
 import RepositoryDetails from 'src/routes/RepositoryDetails/RepositoryDetails';
 import RepositoriesList from './RepositoriesList/RepositoriesList';
 import TagDetails from 'src/routes/TagDetails/TagDetails';
-import {useEffect, useState} from 'react';
-import {fetchUser} from 'src/resources/UserResource';
-import {useSetRecoilState} from 'recoil';
-import {CurrentUsernameState} from 'src/atoms/UserState';
+import {useEffect} from 'react';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import SiteUnavailableError from 'src/components/errors/SiteUnavailableError';
 import NotFound from 'src/components/errors/404';
+import {useCurrentUser} from 'src/hooks/UseCurrentUser';
 
 const NavigationRoutes = [
   {
@@ -43,9 +41,8 @@ const NavigationRoutes = [
 ];
 
 export function StandaloneMain() {
-  const setCurrentUsername = useSetRecoilState(CurrentUsernameState);
-  const [err, setErr] = useState<boolean>();
   const quayConfig = useQuayConfig();
+  const {loading, error} = useCurrentUser();
 
   useEffect(() => {
     if (quayConfig?.config?.REGISTRY_TITLE) {
@@ -53,19 +50,11 @@ export function StandaloneMain() {
     }
   }, [quayConfig]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const user = await fetchUser();
-        setCurrentUsername(user.username);
-      } catch (err) {
-        console.error(err);
-        setErr(true);
-      }
-    })();
-  }, []);
+  if (loading) {
+    return null;
+  }
   return (
-    <ErrorBoundary hasError={err} fallback={<SiteUnavailableError />}>
+    <ErrorBoundary hasError={!!error} fallback={<SiteUnavailableError />}>
       <Page
         header={<QuayHeader />}
         sidebar={<QuaySidebar />}

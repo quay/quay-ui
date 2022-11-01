@@ -15,22 +15,20 @@ import {
 import {UserIcon} from '@patternfly/react-icons';
 import React from 'react';
 import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {useRecoilState} from 'recoil';
-import {CurrentUsernameState} from 'src/atoms/UserState';
 import {GlobalAuthState, logoutUser} from 'src/resources/AuthResource';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import ErrorModal from '../errors/ErrorModal';
 
 import 'src/components/header/HeaderToolbar.css';
+import {useQueryClient} from '@tanstack/react-query';
+import {useCurrentUser} from 'src/hooks/UseCurrentUser';
 
 export function HeaderToolbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentUsername, setCurrentUsername] =
-    useRecoilState(CurrentUsernameState);
-  const [err, setErr] = useState<string>();
 
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const {user} = useCurrentUser();
+  const [err, setErr] = useState<string>();
 
   const onDropdownToggle = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -43,7 +41,7 @@ export function HeaderToolbar() {
         try {
           await logoutUser();
           GlobalAuthState.csrfToken = undefined;
-          setCurrentUsername('');
+          queryClient.invalidateQueries(['user']);
 
           // Ignore client side auth page and use old UI if present
           // TODO: replace this with navigate('/signin') once new ui supports all auth methods
@@ -75,7 +73,7 @@ export function HeaderToolbar() {
       isOpen={isDropdownOpen}
       toggle={
         <DropdownToggle icon={<UserIcon />} onToggle={onDropdownToggle}>
-          {currentUsername}
+          {user.username}
         </DropdownToggle>
       }
       dropdownItems={userDropdownItems}
@@ -132,7 +130,7 @@ export function HeaderToolbar() {
               </Form>
             </ToolbarItem>
             <ToolbarItem>
-              {currentUsername ? userDropdown : signInButton}
+              {user.username ? userDropdown : signInButton}
             </ToolbarItem>
           </ToolbarGroup>
         </ToolbarContent>
