@@ -17,6 +17,8 @@ const queryClient = new QueryClient({
   },
 });
 
+const queryClient = new QueryClient();
+
 export default function App() {
   useAnalytics();
 
