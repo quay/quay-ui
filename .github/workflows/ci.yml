@@ -6,11 +6,44 @@ on:
     - "*"
 
 jobs:
-  cypress-run:
+  # TODO: Focusing on e2e tests for now, will implement this later
+  # cypress-component:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #     - name: Cypress run
+  #       uses: cypress-io/github-action@v4.2.0
+  #       with:
+  #         browser: chrome
+  #         build: npm run build
+  #         start: npm run start:integration
+  #         wait-on: 'http://localhost:9000'
+  #         wait-on-timeout: 120
+  #       env:
+  #         MOCK_API: true
+  cypress-e2e:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Clone Quay Repository
+        uses: actions/checkout@v3
+        with:
+          repository: bcaton85/quay
+          path: './quay'
+          ref: ui-ci
+      - name: Start Quay
+        run: |
+          # TODO: figure out how to cache build deps
+          # docker buildx create --use --driver=docker-container
+          # docker buildx build -t localhost/quay-local:latest --cache-to type=gha --cache-from type=gha .
+          cd quay && make ci-up
+      - name: Load Test Data
+        run: |
+          sleep 15s
+          docker cp ./cypress/test/quay-test-data.txt quay-db:/tmp/data.txt
+          docker exec -t quay-db bash -c 'psql quay -U quay < /tmp/data.txt'
       - name: Cypress run
         uses: cypress-io/github-action@v4.2.0
         with:
@@ -20,7 +53,7 @@ jobs:
           wait-on: 'http://localhost:9000'
           wait-on-timeout: 120
         env:
-          MOCK_API: true
+          REACT_QUAY_APP_API_URL: http://localhost:8080
       # Used for debugging. Uncomment to upload screenshots  
       # and videos of running tests to diagnose issues.
       # - uses: actions/upload-artifact@v2

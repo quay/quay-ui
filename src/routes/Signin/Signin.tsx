@@ -27,8 +27,8 @@ export function Signin() {
   const quayConfig = useQuayConfig();
 
   let logoUrl = logo;
-  if (quayConfig && quayConfig.config.ENTERPRISE_DARK_LOGO_URL) {
-    logoUrl = `${axios.defaults.baseURL}${quayConfig.config.ENTERPRISE_DARK_LOGO_URL}`;
+  if (quayConfig && quayConfig.config?.ENTERPRISE_DARK_LOGO_URL) {
+    logoUrl = `${axios.defaults.baseURL}${quayConfig.config?.ENTERPRISE_DARK_LOGO_URL}`;
   }
 
   const onLoginButtonClick = async (
