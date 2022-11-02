@@ -73,7 +73,6 @@
     "eslint-plugin-react-hooks": "^4.4.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
-    "husky": ">=6",
     "lint-staged": ">=10",
     "prettier": "^2.1.2",
     "raw-loader": "^4.0.2",
@@ -94,7 +93,8 @@
     "webpack-merge": "^5.8.0"
   },
   "optionalDependencies": {
-    "cypress": "^10.10.0"
+    "cypress": "^10.10.0",
+    "husky": ">=6"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --cache --fix"
