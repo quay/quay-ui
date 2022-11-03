@@ -22,7 +22,8 @@ export function formatDate(date: string | number) {
     return 'N/A';
   }
 
-  return new Date(date).toLocaleString('en-US', {
+  const adjustedDate = typeof date === 'number' ? date * 1000 : date;
+  return new Date(adjustedDate).toLocaleString('en-US', {
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     timeStyle: 'short',
     dateStyle: 'medium',
