@@ -119,32 +119,33 @@ describe('Repositories List Page', () => {
   //     cy.contains('Delete').click();
   // })
 
-  // TODO: Need to fix bug when changing visiblity of public/private repositories,
-  // currently does not work for nested repositories
-  // https://issues.redhat.com/browse/PROJQUAY-4662
-  // it('makes multiple repositories public', () => {
-  //     cy.visit('/repositories');
-  //     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-  //     cy.contains('Select page (7)').click();
-  //     cy.contains('Actions').click();
-  //     cy.contains('Make Public').click();
-  //     cy.contains('Make repositories public');
-  //     cy.contains('Update 7 repositories visibility to be public so they are visible to all user, and may be pulled by all users.');
-  //     cy.contains('Make public').click();
-  //     cy.contains('private').should('not.exist');
-  // })
+  it('makes multiple repositories public', () => {
+    cy.visit('/repositories');
+    cy.get('button[id="toolbar-dropdown-checkbox"]').click();
+    cy.contains('Select page (7)').click();
+    cy.contains('Actions').click();
+    cy.contains('Make Public').click();
+    cy.contains('Make repositories public');
+    cy.contains(
+      'Update 7 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
+    );
+    cy.contains('Make public').click();
+    cy.contains('private').should('not.exist');
+  });
 
-  // it('makes multiple repositories public', () => {
-  //     cy.visit('/repositories');
-  //     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-  //     cy.contains('Select page (7)').click();
-  //     cy.contains('Actions').click();
-  //     cy.contains('Make Private').click();
-  //     cy.contains('Make repositories private');
-  //     cy.contains('Update 7 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.');
-  //     cy.contains('Make private').click();
-  //     cy.contains('public').should('not.exist');
-  // })
+  it('makes multiple repositories private', () => {
+    cy.visit('/repositories');
+    cy.get('button[id="toolbar-dropdown-checkbox"]').click();
+    cy.contains('Select page (7)').click();
+    cy.contains('Actions').click();
+    cy.contains('Make Private').click();
+    cy.contains('Make repositories private');
+    cy.contains(
+      'Update 7 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
+    );
+    cy.contains('Make private').click();
+    cy.contains('public').should('not.exist');
+  });
 
   it('searches by name', () => {
     cy.visit('/repositories');

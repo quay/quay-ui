@@ -16,8 +16,9 @@ export function ConfirmationModal(props: ConfirmationModalProps) {
       // function in RepositoryResource in the future
       await Promise.all(
         props.selectedItems.map((item) => {
-          const ls = item.split('/', 2);
-          return setRepositoryVisibility(ls[0], ls[1], visibility);
+          const [org, ...repoArray] = item.split('/');
+          const repo = repoArray.join('/');
+          return setRepositoryVisibility(org, repo, visibility);
         }),
       );
       refresh();
