@@ -1,5 +1,7 @@
 /// <reference types="cypress" />
 
+import {formatDate} from '../../src/libs/utils';
+
 describe('Repositories List Page', () => {
   it('renders list of all repositories', () => {
     cy.visit('/repositories');
@@ -14,6 +16,12 @@ describe('Repositories List Page', () => {
       cy.contains('testorg/postgres').should('exist');
       cy.contains('testorg/redis').should('exist');
     });
+    const firstRow = cy.get('tbody').first();
+    firstRow.within(() => {
+      cy.get(`[data-label="Name"]`).contains('user1/nested/repository');
+      cy.get(`[data-label="Visibility"]`).contains('private');
+      cy.get(`[data-label="Last Modified"]`).contains(formatDate(1656432090));
+    });
   });
 
   it('renders list of repositories for a single organization', () => {
@@ -26,6 +34,12 @@ describe('Repositories List Page', () => {
       cy.contains('postgres').should('exist');
       cy.contains('python').should('exist');
       cy.contains('busybox').should('exist');
+    });
+    const firstRow = cy.get('tbody').first();
+    firstRow.within(() => {
+      cy.get(`[data-label="Name"]`).contains('busybox');
+      cy.get(`[data-label="Visibility"]`).contains('private');
+      cy.get(`[data-label="Last Modified"]`).contains(formatDate(1656428008));
     });
   });
 
