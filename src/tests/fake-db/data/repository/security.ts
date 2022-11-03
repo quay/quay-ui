@@ -641,6 +641,606 @@ const mediumSeverityFeatures = [
       },
     ],
   },
+  {
+    Name: 'libtiff',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:b71f31ebaac9f435ee0f837b5c63b1c2a02eadd0ce52a4736d2ae927bb59835b',
+    Version: '4.0.9-20.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:1810 https://access.redhat.com/security/cve/CVE-2020-19131',
+        FixedBy: '0:4.0.9-21.el8',
+        Description:
+          'The libtiff packages contain a library of functions for manipulating Tagged Image File Format (TIFF) files.\n\nSecurity Fix(es):\n\n* libtiff: a buffer overflow via the "invertImage()" may lead to DoS (CVE-2020-19131)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.\n\nAdditional Changes:\n\nFor detailed information on changes in this release, see the Red Hat Enterprise Linux 8.6 Release Notes linked from the References section.',
+        Name: 'RHSA-2022:1810: libtiff security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+              Score: 7.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'glibc',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '2.28-164.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:0896 https://access.redhat.com/security/cve/CVE-2021-3999 https://access.redhat.com/security/cve/CVE-2022-23218 https://access.redhat.com/security/cve/CVE-2022-23219',
+        FixedBy: '0:2.28-164.el8_5.3',
+        Description:
+          'The glibc packages provide the standard C libraries (libc), POSIX thread libraries (libpthread), standard math libraries (libm), and the name service cache daemon (nscd) used by multiple programs on the system. Without these libraries, the Linux system cannot function correctly.\n\nSecurity Fix(es):\n\n* glibc: Off-by-one buffer overflow/underflow in getcwd() (CVE-2021-3999)\n\n* glibc: Stack-based buffer overflow in svcunix_create via long pathnames (CVE-2022-23218)\n\n* glibc: Stack-based buffer overflow in sunrpc clnt_create via a long pathname (CVE-2022-23219)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:0896: glibc security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+              Score: 9.8,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'cryptography',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:6c5d27ae7a2aa08ebc449d61ed339dfcb3324450ceaded23eec1fbc8d3f10499',
+    Version: '3.3.2',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'pyupio',
+        Link: '',
+        FixedBy: '',
+        Description:
+          'Cryptography 39.0.0 drops support for C library "LibreSSL" < 3.4, as these versions are not receiving security support anymore.',
+        Name: 'pyup.io-51159 (CVE-2021-41581)',
+        Metadata: {
+          UpdatedBy: 'pyupio',
+          RepoName: 'pypi',
+          RepoLink: 'https://pypi.org/simple',
+          DistroName: '',
+          DistroVersion: '',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H',
+              Score: 5.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'platform-python',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '3.6.8-41.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:1986 https://access.redhat.com/security/cve/CVE-2021-3737 https://access.redhat.com/security/cve/CVE-2021-4189',
+        FixedBy: '0:3.6.8-45.el8',
+        Description:
+          'Python is an interpreted, interactive, object-oriented programming language, which includes modules, classes, exceptions, very high level dynamic data types and dynamic typing. Python supports interfaces to many system calls and libraries, as well as to various windowing systems. \n\nSecurity Fix(es):\n\n* python: ftplib should not use the host from the PASV response (CVE-2021-4189)\n\n* python: urllib: HTTP client possible infinite loop on a 100 Continue response (CVE-2021-3737)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.\n\nAdditional Changes:\n\nFor detailed information on changes in this release, see the Red Hat Enterprise Linux 8.6 Release Notes linked from the References section.',
+        Name: 'RHSA-2022:1986: python3 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+              Score: 7.5,
+            },
+          },
+        },
+      },
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:6457 https://access.redhat.com/security/cve/CVE-2015-20107 https://access.redhat.com/security/cve/CVE-2022-0391',
+        FixedBy: '0:3.6.8-47.el8_6',
+        Description:
+          'Python is an interpreted, interactive, object-oriented programming language, which includes modules, classes, exceptions, very high level dynamic data types and dynamic typing. Python supports interfaces to many system calls and libraries, as well as to various windowing systems. \n\nSecurity Fix(es):\n\n* python(mailcap): findmatch() function does not sanitise the second argument (CVE-2015-20107)\n\n* python: urllib.parse does not sanitize URLs containing ASCII newline and tabs (CVE-2022-0391)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:6457: python3 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+              Score: 9.8,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'pypdf2',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:6c5d27ae7a2aa08ebc449d61ed339dfcb3324450ceaded23eec1fbc8d3f10499',
+    Version: '1.26.0',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'pyupio',
+        Link: '',
+        FixedBy: '',
+        Description:
+          "PyPDF2 1.27.5 includes a fix for CVE-2022-24859: In versions prior to 1.27.5 an attacker can craft a PDF which leads to an infinite loop if PyPDF2 code attempts to get the content stream. The reason is that the last while-loop in 'ContentStream._readInlineImage' only terminates when it finds the 'EI' token, but never actually checks if the stream has already ended. Users unable to upgrade should validate PDFs prior to iterating over their content stream.\r\nhttps://github.com/py-pdf/PyPDF2/security/advisories/GHSA-xcjx-m2pj-8g79",
+        Name: 'pyup.io-48186 (CVE-2022-24859)',
+        Metadata: {
+          UpdatedBy: 'pyupio',
+          RepoName: 'pypi',
+          RepoLink: 'https://pypi.org/simple',
+          DistroName: '',
+          DistroVersion: '',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H',
+              Score: 5.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'python-keystoneclient',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:6c5d27ae7a2aa08ebc449d61ed339dfcb3324450ceaded23eec1fbc8d3f10499',
+    Version: '3.22.0',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'pyupio',
+        Link: '',
+        FixedBy: '',
+        Description:
+          'A flaw was found in Keystone. There is a time lag (up to one hour in a default configuration) between when security policy says a token should be revoked from when it is actually revoked. This could allow a remote administrator to secretly maintain access for longer than expected.',
+        Name: 'pyup.io-50880 (CVE-2022-2447)',
+        Metadata: {
+          UpdatedBy: 'pyupio',
+          RepoName: 'pypi',
+          RepoLink: 'https://pypi.org/simple',
+          DistroName: '',
+          DistroVersion: '',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:H',
+              Score: 6.6,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'pcre2',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '10.32-2.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:5809 https://access.redhat.com/security/cve/CVE-2022-1586',
+        FixedBy: '0:10.32-3.el8_6',
+        Description:
+          'The pcre2 package contains a new generation of the Perl Compatible Regular Expression libraries for implementing regular expression pattern matching using the same syntax and semantics as Perl. \n\nSecurity Fix(es):\n\n* pcre2: Out-of-bounds read in compile_xclass_matchingpath in pcre2_jit_compile.c (CVE-2022-1586)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:5809: pcre2 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:H',
+              Score: 9.1,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'python3-libs',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '3.6.8-41.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:1986 https://access.redhat.com/security/cve/CVE-2021-3737 https://access.redhat.com/security/cve/CVE-2021-4189',
+        FixedBy: '0:3.6.8-45.el8',
+        Description:
+          'Python is an interpreted, interactive, object-oriented programming language, which includes modules, classes, exceptions, very high level dynamic data types and dynamic typing. Python supports interfaces to many system calls and libraries, as well as to various windowing systems. \n\nSecurity Fix(es):\n\n* python: ftplib should not use the host from the PASV response (CVE-2021-4189)\n\n* python: urllib: HTTP client possible infinite loop on a 100 Continue response (CVE-2021-3737)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.\n\nAdditional Changes:\n\nFor detailed information on changes in this release, see the Red Hat Enterprise Linux 8.6 Release Notes linked from the References section.',
+        Name: 'RHSA-2022:1986: python3 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H',
+              Score: 7.5,
+            },
+          },
+        },
+      },
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:6457 https://access.redhat.com/security/cve/CVE-2015-20107 https://access.redhat.com/security/cve/CVE-2022-0391',
+        FixedBy: '0:3.6.8-47.el8_6',
+        Description:
+          'Python is an interpreted, interactive, object-oriented programming language, which includes modules, classes, exceptions, very high level dynamic data types and dynamic typing. Python supports interfaces to many system calls and libraries, as well as to various windowing systems. \n\nSecurity Fix(es):\n\n* python(mailcap): findmatch() function does not sanitise the second argument (CVE-2015-20107)\n\n* python: urllib.parse does not sanitize URLs containing ASCII newline and tabs (CVE-2022-0391)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:6457: python3 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+              Score: 9.8,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'python38-pip',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:b71f31ebaac9f435ee0f837b5c63b1c2a02eadd0ce52a4736d2ae927bb59835b',
+    Version: '19.3.1-4.module+el8.5.0+12205+a865257a',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:1764 https://access.redhat.com/security/cve/CVE-2021-3733 https://access.redhat.com/security/cve/CVE-2021-3737 https://access.redhat.com/security/cve/CVE-2021-43818 https://access.redhat.com/security/cve/CVE-2022-0391',
+        FixedBy: '0:19.3.1-5.module+el8.6.0+13002+70cfc74a',
+        Description:
+          'Python is an interpreted, interactive, object-oriented programming language, which includes modules, classes, exceptions, very high level dynamic data types and dynamic typing. Python supports interfaces to many system calls and libraries, as well as to various windowing systems. \n\nThe following packages have been upgraded to a later upstream version: python38 (3.8), python38-devel (3.8). (BZ#1997680, BZ#1997860)\n\nSecurity Fix(es):\n\n* python: urllib: Regular expression DoS in AbstractBasicAuthHandler (CVE-2021-3733)\n\n* python-lxml: HTML Cleaner allows crafted and SVG embedded scripts to pass through (CVE-2021-43818)\n\n* python: urllib.parse does not sanitize URLs containing ASCII newline and tabs (CVE-2022-0391)\n\n* python: urllib: HTTP client possible infinite loop on a 100 Continue response (CVE-2021-3737)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.\n\nAdditional Changes:\n\nFor detailed information on changes in this release, see the Red Hat Enterprise Linux 8.6 Release Notes linked from the References section.',
+        Name: 'RHSA-2022:1764: python38:3.8 and python38-devel:3.8 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N',
+              Score: 7.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'libgcrypt',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '1.8.5-6.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:5311 https://access.redhat.com/security/cve/CVE-2021-40528',
+        FixedBy: '0:1.8.5-7.el8_6',
+        Description:
+          'The libgcrypt library provides general-purpose implementations of various cryptographic algorithms.\n\nSecurity Fix(es):\n\n* libgcrypt: ElGamal implementation allows plaintext recovery (CVE-2021-40528)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:5311: libgcrypt security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N',
+              Score: 5.9,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'python38-pip-wheel',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:b71f31ebaac9f435ee0f837b5c63b1c2a02eadd0ce52a4736d2ae927bb59835b',
+    Version: '19.3.1-4.module+el8.5.0+12205+a865257a',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:1764 https://access.redhat.com/security/cve/CVE-2021-3733 https://access.redhat.com/security/cve/CVE-2021-3737 https://access.redhat.com/security/cve/CVE-2021-43818 https://access.redhat.com/security/cve/CVE-2022-0391',
+        FixedBy: '0:19.3.1-5.module+el8.6.0+13002+70cfc74a',
+        Description:
+          'Python is an interpreted, interactive, object-oriented programming language, which includes modules, classes, exceptions, very high level dynamic data types and dynamic typing. Python supports interfaces to many system calls and libraries, as well as to various windowing systems. \n\nThe following packages have been upgraded to a later upstream version: python38 (3.8), python38-devel (3.8). (BZ#1997680, BZ#1997860)\n\nSecurity Fix(es):\n\n* python: urllib: Regular expression DoS in AbstractBasicAuthHandler (CVE-2021-3733)\n\n* python-lxml: HTML Cleaner allows crafted and SVG embedded scripts to pass through (CVE-2021-43818)\n\n* python: urllib.parse does not sanitize URLs containing ASCII newline and tabs (CVE-2022-0391)\n\n* python: urllib: HTTP client possible infinite loop on a 100 Continue response (CVE-2021-3737)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.\n\nAdditional Changes:\n\nFor detailed information on changes in this release, see the Red Hat Enterprise Linux 8.6 Release Notes linked from the References section.',
+        Name: 'RHSA-2022:1764: python38:3.8 and python38-devel:3.8 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N',
+              Score: 7.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'glibc-minimal-langpack',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '2.28-164.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:0896 https://access.redhat.com/security/cve/CVE-2021-3999 https://access.redhat.com/security/cve/CVE-2022-23218 https://access.redhat.com/security/cve/CVE-2022-23219',
+        FixedBy: '0:2.28-164.el8_5.3',
+        Description:
+          'The glibc packages provide the standard C libraries (libc), POSIX thread libraries (libpthread), standard math libraries (libm), and the name service cache daemon (nscd) used by multiple programs on the system. Without these libraries, the Linux system cannot function correctly.\n\nSecurity Fix(es):\n\n* glibc: Off-by-one buffer overflow/underflow in getcwd() (CVE-2021-3999)\n\n* glibc: Stack-based buffer overflow in svcunix_create via long pathnames (CVE-2022-23218)\n\n* glibc: Stack-based buffer overflow in sunrpc clnt_create via a long pathname (CVE-2022-23219)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:0896: glibc security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+              Score: 9.8,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'glibc-common',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '2.28-164.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:0896 https://access.redhat.com/security/cve/CVE-2021-3999 https://access.redhat.com/security/cve/CVE-2022-23218 https://access.redhat.com/security/cve/CVE-2022-23219',
+        FixedBy: '0:2.28-164.el8_5.3',
+        Description:
+          'The glibc packages provide the standard C libraries (libc), POSIX thread libraries (libpthread), standard math libraries (libm), and the name service cache daemon (nscd) used by multiple programs on the system. Without these libraries, the Linux system cannot function correctly.\n\nSecurity Fix(es):\n\n* glibc: Off-by-one buffer overflow/underflow in getcwd() (CVE-2021-3999)\n\n* glibc: Stack-based buffer overflow in svcunix_create via long pathnames (CVE-2022-23218)\n\n* glibc: Stack-based buffer overflow in sunrpc clnt_create via a long pathname (CVE-2022-23219)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:0896: glibc security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
+              Score: 9.8,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'curl',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '7.61.1-22.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:5313 https://access.redhat.com/security/cve/CVE-2022-22576 https://access.redhat.com/security/cve/CVE-2022-27774 https://access.redhat.com/security/cve/CVE-2022-27776 https://access.redhat.com/security/cve/CVE-2022-27782',
+        FixedBy: '0:7.61.1-22.el8_6.3',
+        Description:
+          'The curl packages provide the libcurl library and the curl utility for downloading files from servers using various protocols, including HTTP, FTP, and LDAP.\n\nSecurity Fix(es):\n\n* curl: OAUTH2 bearer bypass in connection re-use (CVE-2022-22576)\n\n* curl: credential leak on redirect (CVE-2022-27774)\n\n* curl: auth/cookie leak on redirect (CVE-2022-27776)\n\n* curl: TLS and SSH connection too eager reuse (CVE-2022-27782)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:5313: curl security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N',
+              Score: 8.1,
+            },
+          },
+        },
+      },
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:6159 https://access.redhat.com/security/cve/CVE-2022-32206 https://access.redhat.com/security/cve/CVE-2022-32208',
+        FixedBy: '0:7.61.1-22.el8_6.4',
+        Description:
+          'The curl packages provide the libcurl library and the curl utility for downloading files from servers using various protocols, including HTTP, FTP, and LDAP.\n\nSecurity Fix(es):\n\n* curl: HTTP compression denial of service (CVE-2022-32206)\n\n* curl: FTP-KRB bad message verification (CVE-2022-32208)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:6159: curl security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H',
+              Score: 6.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'libcurl',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '7.61.1-22.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:5313 https://access.redhat.com/security/cve/CVE-2022-22576 https://access.redhat.com/security/cve/CVE-2022-27774 https://access.redhat.com/security/cve/CVE-2022-27776 https://access.redhat.com/security/cve/CVE-2022-27782',
+        FixedBy: '0:7.61.1-22.el8_6.3',
+        Description:
+          'The curl packages provide the libcurl library and the curl utility for downloading files from servers using various protocols, including HTTP, FTP, and LDAP.\n\nSecurity Fix(es):\n\n* curl: OAUTH2 bearer bypass in connection re-use (CVE-2022-22576)\n\n* curl: credential leak on redirect (CVE-2022-27774)\n\n* curl: auth/cookie leak on redirect (CVE-2022-27776)\n\n* curl: TLS and SSH connection too eager reuse (CVE-2022-27782)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:5313: curl security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N',
+              Score: 8.1,
+            },
+          },
+        },
+      },
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:6159 https://access.redhat.com/security/cve/CVE-2022-32206 https://access.redhat.com/security/cve/CVE-2022-32208',
+        FixedBy: '0:7.61.1-22.el8_6.4',
+        Description:
+          'The curl packages provide the libcurl library and the curl utility for downloading files from servers using various protocols, including HTTP, FTP, and LDAP.\n\nSecurity Fix(es):\n\n* curl: HTTP compression denial of service (CVE-2022-32206)\n\n* curl: FTP-KRB bad message verification (CVE-2022-32208)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:6159: curl security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLink: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H',
+              Score: 6.5,
+            },
+          },
+        },
+      },
+    ],
+  },
+  {
+    Name: 'gnupg2',
+    VersionFormat: '',
+    NamespaceName: '',
+    AddedBy:
+      'sha256:8dfe9326f733b815c486432e93e0a97f03e90e7cc35def9511cd1efa7f917f56',
+    Version: '2.2.20-2.el8',
+    Vulnerabilities: [
+      {
+        Severity: 'Medium',
+        NamespaceName: 'RHEL8-rhel-8-including-unpatched',
+        Link: 'https://access.redhat.com/errata/RHSA-2022:6463 https://access.redhat.com/security/cve/CVE-2022-34903',
+        FixedBy: '0:2.2.20-3.el8_6',
+        Description:
+          'The GNU Privacy Guard (GnuPG or GPG) is a tool for encrypting data and creating digital signatures, compliant with OpenPGP and S/MIME standards.\n\nSecurity Fix(es):\n\n* gpg: Signature spoofing via status line injection (CVE-2022-34903)\n\nFor more details about the security issue(s), including the impact, a CVSS score, acknowledgments, and other related information, refer to the CVE page(s) listed in the References section.',
+        Name: 'RHSA-2022:6463: gnupg2 security update (Moderate)',
+        Metadata: {
+          UpdatedBy: 'RHEL8-rhel-8-including-unpatched',
+          RepoName: 'cpe:/o:redhat:enterprise_linux:8::baseos',
+          RepoLin: null,
+          DistroName: 'Red Hat Enterprise Linux Server',
+          DistroVersion: '8',
+          NVD: {
+            CVSSv3: {
+              Vectors: 'CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:N',
+              Score: 6.5,
+            },
+          },
+        },
+      },
+    ],
+  },
 ];
 
 const lowSeverityFeatures = [

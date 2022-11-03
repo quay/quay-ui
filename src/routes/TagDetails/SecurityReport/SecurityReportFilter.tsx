@@ -1,23 +1,13 @@
-import React, {useState} from 'react';
-import {useRecoilState} from 'recoil';
-import {
-  filteredVulnListState,
-  VulnerabilityListItem,
-  vulnListState,
-} from 'src/atoms/VulnerabilityReportState';
+import {useState} from 'react';
 import {Checkbox, Flex, FlexItem, SearchInput} from '@patternfly/react-core';
+import {VulnerabilityListItem} from './Types';
 
-export function SecurityReportFilter() {
+export function SecurityReportFilter(props: SecurityReportFilterProps) {
   const [isFixedOnlyChecked, setIsFixedOnlyChecked] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const [vulnList, setVulnList] = useRecoilState(vulnListState);
-  const [filteredVulnList, setFilteredVulnList] = useRecoilState(
-    filteredVulnListState,
-  );
-
   const filterVulnList = (searchTerm: string, fixedOnlyChecked: boolean) => {
-    return vulnList.filter((item: VulnerabilityListItem) => {
+    return props.vulnList.filter((item: VulnerabilityListItem) => {
       const searchStr = item.PackageName + item.Advisory;
       return (
         searchStr.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -27,13 +17,17 @@ export function SecurityReportFilter() {
   };
 
   const onSearchTermChanged = (newSearchTerm: string) => {
+    props.setPage(1);
     setSearchTerm(newSearchTerm);
-    setFilteredVulnList(filterVulnList(newSearchTerm, isFixedOnlyChecked));
+    props.setFilteredVulnList(
+      filterVulnList(newSearchTerm, isFixedOnlyChecked),
+    );
   };
 
   const onShowOnlyFixableChanged = (checked: boolean) => {
+    props.setPage(1);
     setIsFixedOnlyChecked(checked);
-    setFilteredVulnList(filterVulnList(searchTerm, checked));
+    props.setFilteredVulnList(filterVulnList(searchTerm, checked));
   };
 
   return (
@@ -58,4 +52,10 @@ export function SecurityReportFilter() {
       </FlexItem>
     </Flex>
   );
+}
+
+interface SecurityReportFilterProps {
+  setPage: (page: number) => void;
+  vulnList: VulnerabilityListItem[];
+  setFilteredVulnList: (vulnList: VulnerabilityListItem[]) => void;
 }

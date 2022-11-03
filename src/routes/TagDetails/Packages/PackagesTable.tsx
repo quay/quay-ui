@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {
   Vulnerability,
   Feature,
@@ -18,13 +18,9 @@ import {
   PageSectionVariants,
   Spinner,
   Title,
+  Toolbar,
+  ToolbarContent,
 } from '@patternfly/react-core';
-import {useRecoilState} from 'recoil';
-import {
-  filteredPackagesListState,
-  PackagesListItem,
-  packagesListState,
-} from 'src/atoms/PackagesState';
 import {PackagesFilter} from './PackagesFilter';
 import {
   CheckCircleIcon,
@@ -32,6 +28,8 @@ import {
 } from '@patternfly/react-icons';
 import {getSeverityColor} from 'src/libs/utils';
 import {VulnerabilityStats} from '../SecurityReport/SecurityReportChart';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import {PackagesListItem} from './Types';
 
 const columnNames = {
   PackageName: 'Package Name',
@@ -143,9 +141,17 @@ function VulnerabilitiesEntry(props: VulnerabilitiesEntryProps) {
 
 export default function PackagesTable({features}: PackagesProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [packagesList, setPackagesList] = useRecoilState(packagesListState);
-  const [filteredPackagesList, setFilteredPackagesList] = useRecoilState(
-    filteredPackagesListState,
+  const [packagesList, setPackagesList] = useState<PackagesListItem[]>([]);
+  const [filteredPackagesList, setFilteredPackagesList] = useState<
+    PackagesListItem[]
+  >([]);
+
+  // Pagination state
+  const [page, setPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(10);
+  const paginatedPackagList: PackagesListItem[] = filteredPackagesList.slice(
+    (page - 1) * perPage,
+    page * perPage,
   );
 
   useEffect(() => {
@@ -176,17 +182,36 @@ export default function PackagesTable({features}: PackagesProps) {
       const sortedPackagesList = sortPackages(packagesList);
       setPackagesList(sortedPackagesList);
       setFilteredPackagesList(sortedPackagesList);
+    } else {
+      setPackagesList([]);
+      setFilteredPackagesList([]);
     }
   }, [features]);
 
   return (
     <PageSection variant={PageSectionVariants.light}>
       <TableTitle />
-      <PackagesFilter />
-      <TableComposable data-testid="packages-table" aria-label="packages table">
+      <Toolbar>
+        <ToolbarContent>
+          <PackagesFilter
+            setPage={setPage}
+            packagesList={packagesList}
+            setFilteredPackageList={setFilteredPackagesList}
+          />
+          <ToolbarPagination
+            itemsList={filteredPackagesList}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+            id="packages-table-pagination"
+          />
+        </ToolbarContent>
+      </Toolbar>
+      <TableComposable aria-label="packages table" data-testid="packages-table">
         <TableHead />
-        {filteredPackagesList.length !== 0 ? (
-          filteredPackagesList.map((pkg: PackagesListItem) => {
+        {paginatedPackagList.length !== 0 ? (
+          paginatedPackagList.map((pkg: PackagesListItem) => {
             return (
               <Tbody key={pkg.PackageName + pkg.CurrentVersion}>
                 <Tr>
@@ -215,11 +240,24 @@ export default function PackagesTable({features}: PackagesProps) {
         ) : (
           <Tbody>
             <Tr>
-              <Td>{!features ? <Spinner size="lg" /> : <div></div>}</Td>
+              <Td>
+                {!features ? (
+                  <Spinner size="lg" />
+                ) : (
+                  <div>No Packages Found</div>
+                )}
+              </Td>
             </Tr>
           </Tbody>
         )}
       </TableComposable>
+      <ToolbarPagination
+        itemsList={filteredPackagesList}
+        perPage={perPage}
+        page={page}
+        setPage={setPage}
+        setPerPage={setPerPage}
+      />
     </PageSection>
   );
 }
