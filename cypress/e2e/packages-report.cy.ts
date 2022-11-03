@@ -27,20 +27,24 @@ describe('Packages Report Page', () => {
       .should('have.length', 7);
   });
 
-  // // TODO: UI needs to be implemented
-  // it('render unsupported state', () => {
-  //     cy.visit('/tag/quay/postgres/securityreportunsupported?tab=securityreport');
-  // });
+  it('render unsupported state', () => {
+    cy.visit('/tag/quay/postgres/securityreportunsupported?tab=packages');
+    cy.contains('Security scan is not supported.');
+    cy.contains('Image does not have content the scanner recognizes.');
+  });
 
-  // // TODO: UI needs to be implemented
-  // it('render failed state', () => {
-  //     cy.visit('/tag/quay/postgres/securityreportfailed?tab=securityreport');
-  // });
+  it('render failed state', () => {
+    cy.visit('/tag/quay/postgres/securityreportfailed?tab=packages');
+    cy.contains('Security scan has failed.');
+    cy.contains('The scan could not be completed due to error.');
+  });
 
-  // // TODO: UI needs to be implemented
-  // it('render queued state', () => {
-  //     cy.visit('/tag/quay/postgres/securityreportqueued?tab=securityreport');
-  // });
+  it('render queued state', () => {
+    cy.visit('/tag/quay/postgres/securityreportqueued?tab=packages');
+    cy.contains('Security scan is currently queued.');
+    cy.contains('Refresh page for updates in scan status.');
+    cy.contains('Reload');
+  });
 
   it('paginate values', () => {
     cy.visit('/tag/quay/postgres/securityreportmixedvulns?tab=packages');
