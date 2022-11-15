@@ -6,11 +6,23 @@ on:
     - "*"
 
 jobs:
-  cypress-run:
+  cypress-e2e:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Clone Quay Repository
+        uses: actions/checkout@v3
+        with:
+          repository: quay/quay
+          path: './quay'
+      - name: Start Quay
+        run: |
+          # This rebuilds Quay from scratch, should look to use images built off of Quay master
+          cd quay
+          docker-compose up -d redis quay-db
+          docker exec -t quay-db bash -c 'while ! pg_isready; do echo "waiting for postgres"; sleep 2; done'
+          DOCKER_USER="1001:0" docker-compose up -d quay
       - name: Cypress run
         uses: cypress-io/github-action@v4.2.0
         with:
@@ -20,9 +32,7 @@ jobs:
           wait-on: 'http://localhost:9000'
           wait-on-timeout: 120
         env:
-          MOCK_API: true
-      # Used for debugging. Uncomment to upload screenshots  
-      # and videos of running tests to diagnose issues.
+          REACT_QUAY_APP_API_URL: http://localhost:8080
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
