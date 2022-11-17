@@ -1,54 +1,62 @@
 /// <reference types="cypress" />
 
 import {formatDate} from '../../src/libs/utils';
+import {IRepository} from '../../src/resources/RepositoryResource';
 
 describe('Repositories List Page', () => {
+  beforeEach(() => {
+    cy.exec('npm run quay:seed');
+    cy.request('GET', `${Cypress.env('REACT_QUAY_APP_API_URL')}/csrf_token`)
+      .then((response) => response.body.csrf_token)
+      .then((token) => {
+        cy.loginByCSRF(token);
+      });
+  });
+
   it('renders list of all repositories', () => {
     cy.visit('/repositories');
     cy.contains('Repositories').should('exist');
     cy.get('[data-testid="repository-list-table"]')
       .children()
-      .should('have.length', 7);
+      .should('have.length', 2);
     cy.get('[data-testid="repository-list-table"]').within(() => {
-      cy.contains('user1/postgres').should('exist');
-      cy.contains('user1/nested/repository').should('exist');
-      cy.contains('quay/postgres').should('exist');
-      cy.contains('testorg/postgres').should('exist');
-      cy.contains('testorg/redis').should('exist');
+      cy.contains('user1/hello-world').should('exist');
+      cy.contains('user1/nested/repo').should('exist');
     });
     const firstRow = cy.get('tbody').first();
     firstRow.within(() => {
-      cy.get(`[data-label="Name"]`).contains('user1/nested/repository');
+      cy.get(`[data-label="Name"]`).contains('user1/hello-world');
       cy.get(`[data-label="Visibility"]`).contains('private');
-      cy.get(`[data-label="Last Modified"]`).contains(formatDate(1656432090));
+      cy.get(`[data-label="Size"]`).contains('2.42 kB');
+      cy.get(`[data-label="Last Modified"]`).contains(formatDate(1667589337));
     });
   });
 
   it('renders list of repositories for a single organization', () => {
-    cy.visit('/organizations/quay');
-    cy.get('[data-testid="repo-title"]').within(() => cy.contains('quay'));
+    cy.visit('/organizations/user1');
+    cy.get('[data-testid="repo-title"]').within(() => cy.contains('user1'));
     cy.get('[data-testid="repository-list-table"]')
       .children()
-      .should('have.length', 3);
+      .should('have.length', 2);
     cy.get('[data-testid="repository-list-table"]').within(() => {
-      cy.contains('postgres').should('exist');
-      cy.contains('python').should('exist');
-      cy.contains('busybox').should('exist');
+      cy.contains('hello-world').should('exist');
+      cy.contains('nested/repo').should('exist');
     });
     const firstRow = cy.get('tbody').first();
     firstRow.within(() => {
-      cy.get(`[data-label="Name"]`).contains('busybox');
+      cy.get(`[data-label="Name"]`).contains('hello-world');
       cy.get(`[data-label="Visibility"]`).contains('private');
-      cy.get(`[data-label="Last Modified"]`).contains(formatDate(1656428008));
+      cy.get(`[data-label="Size"]`).contains('2.42 kB');
+      cy.get(`[data-label="Last Modified"]`).contains(formatDate(1667589337));
     });
   });
 
   it('create public repository', () => {
     cy.visit('/repositories');
-    cy.get('button').contains('Create Repository').click();
+    cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
     cy.contains('Select namespace').click();
-    cy.get('button').contains('quay').click();
+    cy.get('ul:contains("user1")').click();
     cy.get('input[id="repository-name-input"]').type('new-repo');
     cy.get('input[id="repository-description-input"]').type(
       'This is a new public repository',
@@ -64,10 +72,10 @@ describe('Repositories List Page', () => {
 
   it('create private repository', () => {
     cy.visit('/repositories');
-    cy.get('button').contains('Create Repository').click();
+    cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
     cy.contains('Select namespace').click();
-    cy.get('button').contains('quay').click();
+    cy.get('ul:contains("user1")').click();
     cy.get('input[id="repository-name-input"]').type('new-repo');
     cy.get('input[id="repository-description-input"]').type(
       'This is a new private repository',
@@ -83,10 +91,10 @@ describe('Repositories List Page', () => {
   });
 
   it('create repository under organization', () => {
-    cy.visit('/organizations/quay');
-    cy.get('button').contains('Create Repository').click();
+    cy.visit('/organizations/user1');
+    cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
-    cy.get('button:contains("quay")').should('exist');
+    cy.get('button:contains("user1")').should('exist');
     cy.get('input[id="repository-name-input"]').type('new-repo');
     cy.get('input[id="repository-description-input"]').type(
       'This is a new private repository',
@@ -136,12 +144,12 @@ describe('Repositories List Page', () => {
   it('makes multiple repositories public', () => {
     cy.visit('/repositories');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select page (7)').click();
+    cy.contains('Select page (2)').click();
     cy.contains('Actions').click();
     cy.contains('Make Public').click();
     cy.contains('Make repositories public');
     cy.contains(
-      'Update 7 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
+      'Update 2 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
     );
     cy.contains('Make public').click();
     cy.contains('private').should('not.exist');
@@ -150,12 +158,12 @@ describe('Repositories List Page', () => {
   it('makes multiple repositories private', () => {
     cy.visit('/repositories');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select page (7)').click();
+    cy.contains('Select page (2)').click();
     cy.contains('Actions').click();
     cy.contains('Make Private').click();
     cy.contains('Make repositories private');
     cy.contains(
-      'Update 7 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
+      'Update 2 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
     );
     cy.contains('Make private').click();
     cy.contains('public').should('not.exist');
@@ -163,10 +171,10 @@ describe('Repositories List Page', () => {
 
   it('searches by name', () => {
     cy.visit('/repositories');
-    cy.get('input[placeholder="Search by Name..."]').type('postgres');
+    cy.get('input[placeholder="Search by Name..."]').type('hello');
     cy.get('td[data-label="Name"]')
-      .filter(':contains("postgres")')
-      .should('have.length', 3);
+      .filter(':contains("hello-world")')
+      .should('have.length', 1);
   });
 
   it('searches by name including organization', () => {
@@ -178,7 +186,32 @@ describe('Repositories List Page', () => {
   });
 
   it('paginates repositories', () => {
-    cy.visit('/organizations/manyrepositories');
+    const repos: IRepository[] = [];
+    for (let i = 0; i < 50; i++) {
+      const repo = {
+        namespace: 'manyrepositories',
+        name: '',
+        description: 'description',
+        is_public: false,
+        kind: 'image',
+        state: 'NORMAL',
+        quota_report: {
+          quota_bytes: 132459661,
+          configured_quota: 104857600,
+        },
+        last_modified: 1656432090,
+        popularity: 0.0,
+        is_starred: false,
+      };
+      repo.name = `repo${i}`;
+      repos.push(repo);
+    }
+    cy.intercept(
+      'GET',
+      '/api/v1/repository?last_modified=true&namespace=user1&public=true',
+      {repositories: repos},
+    ).as('getRepositories');
+    cy.visit('/repositories');
     cy.contains('1 - 10 of 50').should('exist');
     cy.get('td[data-label="Name"]').should('have.length', 10);
 

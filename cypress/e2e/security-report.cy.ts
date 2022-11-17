@@ -1,8 +1,36 @@
 /// <reference types="cypress" />
 
 describe('Security Report Page', () => {
+  beforeEach(() => {
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/tag/?limit=100&page=1&onlyActiveTags=true&specificTag=security',
+      {fixture: 'single-tag.json'},
+    ).as('getTag');
+    cy.intercept('GET', '/api/v1/user/', {fixture: 'user.json'}).as('getUser');
+    cy.intercept('GET', '/config', {fixture: 'config.json'}).as('getConfig');
+    cy.intercept('GET', '/csrf_token', {fixture: 'csrfToken.json'}).as(
+      'getCsrfToken',
+    );
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be',
+      {fixture: 'manifest.json'},
+    ).as('getManifest');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/labels',
+      {fixture: 'labels.json'},
+    ).as('getLabels');
+  });
+
   it('render no vulnerabilities', () => {
-    cy.visit('/tag/quay/postgres/securityreportnovulns?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/noVulns.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.contains(
       'Quay Security Reporting has detected no vulnerabilities',
     ).should('exist');
@@ -13,7 +41,12 @@ describe('Security Report Page', () => {
   });
 
   it('render mixed vulnerabilities', () => {
-    cy.visit('/tag/quay/postgres/securityreportmixedvulns?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/mixedVulns.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.contains(
       'Quay Security Reporting has detected 41 vulnerabilities',
     ).should('exist');
@@ -46,7 +79,12 @@ describe('Security Report Page', () => {
   });
 
   it('only show fixable', () => {
-    cy.visit('/tag/quay/postgres/securityreportmixedvulns?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/mixedVulns.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.get('td[data-label="Advisory"]').should('have.length', 10);
     cy.get('button:contains("1 - 10 of 41")').first().click();
     cy.contains('100 per page').click();
@@ -59,7 +97,12 @@ describe('Security Report Page', () => {
   });
 
   it('filter by name', () => {
-    cy.visit('/tag/quay/postgres/securityreportmixedvulns?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/mixedVulns.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.get('td[data-label="Advisory"]').should('have.length', 10);
     cy.get('input[placeholder="Filter Vulnerabilities..."]').type('python');
     cy.get('td[data-label="Advisory"]').should('have.length', 7);
@@ -69,19 +112,34 @@ describe('Security Report Page', () => {
   });
 
   it('render unsupported state', () => {
-    cy.visit('/tag/quay/postgres/securityreportunsupported?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/unsupported.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.contains('Security scan is not supported.');
     cy.contains('Image does not have content the scanner recognizes.');
   });
 
   it('render failed state', () => {
-    cy.visit('/tag/quay/postgres/securityreportfailed?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/failed.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.contains('Security scan has failed.');
     cy.contains('The scan could not be completed due to error.');
   });
 
   it('render queued state', () => {
-    cy.visit('/tag/quay/postgres/securityreportqueued?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/queued.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.contains('Security scan is currently queued.');
     cy.contains('Refresh page for updates in scan status.');
     cy.contains('Reload');
@@ -93,7 +151,12 @@ describe('Security Report Page', () => {
   // });
 
   it('paginate values', () => {
-    cy.visit('/tag/quay/postgres/securityreportmixedvulns?tab=securityreport');
+    cy.intercept(
+      'GET',
+      '/api/v1/repository/user1/hello-world/manifest/sha256:1234567890101112150f0d3de5f80a38f65a85e709b77fd24491253990f306be/security?vulnerabilities=true',
+      {fixture: 'security/mixedVulns.json'},
+    ).as('getSecurityReport');
+    cy.visit('/tag/user1/hello-world/security?tab=securityreport');
     cy.contains('1 - 10 of 41').should('exist');
     cy.get('td[data-label="Advisory"]').should('have.length', 10);
 
