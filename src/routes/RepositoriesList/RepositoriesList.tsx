@@ -70,7 +70,6 @@ export default function RepositoriesList() {
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
-  const search = useRecoilValue(searchRepoState);
   const [err, setErr] = useState<string[]>();
 
   const quayConfig = useQuayConfig();
@@ -82,10 +81,12 @@ export default function RepositoriesList() {
     deleteRepositories,
     setPerPage,
     setPage,
+    search,
+    setSearch,
     page,
     perPage,
     totalResults,
-  } = useRepositories();
+  } = useRepositories(currentOrg);
 
   repos.sort((r1, r2) => {
     return r1.last_modified > r2.last_modified ? -1 : 1;
@@ -111,7 +112,10 @@ export default function RepositoriesList() {
         })
       : repositoryList;
 
-  const paginatedRepositoryList = filteredRepos;
+  const paginatedRepositoryList = filteredRepos.slice(
+    page * perPage - perPage,
+    page * perPage - perPage + perPage,
+  );
 
   // Select related states
   const [selectedRepoNames, setSelectedRepoNames] =
@@ -295,6 +299,9 @@ export default function RepositoriesList() {
       <PageSection variant={PageSectionVariants.light}>
         <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
         <RepositoryToolBar
+          search={search}
+          setSearch={setSearch}
+          total={totalResults}
           currentOrg={currentOrg}
           createRepoModal={createRepoModal}
           isCreateRepoModalOpen={isCreateRepoModalOpen}

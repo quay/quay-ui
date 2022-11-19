@@ -4,12 +4,14 @@ import {
   PaginationVariant,
 } from '@patternfly/react-core';
 
-export function ToolbarPagination(props: ToolbarPaginationProps) {
+export const ToolbarPagination = (props: ToolbarPaginationProps) => {
+  const {total} = props;
+
   return (
     <ToolbarItem variant="pagination">
       <Pagination
         perPageComponent="button"
-        itemCount={props.total}
+        itemCount={total}
         perPage={props.perPage}
         id={props.id ? props.id : 'toolbar-pagination'}
         page={props.page}
@@ -25,7 +27,7 @@ export function ToolbarPagination(props: ToolbarPaginationProps) {
       />
     </ToolbarItem>
   );
-}
+};
 
 type ToolbarPaginationProps = {
   itemsList: any[];

@@ -16,7 +16,7 @@ import {
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import {searchOrgsState, selectedOrgsState} from 'src/atoms/UserState';
+import {selectedOrgsState} from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
 import {IOrganization} from 'src/resources/OrganizationResource';
 import OrgTableData from './OrganizationsListTableData';
@@ -56,7 +56,6 @@ function OrgListHeader() {
 
 export default function OrganizationsList() {
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
-  const search = useRecoilValue(searchOrgsState);
   const [selectedOrganization, setSelectedOrganization] =
     useRecoilState(selectedOrgsState);
   const [err, setErr] = useState<string[]>();
@@ -65,8 +64,15 @@ export default function OrganizationsList() {
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
 
-  const {organizationsTableDetails, loading, error, deleteOrganizations} =
-    useOrganizations();
+  const {
+    organizationsTableDetails,
+    loading,
+    error,
+    deleteOrganizations,
+    totalResults,
+    search,
+    setSearch,
+  } = useOrganizations();
 
   const filteredOrgs =
     search.query !== ''
@@ -274,6 +280,9 @@ export default function OrganizationsList() {
       <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
       <PageSection variant={PageSectionVariants.light}>
         <OrganizationToolBar
+          search={search}
+          setSearch={setSearch}
+          total={totalResults}
           createOrgModal={createOrgModal}
           isOrganizationModalOpen={isOrganizationModalOpen}
           setOrganizationModalOpen={setOrganizationModalOpen}
@@ -326,6 +335,7 @@ export default function OrganizationsList() {
         </TableComposable>
         <PanelFooter>
           <ToolbarPagination
+            total={totalResults}
             itemsList={filteredOrgs}
             perPage={perPage}
             page={page}

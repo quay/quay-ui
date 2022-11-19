@@ -19,10 +19,10 @@ export interface IOrganization {
   teams?: string[];
 }
 
-export async function fetchOrg(orgname: string) {
+export async function fetchOrg(orgname: string, signal: AbortSignal) {
   const getOrgUrl = `/api/v1/organization/${orgname}`;
   // TODO: Add return type
-  const response: AxiosResponse = await axios.get(getOrgUrl);
+  const response: AxiosResponse = await axios.get(getOrgUrl, {signal});
   assertHttpCode(response.status, 200);
   return response.data as IOrganization;
 }

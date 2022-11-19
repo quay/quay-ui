@@ -7,13 +7,11 @@ import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {Kebab} from 'src/components/toolbar/Kebab';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {searchRepoState} from 'src/atoms/RepositoryState';
 import {ReactElement} from 'react';
 import ColumnNames from './ColumnNames';
+import {SearchState} from 'src/components/toolbar/SearchTypes';
 
 export function RepositoryToolBar(props: RepositoryToolBarProps) {
-  const [search, setSearch] = useRecoilState(searchRepoState);
-
   const fetchConfirmationModalText = () => {
     if (props.selectedRepoNames.length == 1) {
       return props.selectedRepoNames[0];
@@ -55,10 +53,10 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
         />
         <SearchDropdown
           items={[ColumnNames.name]}
-          searchState={search}
-          setSearchState={setSearch}
+          searchState={props.search}
+          setSearchState={props.setSearch}
         />
-        <SearchInput searchState={search} onChange={setSearch} />
+        <SearchInput searchState={props.search} onChange={props.setSearch} />
         <ToolbarButton
           id="create-repository-button"
           buttonValue="Create Repository"
@@ -77,6 +75,7 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
           {props.deleteKebabIsOpen ? props.deleteModal : null}
         </ToolbarItem>
         <ToolbarPagination
+          total={props.total}
           itemsList={props.repositoryList}
           perPage={props.perPage}
           page={props.page}
@@ -109,6 +108,7 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
 }
 
 type RepositoryToolBarProps = {
+  total: number;
   currentOrg: string;
   createRepoModal: object;
   isCreateRepoModalOpen: boolean;
@@ -129,6 +129,8 @@ type RepositoryToolBarProps = {
   page: number;
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
+  search: SearchState;
+  setSearch: (searchState) => void;
   setSelectedRepoNames: (selectedRepoList) => void;
   paginatedRepositoryList: any[];
   onSelectRepo: (Repo, rowIndex, isSelecting) => void;
