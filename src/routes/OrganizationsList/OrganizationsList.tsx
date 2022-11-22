@@ -352,6 +352,7 @@ export default function OrganizationsList() {
           body="Create a shared space of public and private repositories for your developers to collaborate in. Organizations make it easy to add and manage people and permissions"
           button={
             <ToolbarButton
+              id="create-organization-button"
               buttonValue="Create Organization"
               Modal={createOrgModal}
               isModalOpen={isOrganizationModalOpen}

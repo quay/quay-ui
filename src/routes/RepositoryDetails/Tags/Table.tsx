@@ -88,7 +88,7 @@ function Row(props: RowProps) {
 
   // Behavior taken from previous UI
   if (tag.size === 0) {
-    size = 'Uknown';
+    size = 'Unknown';
   }
 
   // Reset SecurityDetailsState so that loading skeletons appear when viewing report

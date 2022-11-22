@@ -175,6 +175,7 @@ export default function CreateRepositoryModalTemplate(
                     }
                     onSelect={handleNamespaceSelection}
                     isOpen={currentOrganization.isDropdownOpen}
+                    maxHeight="200px"
                     width="200px"
                     isDisabled={props.orgName !== null}
                     placeholderText={'Select namespace'}

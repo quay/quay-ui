@@ -95,7 +95,12 @@ export const BulkDeleteModalTemplate = <T,>(
         >
           Delete
         </Button>,
-        <Button key="cancel" variant="link" onClick={props.handleModalToggle}>
+        <Button
+          key="cancel"
+          id="delete-org-cancel"
+          variant="link"
+          onClick={props.handleModalToggle}
+        >
           Cancel
         </Button>,
       ]}

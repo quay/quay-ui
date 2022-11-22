@@ -101,6 +101,7 @@ export const CreateOrganizationModal = (
       onClose={props.handleModalToggle}
       actions={[
         <Button
+          id="create-org-confirm"
           key="confirm"
           variant="primary"
           onClick={createOrganizationHandler}
@@ -111,18 +112,23 @@ export const CreateOrganizationModal = (
         >
           Create
         </Button>,
-        <Button key="cancel" variant="link" onClick={props.handleModalToggle}>
+        <Button
+          id="create-org-cancel"
+          key="cancel"
+          variant="link"
+          onClick={props.handleModalToggle}
+        >
           Cancel
         </Button>,
       ]}
     >
       <FormError message={err} setErr={setErr} />
-      <Form id="modal-with-form-form" isWidthLimited>
+      <Form id="create-org-modal" isWidthLimited>
         <FormGroup
           isInline
           label="Organization Name"
           isRequired
-          fieldId="modal-with-form-form-name"
+          fieldId="create-org-name"
           helperText={validation.message}
           helperTextInvalid={validation.message}
           validated={validation.type}
@@ -130,7 +136,7 @@ export const CreateOrganizationModal = (
           <TextInput
             isRequired
             type="text"
-            id="modal-with-form-form-name"
+            id="create-org-name-input"
             value={organizationName}
             onChange={handleNameInputChange}
             validated={validation.type}
@@ -138,15 +144,15 @@ export const CreateOrganizationModal = (
         </FormGroup>
         <FormGroup
           label="Organization Email"
-          fieldId="modal-with-form-form-email"
+          fieldId="create-org-email"
           helperText="This address must be different from your account's email"
           helperTextInvalid={'Enter a valid email: email@provider.com'}
           validated={invalidEmailFlag ? 'error' : 'default'}
         >
           <TextInput
             type="email"
-            id="modal-with-form-form-name"
-            name="modal-with-form-form-name"
+            id="create-org-email-input"
+            name="create-org-email-input"
             value={organizationEmail}
             onChange={handleEmailInputChange}
             validated={invalidEmailFlag ? 'error' : 'default'}
