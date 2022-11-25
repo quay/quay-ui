@@ -8,7 +8,7 @@ import {Kebab} from 'src/components/toolbar/Kebab';
 import {ConfirmationModal} from 'src/components/modals/ConfirmationModal';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {ReactElement} from 'react';
-import ColumnNames from './ColumnNames';
+import {RepositoryListColumnNames as ColumnNames} from './ColumnNames';
 import {SearchState} from 'src/components/toolbar/SearchTypes';
 
 export function RepositoryToolBar(props: RepositoryToolBarProps) {
@@ -60,9 +60,9 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
         <ToolbarButton
           id="create-repository-button"
           buttonValue="Create Repository"
-          Modal={props.createRepoModal}
-          isModalOpen={props.isCreateRepoModalOpen}
-          setModalOpen={props.setCreateRepoModalOpen}
+          Modal={props.pageModal}
+          isModalOpen={props.isModalOpen}
+          setModalOpen={props.setModalOpen}
         />
         <ToolbarItem>
           {props.selectedRepoNames?.length !== 0 ? (
@@ -109,9 +109,11 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
 type RepositoryToolBarProps = {
   total: number;
   currentOrg: string;
-  createRepoModal: object;
-  isCreateRepoModalOpen: boolean;
-  setCreateRepoModalOpen: (open) => void;
+  showPageButton: boolean;
+  buttonText: string;
+  pageModal: object;
+  isModalOpen: boolean;
+  setModalOpen: (open) => void;
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
   kebabItems: ReactElement[];

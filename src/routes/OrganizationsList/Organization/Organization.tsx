@@ -12,6 +12,7 @@ import {useCallback, useState} from 'react';
 import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
 import Settings from './Tabs/Settings/Settings';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
+import RobotAccountsList from 'src/routes/RepositoriesList/RobotAccountsList';
 
 export default function Organization() {
   const location = useLocation();
@@ -39,6 +40,16 @@ export default function Organization() {
       name: 'Settings',
       component: <Settings />,
     },
+    {
+      name: 'Robot accounts',
+      component: <RobotAccountsList />,
+    },
+    // Commenting till needed.
+    // {
+    //   href: NavigationPath.orgDetailUsageLogsTab,
+    //   name: 'Usage Logs',
+    //   component: <UsageLogsTab />,
+    // },
   ];
 
   return (

@@ -37,7 +37,7 @@ import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import ColumnNames from './ColumnNames';
+import {RepositoryListColumnNames} from './ColumnNames';
 import {LoadingPage} from 'src/components/LoadingPage';
 import {useCurrentUser} from 'src/hooks/UseCurrentUser';
 import {useRepositories} from 'src/hooks/UseRepositories';
@@ -306,9 +306,11 @@ export default function RepositoriesList() {
           setSearch={setSearch}
           total={totalResults}
           currentOrg={currentOrg}
-          createRepoModal={createRepoModal}
-          isCreateRepoModalOpen={isCreateRepoModalOpen}
-          setCreateRepoModalOpen={setCreateRepoModalOpen}
+          pageModal={createRepoModal}
+          showPageButton={true}
+          buttonText="Create Repository"
+          isModalOpen={isCreateRepoModalOpen}
+          setModalOpen={setCreateRepoModalOpen}
           isKebabOpen={isKebabOpen}
           setKebabOpen={setKebabOpen}
           kebabItems={kebabItems}
@@ -333,14 +335,14 @@ export default function RepositoriesList() {
           <Thead>
             <Tr>
               <Th />
-              <Th>{ColumnNames.name}</Th>
-              <Th>{ColumnNames.visibility}</Th>
+              <Th>{RepositoryListColumnNames.name}</Th>
+              <Th>{RepositoryListColumnNames.visibility}</Th>
               {quayConfig?.features.QUOTA_MANAGEMENT ? (
-                <Th>{ColumnNames.size}</Th>
+                <Th>{RepositoryListColumnNames.size}</Th>
               ) : (
                 <></>
               )}
-              <Th>{ColumnNames.lastModified}</Th>
+              <Th>{RepositoryListColumnNames.lastModified}</Th>
             </Tr>
           </Thead>
           <Tbody data-testid="repository-list-table">
@@ -363,7 +365,7 @@ export default function RepositoriesList() {
                       disable: !isRepoSelectable(repo),
                     }}
                   />
-                  <Td dataLabel={ColumnNames.name}>
+                  <Td dataLabel={RepositoryListColumnNames.name}>
                     {currentOrg == null ? (
                       <Link to={getRepoDetailPath(repo.namespace, repo.name)}>
                         {repo.namespace}/{repo.name}
@@ -374,18 +376,18 @@ export default function RepositoriesList() {
                       </Link>
                     )}
                   </Td>
-                  <Td dataLabel={ColumnNames.visibility}>
+                  <Td dataLabel={RepositoryListColumnNames.visibility}>
                     {repo.is_public ? 'public' : 'private'}
                   </Td>
                   {quayConfig?.features.QUOTA_MANAGEMENT ? (
-                    <Td dataLabel={ColumnNames.size}>
+                    <Td dataLabel={RepositoryListColumnNames.size}>
                       {' '}
                       {formatSize(repo.size)}
                     </Td>
                   ) : (
                     <></>
                   )}
-                  <Td dataLabel={ColumnNames.lastModified}>
+                  <Td dataLabel={RepositoryListColumnNames.lastModified}>
                     {formatDate(repo.last_modified)}
                   </Td>
                 </Tr>
