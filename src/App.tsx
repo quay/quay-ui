@@ -1,6 +1,7 @@
 import React, {Suspense} from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 
 import 'src/App.css';
 
@@ -23,6 +24,7 @@ export default function App() {
               <Route path="/*" element={<StandaloneMain />} />
               <Route path="/signin" element={<Signin />} />
             </Routes>
+            <ReactQueryDevtools />
           </QueryClientProvider>
         </Suspense>
       </BrowserRouter>

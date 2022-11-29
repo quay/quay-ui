@@ -10,4 +10,5 @@ export const RobotAccountColumnNames = {
   teams: 'Teams',
   repositories: 'Repositories',
   created: 'Created',
+  lastAccessed: 'Last accessed',
 };

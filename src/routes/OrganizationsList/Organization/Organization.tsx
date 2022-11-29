@@ -42,7 +42,7 @@ export default function Organization() {
     },
     {
       name: 'Robot accounts',
-      component: <RobotAccountsList />,
+      component: <RobotAccountsList repositoryName={repositoryName} />,
     },
     // Commenting till needed.
     // {
