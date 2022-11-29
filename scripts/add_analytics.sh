@@ -29,11 +29,11 @@ EOM
     echo $HEADER
     echo $FOOTER
 
-    sed "/<head>/a\\
-        $HEADER" ../src/index.html > temp.html
+    sed -i  "/<head>/a\\
+        $HEADER" ../src/index.html
     
-     sed "/<\/body>/i\\
-        $FOOTER" temp.html > temp2.html
+     sed -i "/<\/body>/i\\
+        $FOOTER" ../src/index.html
 
 fi
 
