@@ -26,14 +26,17 @@ then
     </script>
 EOM
 
-    echo $HEADER
-    echo $FOOTER
-
-    sed -i  "/<head>/a\\
-        $HEADER" ../src/index.html
+    sed "/<head>/a\\
+        $HEADER" ../src/index.html > temp.html
     
-     sed -i "/<\/body>/i\\
-        $FOOTER" ../src/index.html
+    mv temp.html ../src/index.html
+
+    sed "/<\/body>/i\\
+        $FOOTER" ../src/index.html > temp.html
+
+    mv temp.html ../src/index.html
+
+    echo "Added Adobe Analytics $DPAL_URL"
 
 fi
 
