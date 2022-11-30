@@ -7,11 +7,11 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
-import {useOrganizations} from 'src/hooks/UseOrganizations';
 import {isValidEmail} from 'src/libs/utils';
 import {useState} from 'react';
 import FormError from 'src/components/errors/FormError';
 import {addDisplayError} from 'src/resources/ErrorHandling';
+import {useCreateOrganization} from 'src/hooks/UseCreateOrganization';
 
 interface Validation {
   message: string;
@@ -35,7 +35,12 @@ export const CreateOrganizationModal = (
   const [validation, setValidation] = useState<Validation>(defaultMessage);
   const [err, setErr] = useState<string>();
 
-  const {createOrganization} = useOrganizations();
+  const {createOrganization} = useCreateOrganization({
+    onSuccess: () => props.handleModalToggle(),
+    onError: (err) => {
+      setErr(addDisplayError('Unable to create organization', err));
+    },
+  });
 
   const handleNameInputChange = (value: any) => {
     const regex = /^([a-z0-9]+(?:[._-][a-z0-9]+)*)$/;
@@ -71,13 +76,7 @@ export const CreateOrganizationModal = (
   };
 
   const createOrganizationHandler = async () => {
-    try {
-      await createOrganization(organizationName, organizationEmail);
-      props.handleModalToggle();
-    } catch (err) {
-      console.error(err);
-      setErr(addDisplayError('Unable to create organization', err));
-    }
+    await createOrganization(organizationName, organizationEmail);
   };
 
   const onInputBlur = () => {

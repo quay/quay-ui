@@ -19,7 +19,7 @@ import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import {IOrganization} from 'src/resources/OrganizationResource';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
-import {useRepositories} from 'src/hooks/UseRepositories';
+import {useCreateRepository} from 'src/hooks/UseCreateRepository';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -42,7 +42,14 @@ export default function CreateRepositoryModalTemplate(
     isDropdownOpen: false,
   });
 
-  const {createRepository} = useRepositories();
+  const {createRepository} = useCreateRepository({
+    onSuccess: () => {
+      props.handleModalToggle();
+    },
+    onError: (error) => {
+      setErr(addDisplayError('Unable to create repository', error));
+    },
+  });
 
   const [validationState, setValidationState] = useState({
     repoName: true,
@@ -86,19 +93,13 @@ export default function CreateRepositoryModalTemplate(
     if (!validateInput()) {
       return;
     }
-    try {
-      await createRepository({
-        namespace: currentOrganization.name,
-        repository: newRepository.name,
-        visibility: repoVisibility.toLowerCase(),
-        description: newRepository.description,
-        repo_kind: 'image',
-      });
-      props.handleModalToggle();
-    } catch (error) {
-      console.error(error);
-      setErr(addDisplayError('Unable to create repository', error));
-    }
+    await createRepository({
+      namespace: currentOrganization.name,
+      repository: newRepository.name,
+      visibility: repoVisibility.toLowerCase(),
+      description: newRepository.description,
+      repo_kind: 'image',
+    });
   };
 
   const handleNamespaceSelection = (e, value) => {
