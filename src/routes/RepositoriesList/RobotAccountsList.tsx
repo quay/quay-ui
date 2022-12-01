@@ -1,6 +1,12 @@
-import {PageSection, PageSectionVariants} from '@patternfly/react-core';
+import {
+  DropdownItem,
+  PageSection,
+  PageSectionVariants,
+  PanelFooter,
+} from '@patternfly/react-core';
 import {
   TableComposable,
+  ExpandableRowContent,
   Thead,
   Tr,
   Th,
@@ -11,6 +17,7 @@ import {Link} from 'react-router-dom';
 import {RobotAccountColumnNames} from './ColumnNames';
 
 import {RobotAccountsToolBar} from 'src/routes/RepositoriesList/RobotAccountsToolBar';
+import CreateRobotAccountModal from 'src/components/modals/CreateRobotAccountModal';
 import {IRobot} from 'src/resources/RobotsResource';
 import {useRecoilState, useRecoilValue} from 'recoil';
 import {
@@ -18,10 +25,15 @@ import {
   selectedRobotAccountsState,
 } from 'src/atoms/RobotAccountState';
 import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
+import React, {ReactElement, useState} from 'react';
+import {ToolbarPagination} from '../../components/toolbar/ToolbarPagination';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
-  const {robotAccountsForRepo} = useRobotAccounts(props.repositoryName);
+  const {robotAccountsForRepo, page, perPage, setPage, setPerPage} =
+    useRobotAccounts(props.repositoryName);
   const search = useRecoilValue(searchRobotAccountState);
+  const [isCreateRobotModalOpen, setCreateRobotModalOpen] = useState(false);
+  const [isKebabOpen, setKebabOpen] = useState(false);
 
   const robotAccountsList: IRobot[] = robotAccountsForRepo.map(
     (robotAccount) => {
@@ -31,17 +43,36 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
         repositories: robotAccount.repositories,
         last_accessed: robotAccount.last_accessed,
         created: robotAccount.created,
+        description: robotAccount.description,
       } as IRobot;
     },
   );
 
-  const paginatedRobotAccountList =
+  const filteredRobotAccounts =
     search.query !== ''
       ? robotAccountsList.filter((robotAccount) => {
           const RobotAccountname = robotAccount.name;
           return RobotAccountname.includes(search.query);
         })
       : robotAccountsList;
+
+  const paginatedRobotAccountList = filteredRobotAccounts?.slice(
+    page * perPage - perPage,
+    page * perPage - perPage + perPage,
+  );
+
+  // Expandable Row Logic
+  const [expandedRobotNames, setExpandedRobotNames] = useState<string[]>([]);
+  const setRobotExpanded = (robot: IRobot, isExpanding = true) =>
+    setExpandedRobotNames((prevExpanded) => {
+      const otherExpandedRepoNames = prevExpanded.filter(
+        (r) => r !== robot.name,
+      );
+      return isExpanding
+        ? [...otherExpandedRepoNames, robot.name]
+        : otherExpandedRepoNames;
+    });
+  const isRobotExpanded = (robot) => expandedRobotNames.includes(robot.name);
 
   // Logic for handling row-wise checkbox selection in <Td>
   const isRobotAccountSelected = (rob: IRobot) =>
@@ -89,6 +120,17 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     return len.toString() + ' ' + placeholder;
   };
 
+  const kebabItems: ReactElement[] = [
+    <DropdownItem key="kebab-item">Action Item</DropdownItem>,
+  ];
+
+  const createRobotModal = (
+    <CreateRobotAccountModal
+      isModalOpen={isCreateRobotModalOpen}
+      handleModalToggle={() => setCreateRobotModalOpen(!isCreateRobotModalOpen)}
+    />
+  );
+
   return (
     <>
       <PageSection variant={PageSectionVariants.light}>
@@ -98,11 +140,24 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           setSelectedRobotAccounts={setSelectedRobotAccounts}
           itemsPerPageList={paginatedRobotAccountList}
           onItemSelect={onSelectRobot}
+          buttonText="Create robot account"
+          pageModal={createRobotModal}
+          isModalOpen={isCreateRobotModalOpen}
+          setModalOpen={setCreateRobotModalOpen}
+          isKebabOpen={isKebabOpen}
+          setKebabOpen={setKebabOpen}
+          kebabItems={kebabItems}
+          perPage={perPage}
+          page={page}
+          setPage={setPage}
+          setPerPage={setPerPage}
+          total={filteredRobotAccounts.length}
         />
 
-        <TableComposable aria-label="Selectable table">
+        <TableComposable aria-label="Expandable table" variant={undefined}>
           <Thead>
             <Tr>
+              <Th />
               <Th />
               <Th>{RobotAccountColumnNames.robotAccountName}</Th>
               <Th>{RobotAccountColumnNames.teams}</Th>
@@ -111,41 +166,83 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
               <Th>{RobotAccountColumnNames.created}</Th>
             </Tr>
           </Thead>
-          <Tbody>
-            {robotAccountsForRepo.map((robotAccount, rowIndex) => (
-              <Tr key={rowIndex}>
-                <Td
-                  select={{
-                    rowIndex,
-                    onSelect: (_event, isSelecting) =>
-                      onSelectRobot(robotAccount, rowIndex, isSelecting),
-                    isSelected: isRobotAccountSelected(robotAccount),
-                    disable: !isRobotAccountSelectable(robotAccount),
-                  }}
-                />
-                <Td dataLabel={RobotAccountColumnNames.robotAccountName}>
-                  <Link to="#">{robotAccount.name}</Link>
-                </Td>
-                <Td dataLabel={RobotAccountColumnNames.teams}>
-                  <Link to="#">{getLength(robotAccount.teams, true)}</Link>
-                </Td>
-                <Td dataLabel={RobotAccountColumnNames.repositories}>
-                  <Link to="#">
-                    {getLength(robotAccount.repositories, false)}
-                  </Link>
-                </Td>
-                <Td dataLabel={RobotAccountColumnNames.lastAccessed}>
-                  {robotAccount.last_accessed
-                    ? robotAccount.last_accessed
-                    : 'Never'}
-                </Td>
-                <Td dataLabel={RobotAccountColumnNames.created}>
-                  {robotAccount.created}
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
+          {paginatedRobotAccountList.map((robotAccount, rowIndex) => {
+            return (
+              <Tbody
+                key={robotAccount.name}
+                isExpanded={isRobotExpanded(robotAccount)}
+              >
+                <Tr>
+                  <Td
+                    expand={
+                      robotAccount.description
+                        ? {
+                            rowIndex,
+                            isExpanded: isRobotExpanded(robotAccount),
+                            onToggle: () =>
+                              setRobotExpanded(
+                                robotAccount,
+                                !isRobotExpanded(robotAccount),
+                              ),
+                            // expandId: 'expandable-robot-account',
+                          }
+                        : undefined
+                    }
+                  />
+
+                  <Td
+                    select={{
+                      rowIndex,
+                      onSelect: (_event, isSelecting) =>
+                        onSelectRobot(robotAccount, rowIndex, isSelecting),
+                      isSelected: isRobotAccountSelected(robotAccount),
+                      disable: !isRobotAccountSelectable(robotAccount),
+                    }}
+                  />
+                  <Td dataLabel={RobotAccountColumnNames.robotAccountName}>
+                    <Link to="#">{robotAccount.name}</Link>
+                  </Td>
+                  <Td dataLabel={RobotAccountColumnNames.teams}>
+                    <Link to="#">{getLength(robotAccount.teams, true)}</Link>
+                  </Td>
+                  <Td dataLabel={RobotAccountColumnNames.repositories}>
+                    <Link to="#">
+                      {getLength(robotAccount.repositories, false)}
+                    </Link>
+                  </Td>
+                  <Td dataLabel={RobotAccountColumnNames.lastAccessed}>
+                    {robotAccount.last_accessed
+                      ? robotAccount.last_accessed
+                      : 'Never'}
+                  </Td>
+                  <Td dataLabel={RobotAccountColumnNames.created}>
+                    {robotAccount.created}
+                  </Td>
+                </Tr>
+                {robotAccount.description ? (
+                  <Tr isExpanded={isRobotExpanded(robotAccount)}>
+                    <Td dataLabel="Robot Account description" noPadding={false}>
+                      <ExpandableRowContent>
+                        {robotAccount.description}
+                      </ExpandableRowContent>
+                    </Td>
+                  </Tr>
+                ) : null}
+              </Tbody>
+            );
+          })}
         </TableComposable>
+        <PanelFooter>
+          <ToolbarPagination
+            itemsList={filteredRobotAccounts}
+            perPage={perPage}
+            page={page}
+            setPage={setPage}
+            setPerPage={setPerPage}
+            bottom={true}
+            total={filteredRobotAccounts.length}
+          />
+        </PanelFooter>
       </PageSection>
     </>
   );

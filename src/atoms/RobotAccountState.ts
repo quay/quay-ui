@@ -1,6 +1,6 @@
 import {atom} from 'recoil';
 import {SearchState} from '../components/toolbar/SearchTypes';
-import {RobotAccountColumnNames} from '../routes/RepositoriesList/ColumnNames';
+import {RobotAccountColumnNames} from 'src/routes/RepositoriesList/ColumnNames';
 
 export const selectedRobotAccountsState = atom({
   key: 'selectedRobotAccountsState',

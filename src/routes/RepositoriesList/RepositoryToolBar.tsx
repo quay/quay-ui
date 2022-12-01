@@ -80,6 +80,7 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
           page={props.page}
           setPage={props.setPage}
           setPerPage={props.setPerPage}
+          total={props.repositoryList.length}
         />
       </ToolbarContent>
       <ConfirmationModal
