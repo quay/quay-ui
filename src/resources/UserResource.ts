@@ -1,3 +1,4 @@
+import {AvatarProps} from '@patternfly/react-core';
 import {AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
 import {assertHttpCode} from './ErrorHandling';
@@ -52,4 +53,29 @@ export async function fetchUsersAsSuperUser() {
   const response: AxiosResponse<AllUsers> = await axios.get(superUserOrgsUrl);
   assertHttpCode(response.status, 200);
   return response.data?.users;
+}
+
+export interface Entity {
+  avatar: IAvatar;
+  is_org_member: boolean;
+  name: string;
+  kind: string;
+  is_robot?: boolean;
+}
+
+interface EntitiesResponse {
+  results: Entity[];
+}
+
+export async function fetchEntities(org: string, search: string) {
+  // Handles the case of robot accounts, API doesn't recognize anything before the + sign
+  if (search.indexOf('+') > -1) {
+    const splitSearchTerm = search.split('+');
+    search = splitSearchTerm.length > 1 ? splitSearchTerm[1] : '';
+  }
+  const response: AxiosResponse<EntitiesResponse> = await axios.get(
+    `/api/v1/entities/${search}?namespace=${org}&includeTeams=true`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data?.results;
 }

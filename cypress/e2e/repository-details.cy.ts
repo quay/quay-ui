@@ -186,8 +186,8 @@ describe('Repository Details Page', () => {
 
   it('clicking platform name goes to tag details page', () => {
     cy.visit('/repository/user1/hello-world');
-    const firstRow = cy.get('tbody').first();
-    firstRow.within(() => {
+    const manifestListRow = cy.get('tbody:contains("manifestlist")').first();
+    manifestListRow.within(() => {
       cy.get('button').first().click();
       cy.get('a').contains('linux on amd64').click();
     });
@@ -246,7 +246,7 @@ describe('Repository Details Page', () => {
 
   it('search by name', () => {
     cy.visit('/repository/user1/hello-world');
-    cy.get('input[name="search input"]').type('test');
+    cy.get('#tagslist-search-input').type('test');
     cy.contains('latest').should('exist');
     cy.contains('manifestlist').should('not.exist');
   });
@@ -255,7 +255,7 @@ describe('Repository Details Page', () => {
     cy.visit('/repository/user1/hello-world');
     cy.get('#toolbar-dropdown-filter').click();
     cy.get('a').contains('Manifest').click();
-    cy.get('input[name="search input"]').type('f54a58bc1aac');
+    cy.get('#tagslist-search-input').type('f54a58bc1aac');
     cy.contains('latest').should('exist');
     cy.contains('manifestlist').should('not.exist');
   });

@@ -18,7 +18,7 @@ describe('Repositories List Page', () => {
     cy.contains('Repositories').should('exist');
     cy.get('[data-testid="repository-list-table"]')
       .children()
-      .should('have.length', 3);
+      .should('have.length', 4);
     cy.get('[data-testid="repository-list-table"]').within(() => {
       cy.contains('user1/hello-world').should('exist');
       cy.contains('user1/nested/repo').should('exist');
@@ -144,12 +144,12 @@ describe('Repositories List Page', () => {
   it('makes multiple repositories public', () => {
     cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select page (3)').click();
+    cy.contains('Select page (4)').click();
     cy.contains('Actions').click();
     cy.contains('Make Public').click();
     cy.contains('Make repositories public');
     cy.contains(
-      'Update 3 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
+      'Update 4 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
     );
     cy.contains('Make public').click();
     cy.contains('private').should('not.exist');
@@ -158,12 +158,12 @@ describe('Repositories List Page', () => {
   it('makes multiple repositories private', () => {
     cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select page (3)').click();
+    cy.contains('Select page (4)').click();
     cy.contains('Actions').click();
     cy.contains('Make Private').click();
     cy.contains('Make repositories private');
     cy.contains(
-      'Update 3 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
+      'Update 4 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
     );
     cy.contains('Make private').click();
     cy.contains('public').should('not.exist');
@@ -208,15 +208,20 @@ describe('Repositories List Page', () => {
     }
     cy.intercept(
       'GET',
+      '/api/v1/repository?last_modified=true&namespace=*&public=true',
+      {repositories: []},
+    ).as('getRepositories');
+    cy.intercept(
+      'GET',
       '/api/v1/repository?last_modified=true&namespace=user1&public=true',
       {repositories: repos},
     ).as('getRepositories');
     cy.visit('/repository');
-    cy.contains('1 - 10 of 51').should('exist');
+    cy.contains('1 - 10 of 50').should('exist');
     cy.get('td[data-label="Name"]').should('have.length', 10);
 
     // Change per page
-    cy.get('button:contains("1 - 10 of 51")').first().click();
+    cy.get('button:contains("1 - 10 of 50")').first().click();
     cy.contains('20 per page').click();
     cy.get('td[data-label="Name"]').should('have.length', 20);
 
@@ -224,7 +229,7 @@ describe('Repositories List Page', () => {
     cy.get('button[aria-label="Go to next page"]').first().click();
     cy.get('td[data-label="Name"]').should('have.length', 20);
     cy.get('button[aria-label="Go to next page"]').first().click();
-    cy.get('td[data-label="Name"]').should('have.length', 11);
+    cy.get('td[data-label="Name"]').should('have.length', 10);
 
     // Go to first page
     cy.get('button[aria-label="Go to first page"]').first().click();
@@ -235,9 +240,9 @@ describe('Repositories List Page', () => {
     cy.contains('repo49').should('exist');
 
     // Switch per page while while being on a different page
-    cy.get('button:contains("41 - 51 of 51")').first().click();
+    cy.get('button:contains("41 - 50 of 50")').first().click();
     cy.contains('10 per page').click();
-    cy.contains('1 - 10 of 51').should('exist');
+    cy.contains('1 - 10 of 50').should('exist');
     cy.get('td[data-label="Name"]').should('have.length', 10);
   });
 });

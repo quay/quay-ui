@@ -1,6 +1,12 @@
 import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
-import {assertHttpCode, BulkOperationError} from './ErrorHandling';
+import {
+  assertHttpCode,
+  BulkOperationError,
+  ResourceError,
+  throwIfError,
+} from './ErrorHandling';
+import {IAvatar} from './OrganizationResource';
 
 export interface IRepository {
   namespace: string;
@@ -135,6 +141,100 @@ export async function bulkDeleteRepositories(repos: IRepository[]) {
       bulkDeleteError.addError(reason.repo, reason);
     }
     throw bulkDeleteError;
+  }
+}
+
+export interface RepoPermissionsResponse {
+  permissions: Record<string, RepoMemberPermissions>;
+}
+
+export interface RepoMemberPermissions {
+  role: RepoRole;
+  name: string;
+  avatar: IAvatar;
+  is_robot?: boolean;
+  is_org_member?: boolean;
+}
+
+export async function fetchUserRepoPermissions(org: string, repo: string) {
+  const response: AxiosResponse<RepoPermissionsResponse> = await axios.get(
+    `/api/v1/repository/${org}/${repo}/permissions/user/`,
+  );
+  return response.data.permissions;
+}
+
+export async function fetchTeamRepoPermissions(org: string, repo: string) {
+  const response: AxiosResponse<RepoPermissionsResponse> = await axios.get(
+    `/api/v1/repository/${org}/${repo}/permissions/team/`,
+  );
+  return response.data.permissions;
+}
+
+export interface RepoMember {
+  org: string;
+  repo: string;
+  name: string;
+  type: MemberType;
+  role: RepoRole;
+}
+
+export enum RepoRole {
+  read = 'read',
+  write = 'write',
+  admin = 'admin',
+}
+
+export enum MemberType {
+  user = 'user',
+  robot = 'robot',
+  team = 'team',
+}
+
+export async function setRepoPermissions(role: RepoMember, newRole: RepoRole) {
+  const type = role.type == MemberType.robot ? MemberType.user : role.type;
+  try {
+    await axios.put(
+      `/api/v1/repository/${role.org}/${role.repo}/permissions/${type}/${role.name}`,
+      {role: newRole},
+    );
+  } catch (err) {
+    throw new ResourceError(
+      'failed to set repository permissions',
+      role.name,
+      err,
+    );
+  }
+}
+
+export async function bulkSetRepoPermissions(
+  roles: RepoMember[],
+  newRole: RepoRole,
+) {
+  const responses = await Promise.allSettled(
+    roles.map((role) => setRepoPermissions(role, newRole)),
+  );
+  throwIfError(responses);
+}
+
+export async function bulkDeleteRepoPermissions(roles: RepoMember[]) {
+  const responses = await Promise.allSettled(
+    roles.map((role) => deleteRepoPermissions(role)),
+  );
+  throwIfError(responses);
+}
+
+export async function deleteRepoPermissions(role: RepoMember) {
+  const roleType = role.type == MemberType.robot ? MemberType.user : role.type;
+  try {
+    await axios.delete(
+      `/api/v1/repository/${role.org}/${role.repo}/permissions/${roleType}/${role.name}`,
+    );
+  } catch (err) {
+    throw new ResourceError(
+      'failed to set repository permissions',
+      role.name,
+      err,
+    );
   }
 }
 

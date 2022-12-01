@@ -65,7 +65,7 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
           <DropdownToggle
             splitButtonItems={[
               <DropdownToggleCheckbox
-                id="split-button-text-checkbox"
+                id={props.id ? props.id : 'split-button-text-checkbox'}
                 key="split-checkbox"
                 aria-label="Select all"
                 isChecked={props.selectedItems.length > 0 ? true : false}
@@ -95,4 +95,5 @@ type DropdownCheckboxProps = {
   allItemsList: any[];
   itemsPerPageList: any[];
   onItemSelect: (Item, rowIndex, isSelecting) => void;
+  id?: string;
 };
