@@ -26,7 +26,7 @@ import {
 } from 'src/atoms/RobotAccountState';
 import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
 import React, {ReactElement, useState} from 'react';
-import {ToolbarPagination} from '../../components/toolbar/ToolbarPagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
   const {robotAccountsForRepo, page, perPage, setPage, setPerPage} =
@@ -34,6 +34,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const search = useRecoilValue(searchRobotAccountState);
   const [isCreateRobotModalOpen, setCreateRobotModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
+  const [isTableExpanded, setTableExpanded] = useState(false);
 
   const robotAccountsList: IRobot[] = robotAccountsForRepo.map(
     (robotAccount) => {
@@ -131,6 +132,21 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     />
   );
 
+  const collapseTable = () => {
+    setTableExpanded(!isTableExpanded);
+    setExpandedRobotNames([]);
+  };
+
+  const expandTable = () => {
+    if (isTableExpanded) {
+      return;
+    }
+    setTableExpanded(!isTableExpanded);
+    paginatedRobotAccountList.map((robotAccount, index) => {
+      setRobotExpanded(robotAccount);
+    });
+  };
+
   return (
     <>
       <PageSection variant={PageSectionVariants.light}>
@@ -152,6 +168,8 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           setPage={setPage}
           setPerPage={setPerPage}
           total={filteredRobotAccounts.length}
+          expandTable={expandTable}
+          collapseTable={collapseTable}
         />
 
         <TableComposable aria-label="Expandable table" variant={undefined}>

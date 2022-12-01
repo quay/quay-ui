@@ -1,9 +1,4 @@
-import {
-  Toolbar,
-  ToolbarContent,
-  ToolbarItem,
-  SearchInput,
-} from '@patternfly/react-core';
+import {Toolbar, ToolbarContent} from '@patternfly/react-core';
 import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
 import {IRobot} from 'src/resources/RobotsResource';
 import {useRecoilState} from 'recoil';
@@ -11,8 +6,9 @@ import {searchRobotAccountState} from 'src/atoms/RobotAccountState';
 import {FilterInput} from 'src/components/toolbar/FilterInput';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {Kebab} from '../../components/toolbar/Kebab';
-import {ReactElement} from 'react';
+import React, {ReactElement} from 'react';
 import {ToolbarPagination} from '../../components/toolbar/ToolbarPagination';
+import {ExpandCollapseButton} from 'src/components/toolbar/ExpandCollapseButton';
 
 export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
   const [search, setSearch] = useRecoilState(searchRobotAccountState);
@@ -33,6 +29,10 @@ export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
           Modal={props.pageModal}
           isModalOpen={props.isModalOpen}
           setModalOpen={props.setModalOpen}
+        />
+        <ExpandCollapseButton
+          expandTable={props.expandTable}
+          collapseTable={props.collapseTable}
         />
         <Kebab
           isKebabOpen={props.isKebabOpen}
@@ -70,4 +70,6 @@ type RobotAccountsToolBarProps = {
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
   total: number;
+  expandTable: () => void;
+  collapseTable: () => void;
 };

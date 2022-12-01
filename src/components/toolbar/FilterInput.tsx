@@ -4,7 +4,7 @@ import {SearchState} from './SearchTypes';
 import {SetterOrUpdater} from 'recoil';
 
 export function FilterInput(props: FilterInputProps) {
-  const setSearchState = (val) => {
+  const setSearchState = (val: string) => {
     props.onChange((prev: SearchState) => ({...prev, query: val.trim()}));
   };
 
@@ -14,6 +14,7 @@ export function FilterInput(props: FilterInputProps) {
         placeholder="Search"
         value={props.searchState.query}
         onChange={setSearchState}
+        onClear={() => setSearchState('')}
       />
     </ToolbarItem>
   );
