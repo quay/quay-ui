@@ -17,8 +17,8 @@ const tagNameBreadcrumb = (match) => {
 };
 
 const Breadcrumb = {
-  organizationsListBreadcrumb: 'Organizations',
-  repositoriesListBreadcrumb: 'Repositories',
+  organizationsListBreadcrumb: 'Organization',
+  repositoriesListBreadcrumb: 'Repository',
   organizationDetailBreadcrumb: organizationNameBreadcrumb,
   repositoryDetailBreadcrumb: repositoryNameBreadcrumb,
   tagDetailBreadcrumb: tagNameBreadcrumb,
@@ -27,15 +27,15 @@ const Breadcrumb = {
 export enum NavigationPath {
   // Side Nav
   home = '/',
-  organizationsList = '/organizations',
+  organizationsList = '/organization',
 
-  repositoriesList = '/repositories',
+  repositoriesList = '/repository',
 
   // Organization detail
-  organizationDetail = '/organizations/:organizationName',
+  organizationDetail = '/organization/:organizationName',
 
   // Repository detail
-  repositoryDetail = '/repositories/:organizationName/*',
+  repositoryDetail = '/repository/:organizationName/*',
 
   // Tag Detail
   tagDetail = '/tag/:organizationName/*',
@@ -75,7 +75,7 @@ const NavigationRoutes = [
   {
     path: NavigationPath.organizationsList,
     Component: <OrganizationsList />,
-    breadcrumb: 'organizations',
+    breadcrumb: Breadcrumb.organizationsListBreadcrumb,
   },
   {
     path: NavigationPath.organizationDetail,

@@ -51,7 +51,7 @@ import {fetchUser, IUserResource} from 'src/resources/UserResource';
 import {LoadingPage} from 'src/components/LoadingPage';
 
 function getReponameFromURL(pathname: string): string {
-  return pathname.includes('organizations') ? pathname.split('/')[2] : null;
+  return pathname.includes('organization') ? pathname.split('/')[2] : null;
 }
 
 interface RepoListHeaderProps {

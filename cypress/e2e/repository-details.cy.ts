@@ -18,7 +18,7 @@ describe('Repository Details Page', () => {
       '/api/v1/repository/user1/hello-world/manifest/sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4/security?vulnerabilities=true',
       {fixture: 'security/mixedVulns.json'},
     ).as('getSecurityReport');
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     const latestRow = cy.get('tbody:contains("latest")');
     latestRow.within(() => {
       cy.get(`[data-label="Name"]`).should('have.text', 'latest');
@@ -42,7 +42,7 @@ describe('Repository Details Page', () => {
       '/api/v1/repository/user1/hello-world/manifest/sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4/security?vulnerabilities=true',
       {fixture: 'security/mixedVulns.json'},
     ).as('getSecurityReport');
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
 
     const manifestListRow = cy.get('tbody:contains("manifestlist")');
     manifestListRow.within(() => {
@@ -102,7 +102,7 @@ describe('Repository Details Page', () => {
   });
 
   it('deletes tag', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.get('tbody:contains("latest")').within(() => cy.get('input').click());
     cy.contains('Actions').click();
     cy.contains('Delete').click();
@@ -114,7 +114,7 @@ describe('Repository Details Page', () => {
   });
 
   it('bulk deletes tags', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.get('#toolbar-dropdown-checkbox').click();
     cy.get('button').contains('Select page (2)').click();
     cy.contains('Actions').click();
@@ -135,7 +135,7 @@ describe('Repository Details Page', () => {
   });
 
   it('renders pull popover', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.get('tbody:contains("latest")').within(() =>
       cy.get('svg').trigger('mouseover'),
     );
@@ -173,7 +173,7 @@ describe('Repository Details Page', () => {
   });
 
   it('clicking tag name goes to tag details page', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.contains('latest').click();
     cy.url().should('include', '/tag/user1/hello-world/latest');
     cy.get('[data-testid="tag-details"]').within(() => {
@@ -185,7 +185,7 @@ describe('Repository Details Page', () => {
   });
 
   it('clicking platform name goes to tag details page', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     const firstRow = cy.get('tbody').first();
     firstRow.within(() => {
       cy.get('button').first().click();
@@ -210,7 +210,7 @@ describe('Repository Details Page', () => {
       '/api/v1/repository/user1/hello-world/manifest/sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4/security?vulnerabilities=true',
       {fixture: 'security/mixedVulns.json'},
     ).as('getSecurityReport');
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.get('tr:contains("latest")').contains('3 Critical').click();
     cy.url().should(
       'include',
@@ -228,7 +228,7 @@ describe('Repository Details Page', () => {
       '/api/v1/repository/user1/hello-world/manifest/sha256:f54a58bc1aac5ea1a25d796ae155dc228b3f0e11d046ae276b39c4bf2f13d8c4/security?vulnerabilities=true',
       {fixture: 'security/mixedVulns.json'},
     ).as('getSecurityReport');
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     const manifestListRow = cy.get('tbody:contains("manifestlist")');
     manifestListRow.within(() => {
       cy.get('button').first().click();
@@ -245,14 +245,14 @@ describe('Repository Details Page', () => {
   });
 
   it('search by name', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.get('input[name="search input"]').type('test');
     cy.contains('latest').should('exist');
     cy.contains('manifestlist').should('not.exist');
   });
 
   it('search by manifest', () => {
-    cy.visit('/repositories/user1/hello-world');
+    cy.visit('/repository/user1/hello-world');
     cy.get('#toolbar-dropdown-filter').click();
     cy.get('a').contains('Manifest').click();
     cy.get('input[name="search input"]').type('f54a58bc1aac');
@@ -261,7 +261,7 @@ describe('Repository Details Page', () => {
   });
 
   it('renders nested repositories', () => {
-    cy.visit('/repositories/user1/nested/repo');
+    cy.visit('/repository/user1/nested/repo');
     cy.get('[data-testid="repo-title"]').within(() =>
       cy.contains('nested/repo').should('exist'),
     );

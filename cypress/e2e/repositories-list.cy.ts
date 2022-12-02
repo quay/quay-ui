@@ -14,7 +14,7 @@ describe('Repositories List Page', () => {
   });
 
   it('renders list of all repositories', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.contains('Repositories').should('exist');
     cy.get('[data-testid="repository-list-table"]')
       .children()
@@ -33,7 +33,7 @@ describe('Repositories List Page', () => {
   });
 
   it('renders list of repositories for a single organization', () => {
-    cy.visit('/organizations/user1');
+    cy.visit('/organization/user1');
     cy.get('[data-testid="repo-title"]').within(() => cy.contains('user1'));
     cy.get('[data-testid="repository-list-table"]')
       .children()
@@ -52,7 +52,7 @@ describe('Repositories List Page', () => {
   });
 
   it('create public repository', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
     cy.contains('Select namespace').click();
@@ -71,7 +71,7 @@ describe('Repositories List Page', () => {
   });
 
   it('create private repository', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
     cy.contains('Select namespace').click();
@@ -91,7 +91,7 @@ describe('Repositories List Page', () => {
   });
 
   it('create repository under organization', () => {
-    cy.visit('/organizations/user1');
+    cy.visit('/organization/user1');
     cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
     cy.get('button:contains("user1")').should('exist');
@@ -110,7 +110,7 @@ describe('Repositories List Page', () => {
   });
 
   it('deletes multiple repositories', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
     cy.contains('Select page').click();
     cy.contains('Actions').click();
@@ -134,7 +134,7 @@ describe('Repositories List Page', () => {
   // TODO: per page currently does not work
   // https://issues.redhat.com/browse/PROJQUAY-4663
   // it('deletes repositories pagination', () => {
-  //     cy.visit('/organizations/manyrepositories');
+  //     cy.visit('/organization/manyrepositories');
   //     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
   //     cy.contains('Select all').click();
   //     cy.contains('Actions').click();
@@ -142,7 +142,7 @@ describe('Repositories List Page', () => {
   // })
 
   it('makes multiple repositories public', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
     cy.contains('Select page (3)').click();
     cy.contains('Actions').click();
@@ -156,7 +156,7 @@ describe('Repositories List Page', () => {
   });
 
   it('makes multiple repositories private', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
     cy.contains('Select page (3)').click();
     cy.contains('Actions').click();
@@ -170,7 +170,7 @@ describe('Repositories List Page', () => {
   });
 
   it('searches by name', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.get('input[placeholder="Search by Name..."]').type('hello');
     cy.get('td[data-label="Name"]')
       .filter(':contains("hello-world")')
@@ -178,7 +178,7 @@ describe('Repositories List Page', () => {
   });
 
   it('searches by name including organization', () => {
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.get('input[placeholder="Search by Name..."]').type('user1');
     cy.get('td[data-label="Name"]')
       .filter(':contains("user1")')
@@ -211,7 +211,7 @@ describe('Repositories List Page', () => {
       '/api/v1/repository?last_modified=true&namespace=user1&public=true',
       {repositories: repos},
     ).as('getRepositories');
-    cy.visit('/repositories');
+    cy.visit('/repository');
     cy.contains('1 - 10 of 51').should('exist');
     cy.get('td[data-label="Name"]').should('have.length', 10);
 

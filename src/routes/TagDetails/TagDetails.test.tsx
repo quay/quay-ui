@@ -167,7 +167,7 @@ test('Render simple tag', async () => {
   mocked(getSecurityDetails, true).mockResolvedValue(createSecurityResponse());
   mocked(useLocation, true).mockImplementation(() => ({
     ...jest.requireActual('react-router-dom').useLocation,
-    pathname: '/organizations/testorg/testrepo/latest',
+    pathname: '/organization/testorg/testrepo/latest',
   }));
   mocked(useSearchParams, true).mockImplementation(() => [
     new URLSearchParams(),
@@ -284,7 +284,7 @@ test('Render manifest list tag', async () => {
   });
   mocked(useLocation, true).mockImplementation(() => ({
     ...jest.requireActual('react-router-dom').useLocation,
-    pathname: '/organizations/testorg/testrepo/latest',
+    pathname: '/organization/testorg/testrepo/latest',
   }));
   mocked(useSearchParams, true).mockImplementation(() => [
     new URLSearchParams(),

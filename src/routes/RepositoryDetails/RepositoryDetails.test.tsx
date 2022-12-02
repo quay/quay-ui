@@ -18,7 +18,7 @@ test('Org and repo names should show in Title and Breadcrumb', () => {
 // test('Org and repo names should show in Title and Breadcrumb', () => {
 //   mocked(useLocation, true).mockImplementation(() => ({
 //     ...jest.requireActual('react-router-dom').useLocation,
-//     pathname: '/organizations/testorg/testrepo',
+//     pathname: '/organization/testorg/testrepo',
 //   }));
 //   mocked(useSearchParams, true).mockImplementation(() => [
 //     new URLSearchParams(),
@@ -30,7 +30,7 @@ test('Org and repo names should show in Title and Breadcrumb', () => {
 //     </RecoilRoot>,
 //   );
 //   expect(screen.getByTestId('namespace-breadcrumb')).toHaveTextContent(
-//     'organizations',
+//     'organization',
 //   );
 //   expect(screen.getByTestId('org-breadcrumb')).toHaveTextContent('testorg');
 //   expect(screen.getByTestId('repo-breadcrumb')).toHaveTextContent('testrepo');
