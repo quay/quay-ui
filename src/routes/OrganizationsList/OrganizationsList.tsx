@@ -15,8 +15,11 @@ import {
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
-import {useRecoilState, useRecoilValue} from 'recoil';
-import {selectedOrgsState} from 'src/atoms/UserState';
+import {useRecoilState} from 'recoil';
+import {
+  searchOrgsState,
+  selectedOrgsState,
+} from 'src/atoms/OrganizationListState';
 import {useEffect, useState} from 'react';
 import {IOrganization} from 'src/resources/OrganizationResource';
 import OrgTableData from './OrganizationsListTableData';
