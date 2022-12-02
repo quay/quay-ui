@@ -5,6 +5,7 @@ import {RecoilRoot} from 'recoil';
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/patternfly/patternfly-addons.css';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+// import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
 
 // Load App after patternfly so custom CSS that overrides patternfly doesn't require !important
 import App from './App';
@@ -23,6 +24,7 @@ ReactDOM.render(
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
         <App />
+        {/* <ReactQueryDevtools initialIsOpen={true} /> */}
       </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>,

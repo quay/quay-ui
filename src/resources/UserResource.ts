@@ -56,10 +56,10 @@ export async function fetchUsersAsSuperUser() {
 }
 
 export interface Entity {
-  avatar: IAvatar;
-  is_org_member: boolean;
+  avatar?: IAvatar;
+  is_org_member?: boolean;
   name: string;
-  kind: string;
+  kind?: string;
   is_robot?: boolean;
 }
 
@@ -77,15 +77,18 @@ export function getMemberType(entity: Entity) {
   }
 }
 
-export async function fetchEntities(org: string, search: string) {
+export async function fetchEntities(searchInput: string, org?: string) {
   // Handles the case of robot accounts, API doesn't recognize anything before the + sign
-  if (search.indexOf('+') > -1) {
-    const splitSearchTerm = search.split('+');
-    search = splitSearchTerm.length > 1 ? splitSearchTerm[1] : '';
+  if (searchInput.indexOf('+') > -1) {
+    const splitSearchTerm = searchInput.split('+');
+    searchInput = splitSearchTerm.length > 1 ? splitSearchTerm[1] : '';
   }
-  const response: AxiosResponse<EntitiesResponse> = await axios.get(
-    `/api/v1/entities/${search}?namespace=${org}&includeTeams=true`,
-  );
+  const searchUrl = org
+    ? `/api/v1/entities/${searchInput}?namespace=${org}&includeTeams=true`
+    : `/api/v1/entities/${searchInput}`;
+
+  const response: AxiosResponse<EntitiesResponse> = await axios.get(searchUrl);
+
   assertHttpCode(response.status, 200);
   return response.data?.results;
 }

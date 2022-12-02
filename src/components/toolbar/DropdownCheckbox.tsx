@@ -17,14 +17,15 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
 
   const selectPageItems = () => {
     props.deSelectAll([]);
-    props.itemsPerPageList.map((value, index) =>
+    props.itemsPerPageList?.map((value, index) =>
       props.onItemSelect(value, index, true),
     );
     setIsOpen(false);
   };
 
   const selectAllItems = () => {
-    props.allItemsList.map((value, index) =>
+    deSelectAll();
+    props.allItemsList?.map((value, index) =>
       props.onItemSelect(value, index, true),
     );
     setIsOpen(false);
@@ -44,9 +45,9 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
       onClick={selectPageItems}
     >
       Select page (
-      {props.allItemsList.length > props.itemsPerPageList.length
-        ? props.itemsPerPageList.length
-        : props.allItemsList.length}
+      {props.allItemsList?.length > props.itemsPerPageList?.length
+        ? props.itemsPerPageList?.length
+        : props.allItemsList?.length}
       )
     </DropdownItem>,
     <DropdownItem
@@ -54,7 +55,7 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
       component="button"
       onClick={selectAllItems}
     >
-      Select all ({props.allItemsList.length})
+      Select all ({props.allItemsList?.length})
     </DropdownItem>,
   ];
 
@@ -68,13 +69,13 @@ export function DropdownCheckbox(props: DropdownCheckboxProps) {
                 id={props.id ? props.id : 'split-button-text-checkbox'}
                 key="split-checkbox"
                 aria-label="Select all"
-                isChecked={props.selectedItems.length > 0 ? true : false}
+                isChecked={props.selectedItems?.length > 0 ? true : false}
                 onChange={(checked) =>
                   checked ? selectPageItems() : deSelectAll()
                 }
               >
-                {props.selectedItems.length != 0
-                  ? props.selectedItems.length + ' selected'
+                {props.selectedItems?.length != 0
+                  ? props.selectedItems?.length + ' selected'
                   : ''}
               </DropdownToggleCheckbox>,
             ]}

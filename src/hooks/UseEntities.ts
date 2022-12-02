@@ -9,7 +9,7 @@ export function useEntities(org: string) {
 
   const search = async () => {
     try {
-      const entityResults = await fetchEntities(org, searchTerm);
+      const entityResults = await fetchEntities(searchTerm, org);
       setEntities(entityResults);
     } catch (err) {
       setIsError(true);
@@ -32,5 +32,6 @@ export function useEntities(org: string) {
     isError: isError,
     searchTerm: searchTerm,
     setSearchTerm: setSearchTerm,
+    setEntities: setEntities,
   };
 }

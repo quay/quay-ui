@@ -6,8 +6,8 @@ export interface IRobot {
   name: string;
   created: string;
   last_accessed: string;
-  teams: string[];
-  repositories: string[];
+  teams?: string[];
+  repositories?: string[];
   description: string;
 }
 

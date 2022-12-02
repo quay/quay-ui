@@ -5,7 +5,7 @@ import {assertHttpCode} from './ErrorHandling';
 export interface IMember {
   name: string;
   kind: string;
-  teams: ITeam[];
+  teams?: ITeam[];
   repositories: string[];
 }
 
@@ -28,4 +28,17 @@ export async function fetchMembersForOrg(
   const response = await axios.get(getMembersUrl, {signal});
   assertHttpCode(response.status, 200);
   return response.data?.members;
+}
+
+export async function addMemberToTeamAPI(
+  orgName: string,
+  teamName: string,
+  member: string,
+) {
+  const addMemberUrl = `/api/v1/organization/${orgName}/team/${teamName}/members/${member}`;
+  try {
+    await axios.put(addMemberUrl, {});
+  } catch (err) {
+    console.error('Unable to add member to team', err);
+  }
 }
