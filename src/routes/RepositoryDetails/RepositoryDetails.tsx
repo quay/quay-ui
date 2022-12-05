@@ -17,10 +17,17 @@ import {
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import Tags from './Tags/Tags';
 import {useLocation, useSearchParams, useNavigate} from 'react-router-dom';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Settings from './Settings/Settings';
 import {DrawerContentType} from './Types';
 import AddPermissions from './Settings/PermissionsAddPermission';
+import {
+  fetchRepositoryDetails,
+  RepositoryDetails,
+} from 'src/resources/RepositoryResource';
+import ErrorBoundary from 'src/components/errors/ErrorBoundary';
+import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
+import RequestError from 'src/components/errors/RequestError';
 
 enum TabIndex {
   Tags = 'tags',
@@ -38,7 +45,7 @@ function getTabIndex(tab: string) {
   }
 }
 
-export default function RepositoryDetails(props) {
+export default function RepositoryDetails() {
   const [activeTabKey, setActiveTabKey] = useState(TabIndex.Tags);
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,6 +53,9 @@ export default function RepositoryDetails(props) {
   const [drawerContent, setDrawerContent] = useState<DrawerContentType>(
     DrawerContentType.None,
   );
+  const [repoDetails, setRepoDetails] = useState<RepositoryDetails>();
+  const [err, setErr] = useState<string>();
+
   const drawerRef = useRef<HTMLDivElement>();
 
   // TODO: refactor
@@ -74,6 +84,21 @@ export default function RepositoryDetails(props) {
       />
     ),
   };
+
+  // TODO: replace this with hooks
+  useEffect(() => {
+    (async () => {
+      try {
+        const repoDetails = await fetchRepositoryDetails(
+          organization,
+          repository,
+        );
+        setRepoDetails(repoDetails);
+      } catch (err) {
+        setErr(addDisplayError('Unable to get repository', err));
+      }
+    })();
+  }, []);
 
   return (
     <Drawer
@@ -115,24 +140,33 @@ export default function RepositoryDetails(props) {
               className="no-padding-on-sides"
               style={{padding: 0}}
             >
-              <Tabs activeKey={activeTabKey} onSelect={tabsOnSelect}>
-                <Tab
-                  eventKey={TabIndex.Tags}
-                  title={<TabTitleText>Tags</TabTitleText>}
-                >
-                  <Tags organization={organization} repository={repository} />
-                </Tab>
-                <Tab
-                  eventKey={TabIndex.Settings}
-                  title={<TabTitleText>Settings</TabTitleText>}
-                >
-                  <Settings
-                    org={organization}
-                    repo={repository}
-                    setDrawerContent={setDrawerContent}
-                  />
-                </Tab>
-              </Tabs>
+              <ErrorBoundary
+                hasError={isErrorString(err)}
+                fallback={<RequestError message={err} />}
+              >
+                <Tabs activeKey={activeTabKey} onSelect={tabsOnSelect}>
+                  <Tab
+                    eventKey={TabIndex.Tags}
+                    title={<TabTitleText>Tags</TabTitleText>}
+                  >
+                    <Tags
+                      organization={organization}
+                      repository={repository}
+                      repoDetails={repoDetails}
+                    />
+                  </Tab>
+                  <Tab
+                    eventKey={TabIndex.Settings}
+                    title={<TabTitleText>Settings</TabTitleText>}
+                  >
+                    <Settings
+                      org={organization}
+                      repo={repository}
+                      setDrawerContent={setDrawerContent}
+                    />
+                  </Tab>
+                </Tabs>
+              </ErrorBoundary>
             </PageSection>
           </Page>
         </DrawerContentBody>
