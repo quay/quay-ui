@@ -9,7 +9,7 @@ describe('Org List Page', () => {
   });
 
   it('Search Filter', () => {
-    cy.visit('/organizations');
+    cy.visit('/organization');
 
     // Filter for a single org
     cy.get('#toolbar-text-input').type('user1');
@@ -23,7 +23,7 @@ describe('Org List Page', () => {
   });
 
   it('Create Org', () => {
-    cy.visit('/organizations');
+    cy.visit('/organization');
 
     // Open and cancel modal
     cy.get('#create-organization-button').click();
@@ -59,7 +59,7 @@ describe('Org List Page', () => {
   });
 
   it('Delete Org', () => {
-    cy.visit('/organizations');
+    cy.visit('/organization');
 
     // Open the select box and check delete for all orgs, don't actually delete
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
@@ -97,7 +97,7 @@ describe('Org List Page', () => {
   });
 
   it('Pagination', () => {
-    cy.visit('/organizations');
+    cy.visit('/organization');
 
     cy.contains('1 - 10 of 25').should('exist');
     cy.get('td[data-label="Name"]').should('have.length', 10);

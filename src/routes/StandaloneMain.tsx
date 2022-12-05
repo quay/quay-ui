@@ -74,7 +74,7 @@ export function StandaloneMain() {
         defaultManagedSidebarIsOpen={true}
       >
         <Routes>
-          <Route index element={<Navigate to="/organizations" replace />} />
+          <Route index element={<Navigate to="/organization" replace />} />
           {NavigationRoutes.map(({path, Component}, key) => (
             <Route path={path} key={key} element={Component} />
           ))}
