@@ -8,7 +8,7 @@ describe('Repository Details Page', () => {
       .then((token) => {
         cy.loginByCSRF(token);
       });
-    cy.visit('/repositories/testorg/testrepo?tab=settings');
+    cy.visit('/repository/testorg/testrepo?tab=settings');
   });
 
   it('Renders permissions', () => {
