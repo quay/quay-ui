@@ -26,6 +26,7 @@ export function useRepositoryPermissions(org: string, repo: string) {
     data: userRoles,
     isError: errorLoadingUserRoles,
     isLoading: loadingUserRoles,
+    isPlaceholderData: isUserPlaceholderData,
   } = useQuery(
     ['userrepopermissions', org, repo],
     () => fetchUserRepoPermissions(org, repo),
@@ -38,6 +39,7 @@ export function useRepositoryPermissions(org: string, repo: string) {
     data: teamRoles,
     isError: errorLoadingTeamRoles,
     isLoading: loadingTeamRoles,
+    isPlaceholderData: isTeamPlaceholderData,
   } = useQuery(
     ['teamrepopermissions', org, repo],
     () => fetchTeamRepoPermissions(org, repo),
@@ -80,7 +82,11 @@ export function useRepositoryPermissions(org: string, repo: string) {
   );
 
   return {
-    loading: loadingUserRoles || loadingTeamRoles,
+    loading:
+      loadingUserRoles ||
+      loadingTeamRoles ||
+      isUserPlaceholderData ||
+      isTeamPlaceholderData,
     error: errorLoadingUserRoles || errorLoadingTeamRoles,
     members: members,
     paginatedMembers: paginatedMembers,
