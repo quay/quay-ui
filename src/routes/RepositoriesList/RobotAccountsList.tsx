@@ -25,7 +25,7 @@ import {
   selectedRobotAccountsState,
 } from 'src/atoms/RobotAccountState';
 import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
-import React, {ReactElement, useState} from 'react';
+import {ReactElement, useState} from 'react';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
