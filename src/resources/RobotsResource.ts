@@ -28,3 +28,17 @@ export async function fetchRobotsForNamespace(
   assertHttpCode(response.status, 200);
   return response.data?.robots;
 }
+
+export async function createNewRobotForNamespace(
+  orgname: string,
+  robotname: string,
+  description: string,
+  isUser = false,
+): Promise<IRobot[]> {
+  const namespacePath = isUser ? 'user' : `organization/${orgname}`;
+  const createOrgRobotsUrl = `/api/v1/${namespacePath}/robots/${robotname}`;
+  const payload = {description: description};
+  const response: AxiosResponse = await axios.put(createOrgRobotsUrl, payload);
+  assertHttpCode(response.status, 201);
+  return response.data?.name;
+}

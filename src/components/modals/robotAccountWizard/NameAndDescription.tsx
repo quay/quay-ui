@@ -53,7 +53,7 @@ export default function NameAndDescription(props: NameAndDescriptionProps) {
       <FormGroup
         label="Provide an optional description for your new robot:"
         fieldId="robot-form-description"
-        helperText="Enter a description to provice extra information to your teammates about this robot account."
+        helperText="Enter a description to provide extra information to your teammates about this robot account. Max length: 255"
       >
         <TextInput
           type="text"

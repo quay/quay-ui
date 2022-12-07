@@ -29,14 +29,14 @@ import {ReactElement, useState} from 'react';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
-  const {robotAccountsForRepo, page, perPage, setPage, setPerPage} =
-    useRobotAccounts(props.repositoryName);
+  const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
+    useRobotAccounts(props.orgName);
   const search = useRecoilValue(searchRobotAccountState);
   const [isCreateRobotModalOpen, setCreateRobotModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [isTableExpanded, setTableExpanded] = useState(false);
 
-  const robotAccountsList: IRobot[] = robotAccountsForRepo.map(
+  const robotAccountsList: IRobot[] = robotAccountsForOrg?.map(
     (robotAccount) => {
       return {
         name: robotAccount.name,
@@ -129,6 +129,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     <CreateRobotAccountModal
       isModalOpen={isCreateRobotModalOpen}
       handleModalToggle={() => setCreateRobotModalOpen(!isCreateRobotModalOpen)}
+      namespace={props.orgName}
     />
   );
 
@@ -152,7 +153,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       <PageSection variant={PageSectionVariants.light}>
         <RobotAccountsToolBar
           selectedItems={selectedRobotAccounts}
-          allItemsList={robotAccountsForRepo}
+          allItemsList={robotAccountsForOrg}
           setSelectedRobotAccounts={setSelectedRobotAccounts}
           itemsPerPageList={paginatedRobotAccountList}
           onItemSelect={onSelectRobot}
@@ -267,5 +268,5 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
 }
 
 interface RobotAccountsListProps {
-  repositoryName: string;
+  orgName: string;
 }

@@ -16,7 +16,7 @@ import RobotAccountsList from 'src/routes/RepositoriesList/RobotAccountsList';
 
 export default function Organization() {
   const location = useLocation();
-  const repositoryName = location.pathname.split('/')[2];
+  const orgName = location.pathname.split('/')[2];
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [activeTabKey, setActiveTabKey] = useState<string>(
@@ -42,7 +42,7 @@ export default function Organization() {
     },
     {
       name: 'Robot accounts',
-      component: <RobotAccountsList repositoryName={repositoryName} />,
+      component: <RobotAccountsList orgName={orgName} />,
     },
     // Commenting till needed.
     // {
@@ -60,7 +60,7 @@ export default function Organization() {
         className="no-padding-bottom"
       >
         <Title data-testid="repo-title" headingLevel="h1">
-          {repositoryName}
+          {orgName}
         </Title>
       </PageSection>
       <PageSection
