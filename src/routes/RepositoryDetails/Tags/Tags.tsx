@@ -26,14 +26,10 @@ import RequestError from 'src/components/errors/RequestError';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {
-  fetchRepositoryDetails,
-  RepositoryDetails,
-} from 'src/resources/RepositoryResource';
+import {RepositoryDetails} from 'src/resources/RepositoryResource';
 
 export default function Tags(props: TagsProps) {
   const [tags, setTags] = useState<Tag[]>([]);
-  const [repoDetails, setRepoDetails] = useState<RepositoryDetails>();
   const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string>();
   const resetSelectedTags = useResetRecoilState(selectedTagsState);
@@ -75,12 +71,6 @@ export default function Tags(props: TagsProps) {
     let page = 1;
     let hasAdditional = false;
     try {
-      const repoDetails = await fetchRepositoryDetails(
-        props.organization,
-        props.repository,
-      );
-      setRepoDetails(repoDetails);
-
       do {
         const resp: TagsResponse = await getTags(
           props.organization,
@@ -143,7 +133,7 @@ export default function Tags(props: TagsProps) {
             setPage={setPage}
             setPerPage={setPerPage}
             selectTag={selectTag}
-            repoDetails={repoDetails}
+            repoDetails={props.repoDetails}
           />
           <Table
             org={props.organization}
@@ -173,4 +163,5 @@ export default function Tags(props: TagsProps) {
 type TagsProps = {
   organization: string;
   repository: string;
+  repoDetails: RepositoryDetails;
 };

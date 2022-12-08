@@ -17,6 +17,36 @@ export class BulkOperationError<T> extends Error {
   }
 }
 
+export class ResourceError extends Error {
+  error: Error;
+  resource: string;
+  constructor(message: string, resource: string, error: AxiosError) {
+    super(message);
+    this.resource = resource;
+    this.error = error;
+    Object.setPrototypeOf(this, ResourceError.prototype);
+  }
+}
+
+export function throwIfError(responses: PromiseSettledResult<void>[]) {
+  // Aggregate failed responses
+  const errResponses = responses.filter(
+    (r) => r.status == 'rejected',
+  ) as PromiseRejectedResult[];
+
+  // If errors, collect and throw
+  if (errResponses.length > 0) {
+    const bulkDeleteError = new BulkOperationError<ResourceError>(
+      'error setting permissions',
+    );
+    for (const response of errResponses) {
+      const reason = response.reason as ResourceError;
+      bulkDeleteError.addError(reason.resource, reason);
+    }
+    throw bulkDeleteError;
+  }
+}
+
 // Convert error to human readble output
 export function addDisplayError(message: string, error: Error | AxiosError) {
   const errorDetails =

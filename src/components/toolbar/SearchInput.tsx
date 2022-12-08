@@ -12,7 +12,7 @@ export function SearchInput(props: SearchInput) {
       <TextInput
         isRequired
         type="search"
-        id="toolbar-text-input"
+        id={props.id ? props.id : 'toolbar-text-input'}
         name="search input"
         placeholder={`Search by ${props.searchState.field}...`}
         value={props.searchState.query}
@@ -25,4 +25,5 @@ export function SearchInput(props: SearchInput) {
 interface SearchInput {
   searchState: SearchState;
   onChange: SetterOrUpdater<SearchState>;
+  id?: string;
 }

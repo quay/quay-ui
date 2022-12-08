@@ -53,8 +53,11 @@ export function TagsToolbar(props: ToolBarProps) {
           setSearchState={setSearch}
           items={[ColumnNames.name, ColumnNames.manifest]}
         />
-        <SearchInput searchState={search} onChange={setSearch} />
-
+        <SearchInput
+          id="tagslist-search-input"
+          searchState={search}
+          onChange={setSearch}
+        />
         <ToolbarItem>
           {selectedTags?.length !== 0 ? (
             <Kebab
