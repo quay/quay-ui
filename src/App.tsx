@@ -7,6 +7,7 @@ import 'src/App.css';
 import {LoadingPage} from 'src/components/LoadingPage';
 import {StandaloneMain} from 'src/routes/StandaloneMain';
 import {Signin} from 'src/routes/Signin/Signin';
+import {useAnalytics} from 'src/hooks/UseAnalytics';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,6 +18,8 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
+  useAnalytics();
+
   return (
     <div className="App">
       <BrowserRouter>
