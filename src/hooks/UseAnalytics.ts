@@ -17,7 +17,7 @@ export function useAnalytics() {
     const host = quayConfig?.config?.SERVER_HOSTNAME;
 
     // analytics only for quay.io
-    if (!host || host != 'quay.io' || host != 'stage.quay.io') {
+    if (!host || (host != 'quay.io' && host != 'stage.quay.io')) {
       return;
     }
 
