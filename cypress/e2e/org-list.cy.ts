@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Org List Page', () => {
   beforeEach(() => {
     cy.exec('npm run quay:seed');
@@ -99,7 +101,7 @@ describe('Org List Page', () => {
   it('Pagination', () => {
     cy.visit('/organization');
 
-    cy.contains('1 - 10 of 25').should('exist');
+    cy.contains('1 - 10 of 26').should('exist');
     cy.get('td[data-label="Name"]').should('have.length', 10);
 
     // cycle through the pages
@@ -114,12 +116,12 @@ describe('Org List Page', () => {
     // Go to last page
     cy.get('button[aria-label="Go to last page"]').first().click();
     cy.contains('user1').should('exist');
-    cy.get('td[data-label="Name"]').should('have.length', 5);
+    cy.get('td[data-label="Name"]').should('have.length', 6);
 
     // Change per page
-    cy.get('button:contains("21 - 25 of 25")').first().click();
+    cy.get('button:contains("21 - 26 of 26")').first().click();
     cy.contains('20 per page').click();
     cy.get('td[data-label="Name"]').should('have.length', 20);
-    cy.contains('1 - 20 of 25').should('exist');
+    cy.contains('1 - 20 of 26').should('exist');
   });
 });
