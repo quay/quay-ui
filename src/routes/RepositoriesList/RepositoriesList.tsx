@@ -41,6 +41,8 @@ import ColumnNames from './ColumnNames';
 import {LoadingPage} from 'src/components/LoadingPage';
 import {useCurrentUser} from 'src/hooks/UseCurrentUser';
 import {useRepositories} from 'src/hooks/UseRepositories';
+import {useDeleteRepositories} from 'src/hooks/UseDeleteRepositories';
+
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organization') ? pathname.split('/')[2] : null;
 }
@@ -78,7 +80,6 @@ export default function RepositoriesList() {
     repos,
     loading,
     error,
-    deleteRepositories,
     setPerPage,
     setPage,
     search,
@@ -162,10 +163,12 @@ export default function RepositoriesList() {
     setDeleteModalOpen(!isDeleteModalOpen);
   };
 
-  const handleRepoDeletion = async (repos: IRepository[]) => {
-    try {
-      await deleteRepositories(repos);
-    } catch (err) {
+  const {deleteRepositories} = useDeleteRepositories({
+    onSuccess: () => {
+      setSelectedRepoNames([]);
+      setDeleteModalOpen(!isDeleteModalOpen);
+    },
+    onError: (err) => {
       if (err instanceof BulkOperationError) {
         const errMessages = [];
         // TODO: Would like to use for .. of instead of foreach
@@ -179,11 +182,10 @@ export default function RepositoriesList() {
       } else {
         setErr([addDisplayError('Failed to delete repository', err)]);
       }
-    } finally {
       setSelectedRepoNames([]);
       setDeleteModalOpen(!isDeleteModalOpen);
-    }
-  };
+    },
+  });
 
   const kebabItems: ReactElement[] = [
     <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
@@ -243,7 +245,7 @@ export default function RepositoriesList() {
     <BulkDeleteModalTemplate
       mapOfColNamesToTableData={mapOfColNamesToTableData}
       handleModalToggle={handleDeleteModalToggle}
-      handleBulkDeletion={handleRepoDeletion}
+      handleBulkDeletion={deleteRepositories}
       isModalOpen={isDeleteModalOpen}
       selectedItems={repositoryList.filter((repo) =>
         selectedRepoNames.some(
@@ -283,6 +285,7 @@ export default function RepositoriesList() {
         body="Either no repositories exist yet or you may not have permission to view any. If you have permission, try creating a new repository."
         button={
           <ToolbarButton
+            id=""
             buttonValue="Create Repository"
             Modal={createRepoModal}
             isModalOpen={isCreateRepoModalOpen}

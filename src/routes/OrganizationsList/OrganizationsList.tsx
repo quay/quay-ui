@@ -34,7 +34,7 @@ import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import ColumnNames from './ColumnNames';
 import RepoCount from 'src/components/Table/RepoCount';
 import {useOrganizations} from 'src/hooks/UseOrganizations';
-import {useCurrentUser} from 'src/hooks/UseCurrentUser';
+import {useDeleteOrganizations} from 'src/hooks/UseDeleteOrganizations';
 
 export interface OrganizationsTableItem {
   name: string;
@@ -68,7 +68,6 @@ export default function OrganizationsList() {
     organizationsTableDetails,
     loading,
     error,
-    deleteOrganizations,
     totalResults,
     search,
     setSearch,
@@ -138,13 +137,12 @@ export default function OrganizationsList() {
     setRecentSelectedRowIndex(rowIndex);
   };
 
-  const handleOrgDeletion = async () => {
-    // Error handling is in BulkDeleteModalTemplate,
-    // since that is where it is reported to the user.
-    try {
-      const orgs = selectedOrganization.map((org) => org.name);
-      await deleteOrganizations(orgs);
-    } catch (err) {
+  const {deleteOrganizations} = useDeleteOrganizations({
+    onSuccess: () => {
+      setDeleteModalIsOpen(!deleteModalIsOpen);
+      setSelectedOrganization([]);
+    },
+    onError: (err) => {
       console.error(err);
       if (err instanceof BulkOperationError) {
         const errMessages = [];
@@ -159,10 +157,14 @@ export default function OrganizationsList() {
       } else {
         setErr([addDisplayError('Failed to delete orgs', err)]);
       }
-    } finally {
       setDeleteModalIsOpen(!deleteModalIsOpen);
       setSelectedOrganization([]);
-    }
+    },
+  });
+
+  const handleOrgDeletion = async () => {
+    const orgs = selectedOrganization.map((org) => org.name);
+    await deleteOrganizations(orgs);
   };
 
   const handleDeleteModalToggle = () => {
