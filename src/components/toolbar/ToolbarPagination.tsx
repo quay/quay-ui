@@ -5,13 +5,11 @@ import {
 } from '@patternfly/react-core';
 
 export const ToolbarPagination = (props: ToolbarPaginationProps) => {
-  const {total} = props;
-
   return (
     <ToolbarItem variant="pagination">
       <Pagination
         perPageComponent="button"
-        itemCount={total}
+        itemCount={props.total || props.itemsList.length}
         perPage={props.perPage}
         id={props.id ? props.id : 'toolbar-pagination'}
         page={props.page}
@@ -37,5 +35,5 @@ type ToolbarPaginationProps = {
   setPerPage: (perPageNumber: number) => void;
   bottom?: boolean;
   id?: string;
-  total: number;
+  total?: number;
 };

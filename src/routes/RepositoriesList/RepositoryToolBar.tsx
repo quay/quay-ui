@@ -75,7 +75,6 @@ export function RepositoryToolBar(props: RepositoryToolBarProps) {
           {props.deleteKebabIsOpen ? props.deleteModal : null}
         </ToolbarItem>
         <ToolbarPagination
-          total={props.total}
           itemsList={props.repositoryList}
           perPage={props.perPage}
           page={props.page}
