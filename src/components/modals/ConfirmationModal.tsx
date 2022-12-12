@@ -3,25 +3,25 @@ import {Modal, ModalVariant, Button} from '@patternfly/react-core';
 import {useState} from 'react';
 import FormError from 'src/components/errors/FormError';
 import {addDisplayError} from 'src/resources/ErrorHandling';
-import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
+import {useQueryClient} from '@tanstack/react-query';
 
 export function ConfirmationModal(props: ConfirmationModalProps) {
   const [err, setErr] = useState<string>();
-  const refresh = useRefreshRepoList();
 
+  const queryClient = useQueryClient();
   const changeVisibility = async () => {
     const visibility = props.makePublic ? 'public' : 'private';
     try {
       // TODO: Could replace this with a 'bulkSetRepoVisibility'
       // function in RepositoryResource in the future
       await Promise.all(
-        props.selectedItems.map((item) => {
+        props.selectedItems.map(async (item) => {
           const [org, ...repoArray] = item.split('/');
           const repo = repoArray.join('/');
-          return setRepositoryVisibility(org, repo, visibility);
+          await setRepositoryVisibility(org, repo, visibility);
         }),
       );
-      refresh();
+      queryClient.invalidateQueries(['organization']);
       props.toggleModal();
       props.selectAllRepos(false);
     } catch (error: any) {

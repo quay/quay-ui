@@ -124,6 +124,7 @@ export const BulkDeleteModalTemplate = <T,>(
               />
             </ToolbarItem>
             <ToolbarPagination
+              total={paginatedBulkItemsList.length}
               page={bulkModalPage}
               perPage={bulkModalPerPage}
               itemsList={paginatedBulkItemsList}
@@ -157,6 +158,7 @@ export const BulkDeleteModalTemplate = <T,>(
         </TableComposable>
         <Toolbar>
           <ToolbarPagination
+            total={paginatedBulkItemsList.length}
             page={bulkModalPage}
             perPage={bulkModalPerPage}
             itemsList={paginatedBulkItemsList}
