@@ -5,6 +5,9 @@ import {
 } from '@patternfly/react-core';
 
 export default function Footer(props: FooterProps) {
+  if (props.isDrawerExpanded) {
+    return null;
+  }
   return (
     <WizardFooter>
       <WizardContextConsumer>
@@ -47,4 +50,5 @@ export default function Footer(props: FooterProps) {
 
 interface FooterProps {
   onSubmit: () => void;
+  isDrawerExpanded: boolean;
 }

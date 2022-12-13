@@ -2,38 +2,36 @@ import {Form, FormGroup, TextInput} from '@patternfly/react-core';
 import ExclamationCircleIcon from '@patternfly/react-icons/dist/esm/icons/exclamation-circle-icon';
 import {useEffect, useState} from 'react';
 
-const NameHelperText =
-  'Choose a name to inform your teammates about this robot account. Must match ^[a-z][a-z0-9_]{1,254}$.';
 type validate = 'success' | 'error' | 'default';
 
 export default function NameAndDescription(props: NameAndDescriptionProps) {
   const [validatedName, setValidatedName] = useState<validate>('default');
-  const [nameHelperText, setNameHelperText] = useState(NameHelperText);
+  const [nameHelperText, setNameHelperText] = useState(props.nameHelperText);
 
   const handleNameChange = (robotName: string) => {
-    props.setRobotName(robotName);
+    props.setName(robotName);
     setNameHelperText('Validating...');
   };
 
   useEffect(() => {
-    if (props.robotName == '') {
+    if (props.name == '') {
       setValidatedName('default');
-      setNameHelperText(NameHelperText);
+      setNameHelperText(props.nameHelperText);
       return;
     }
-    if (/^[a-z][a-z0-9_]{1,254}$/.test(props.robotName)) {
+    if (props.validateName()) {
       setValidatedName('success');
     } else {
       setValidatedName('error');
     }
-    setNameHelperText(NameHelperText);
-  }, [props.robotName]);
+    setNameHelperText(props.nameHelperText);
+  }, [props.name]);
 
   return (
     <Form>
       <FormGroup
-        label="Provide a name for your robot account:"
-        fieldId="robot-form-name"
+        label={props.nameLabel}
+        fieldId="form-name"
         isRequired
         helperText={nameHelperText}
         helperTextInvalid={nameHelperText}
@@ -43,25 +41,25 @@ export default function NameAndDescription(props: NameAndDescriptionProps) {
         <TextInput
           isRequired
           type="text"
-          id="robot-form-name"
-          name="robot-form-name"
-          value={props.robotName}
+          id="form-name"
+          name="form-name"
+          value={props.name}
           onChange={handleNameChange}
           validated={validatedName}
         />
       </FormGroup>
       <FormGroup
-        label="Provide an optional description for your new robot:"
-        fieldId="robot-form-description"
-        helperText="Enter a description to provide extra information to your teammates about this robot account. Max length: 255"
+        label={props.descriptionLabel}
+        fieldId="form-description"
+        helperText={props.helperText}
       >
         <TextInput
           type="text"
-          id="robot-form-description"
-          name="robot-form-description"
-          value={props.robotDescription}
+          id="form-description"
+          name="form-description"
+          value={props.description}
           onChange={(robotDescription: string) =>
-            props.setrobotDescription(robotDescription)
+            props.setDescription(robotDescription)
           }
         />
       </FormGroup>
@@ -70,8 +68,13 @@ export default function NameAndDescription(props: NameAndDescriptionProps) {
 }
 
 interface NameAndDescriptionProps {
-  robotName: string;
-  setRobotName: (robotName) => void;
-  robotDescription: string;
-  setrobotDescription: (robotDescription) => void;
+  name: string;
+  setName: (robotName) => void;
+  description: string;
+  setDescription: (robotDescription) => void;
+  nameLabel: string;
+  descriptionLabel: string;
+  helperText: string;
+  nameHelperText: string;
+  validateName: () => boolean;
 }

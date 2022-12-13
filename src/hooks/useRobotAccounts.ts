@@ -7,7 +7,6 @@ export function useRobotAccounts(name: string) {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [namespace, setNamespace] = useState(name);
-  console.log('namespace', namespace);
 
   const {
     data: robotAccountsForOrg,

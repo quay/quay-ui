@@ -22,15 +22,16 @@ export default function CreateRobotAccountModal(
   const [robotDescription, setrobotDescription] = useState('');
   const [err, setErr] = useState<string>();
   const [teams, setTeams] = useState([]);
+  const [isDrawerExpanded, setDrawerExpanded] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetching teams
   useQuery(
-    ['organization', props.namespace],
+    ['organization', props.namespace, 'teams'],
     () => {
       fetchOrg(props.namespace).then((response) => {
         setTeams(Object['values'](response?.teams));
-        return response;
+        return response?.teams;
       });
       return [];
     },
@@ -52,8 +53,12 @@ export default function CreateRobotAccountModal(
       props.handleModalToggle();
     } catch (error) {
       console.error(error);
-      setErr(addDisplayError('Unable to create repository', error));
+      setErr(addDisplayError('Unable to create robot', error));
     }
+  };
+
+  const validateRobotName = () => {
+    return /^[a-z][a-z0-9_]{1,254}$/.test(robotName);
   };
 
   const steps = [
@@ -61,21 +66,34 @@ export default function CreateRobotAccountModal(
       name: 'Robot name and description',
       component: (
         <NameAndDescription
-          robotName={robotName}
-          setRobotName={setRobotName}
-          robotDescription={robotDescription}
-          setrobotDescription={setrobotDescription}
+          name={robotName}
+          setName={setRobotName}
+          description={robotDescription}
+          setDescription={setrobotDescription}
+          nameLabel="Provide a name for your robot account:"
+          descriptionLabel="Provide an optional description for your new robot:"
+          helperText="Enter a description to provide extra information to your teammates about this robot account. Max length: 255"
+          nameHelperText="Choose a name to inform your teammates about this robot account. Must match ^[a-z][a-z0-9_]{1,254}$."
+          validateName={validateRobotName}
         />
       ),
     },
     {
       name: 'Add to team (optional)',
-      component: <AddToTeam items={teams} namespace={props.namespace} />,
+      component: (
+        <AddToTeam
+          items={teams}
+          namespace={props.namespace}
+          isDrawerExpanded={isDrawerExpanded}
+          setDrawerExpanded={setDrawerExpanded}
+        />
+      ),
     },
     {name: 'Add to repository (optional)', component: <p>Step 3</p>},
     {name: 'Default permissions (optional)', component: <p>Step 4</p>},
     {name: 'Review and Finish', component: <p>Review Step</p>},
   ];
+  console.log('isDrawerExpanded in create robot modal', isDrawerExpanded);
 
   return (
     <Modal
@@ -95,7 +113,11 @@ export default function CreateRobotAccountModal(
         steps={steps}
         onClose={props.handleModalToggle}
         height={600}
-        footer={<Footer onSubmit={onSubmit} />}
+        width={1170}
+        footer={
+          <Footer onSubmit={onSubmit} isDrawerExpanded={isDrawerExpanded} />
+        }
+        hasNoBodyPadding={isDrawerExpanded ? true : false}
       />
     </Modal>
   );

@@ -95,6 +95,10 @@ export default function OrgTableData(props: OrganizationsTableItem) {
 
   let teamCountVal: string;
   if (!props.isUser) {
+    const {data: teams} = useQuery(
+      ['organization', props.name, 'teams'],
+      () => organization?.teams || [],
+    );
     teamCountVal = organization?.teams
       ? Object.keys(organization?.teams)?.length.toString()
       : '0';
