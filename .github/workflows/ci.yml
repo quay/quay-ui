@@ -16,6 +16,20 @@ jobs:
         with:
           repository: quay/quay
           path: './quay'
+
+      - name: install yq
+        env:
+          VERSION: v4.14.2
+          BINARY: yq_linux_amd64
+        run: |
+          wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY} -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+      - name: Update images
+        run: |
+          yq e -i '
+            .services.quay.image = "quay.io/projectquay/quay" ' ./quay/docker-compose.yaml && \
+          yq e -i 'del(.services.quay.build)' ./quay/docker-compose.yaml
+   
       - name: Start Quay
         run: |
           # This rebuilds Quay from scratch, should look to use images built off of Quay master
