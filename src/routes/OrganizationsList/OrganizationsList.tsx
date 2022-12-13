@@ -15,14 +15,10 @@ import {
 } from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {CreateOrganizationModal} from './CreateOrganizationModal';
-import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
-import {searchOrgsState, selectedOrgsState} from 'src/atoms/UserState';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import {selectedOrgsState} from 'src/atoms/UserState';
 import {useEffect, useState} from 'react';
-import {
-  bulkDeleteOrganizations,
-  fetchOrgsAsSuperUser,
-  IOrganization,
-} from 'src/resources/OrganizationResource';
+import {IOrganization} from 'src/resources/OrganizationResource';
 import OrgTableData from './OrganizationsListTableData';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import RequestError from 'src/components/errors/RequestError';
@@ -32,23 +28,13 @@ import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import Empty from 'src/components/empty/Empty';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {LoadingPage} from 'src/components/LoadingPage';
-import {
-  addDisplayError,
-  BulkOperationError,
-  isErrorString,
-} from 'src/resources/ErrorHandling';
+import {addDisplayError, BulkOperationError} from 'src/resources/ErrorHandling';
 import ErrorModal from 'src/components/errors/ErrorModal';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {
-  fetchUser,
-  fetchUsersAsSuperUser,
-  IUserResource,
-} from 'src/resources/UserResource';
 import ColumnNames from './ColumnNames';
-import {userRefreshOrgList} from 'src/hooks/UseRefreshPage';
-import {refreshPageState} from 'src/atoms/OrganizationListState';
-import {fetchQuayConfig} from 'src/resources/QuayConfig';
 import RepoCount from 'src/components/Table/RepoCount';
+import {useOrganizations} from 'src/hooks/UseOrganizations';
+import {useDeleteOrganizations} from 'src/hooks/UseDeleteOrganizations';
 
 export interface OrganizationsTableItem {
   name: string;
@@ -70,29 +56,29 @@ function OrgListHeader() {
 
 export default function OrganizationsList() {
   const [isOrganizationModalOpen, setOrganizationModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const search = useRecoilValue(searchOrgsState);
-  const resetSearch = useResetRecoilState(searchOrgsState);
   const [selectedOrganization, setSelectedOrganization] =
     useRecoilState(selectedOrgsState);
   const [err, setErr] = useState<string[]>();
-  const [loadingErr, setLoadingErr] = useState<string>();
-  const [organizationsList, setOrganizationsList] = useState<
-    OrganizationsTableItem[]
-  >([]);
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [perPage, setPerPage] = useState<number>(10);
   const [page, setPage] = useState<number>(1);
-  const [userData, setUserData] = useState<IUserResource>();
-  const [quayConfig, setQuayConfig] = useState(null);
-  const refresh = userRefreshOrgList();
-  const refreshPageIndex = useRecoilValue(refreshPageState);
+
+  const {
+    organizationsTableDetails,
+    loading,
+    error,
+    totalResults,
+    search,
+    setSearch,
+  } = useOrganizations();
 
   const filteredOrgs =
     search.query !== ''
-      ? organizationsList?.filter((repo) => repo.name.includes(search.query))
-      : organizationsList;
+      ? organizationsTableDetails?.filter((repo) =>
+          repo.name.includes(search.query),
+        )
+      : organizationsTableDetails;
 
   const paginatedOrganizationsList = filteredOrgs?.slice(
     page * perPage - perPage,
@@ -143,7 +129,7 @@ export default function OrganizationsList() {
               (_x, i) => i + rowIndex,
             );
       intermediateIndexes.forEach((index) =>
-        setOrganizationChecked(organizationsList[index], isSelecting),
+        setOrganizationChecked(organizationsTableDetails[index], isSelecting),
       );
     } else {
       setOrganizationChecked(currentOrganization, isSelecting);
@@ -151,15 +137,12 @@ export default function OrganizationsList() {
     setRecentSelectedRowIndex(rowIndex);
   };
 
-  const handleOrgDeletion = async () => {
-    // Error handling is in BulkDeleteModalTemplate,
-    // since that is where it is reported to the user.
-    try {
-      const isSuperUser =
-        quayConfig?.features.SUPERUSERS_FULL_ACCESS && userData?.super_user;
-      const orgs = selectedOrganization.map((org) => org.name);
-      await bulkDeleteOrganizations(orgs, isSuperUser);
-    } catch (err) {
+  const {deleteOrganizations} = useDeleteOrganizations({
+    onSuccess: () => {
+      setDeleteModalIsOpen(!deleteModalIsOpen);
+      setSelectedOrganization([]);
+    },
+    onError: (err) => {
       console.error(err);
       if (err instanceof BulkOperationError) {
         const errMessages = [];
@@ -174,11 +157,14 @@ export default function OrganizationsList() {
       } else {
         setErr([addDisplayError('Failed to delete orgs', err)]);
       }
-    } finally {
       setDeleteModalIsOpen(!deleteModalIsOpen);
-      refresh();
       setSelectedOrganization([]);
-    }
+    },
+  });
+
+  const handleOrgDeletion = async () => {
+    const orgs = selectedOrganization.map((org) => org.name);
+    await deleteOrganizations(orgs);
   };
 
   const handleDeleteModalToggle = () => {
@@ -218,7 +204,7 @@ export default function OrganizationsList() {
       handleModalToggle={() => setDeleteModalIsOpen(!deleteModalIsOpen)}
       handleBulkDeletion={handleOrgDeletion}
       isModalOpen={deleteModalIsOpen}
-      selectedItems={organizationsList?.filter((org) =>
+      selectedItems={organizationsTableDetails?.filter((org) =>
         selectedOrganization.some(
           (selectedOrg) => org.name === selectedOrg.name,
         ),
@@ -247,80 +233,6 @@ export default function OrganizationsList() {
     };
   }, []);
 
-  // Get initial data required for rendering page
-  useEffect(() => {
-    // TODO: Many operations in this function are ran synchronously when
-    // they can be ran async - look into running some of these calls in
-    // parallel in the future
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        resetSearch();
-        setSelectedOrganization([]);
-        const config = await fetchQuayConfig();
-        const user: IUserResource = await fetchUser();
-        setQuayConfig(config);
-        setUserData(user);
-
-        let orgnames: string[];
-        if (config?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
-          const orgs: IOrganization[] = await fetchOrgsAsSuperUser();
-          orgnames = orgs.map((org) => org.name);
-        } else {
-          orgnames = user?.organizations.map((org) => org.name);
-        }
-
-        // Populate org table temporarily with org names while we wait for org details to return
-        const tempOrgsList: OrganizationsTableItem[] = orgnames.map((org) => {
-          return {
-            name: org,
-            isUser: false,
-          } as OrganizationsTableItem;
-        });
-        setOrganizationsList(tempOrgsList);
-        setLoading(false);
-
-        const newOrgsList: OrganizationsTableItem[] = orgnames.map((org) => {
-          return {
-            name: org,
-            isUser: false,
-          } as OrganizationsTableItem;
-        });
-
-        // Add the user namespace. If superuser get all user namespaces
-        // otherwise default to the current user's namespace
-        let usernames: string[];
-        if (config?.features.SUPERUSERS_FULL_ACCESS && user?.super_user) {
-          const users: IUserResource[] = await fetchUsersAsSuperUser();
-          usernames = users.map((user) => user.username);
-        } else {
-          usernames = [user.username];
-        }
-
-        for (const username of usernames) {
-          newOrgsList.push({
-            name: username,
-            isUser: true,
-          });
-        }
-
-        // sort on last modified
-        // TODO revisit this after API changes, we don't have enough info to sort 2022-09-14
-        // newOrgsList.sort((r1, r2) => {
-        //   return r1.lastModified > r2.lastModified ? -1 : 1;
-        // });
-        setOrganizationsList(newOrgsList);
-      } catch (err) {
-        console.error(err);
-        setLoadingErr(addDisplayError('Unable to get organizations', err));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [refreshPageIndex]);
-
   // Return component Loading state
   if (loading) {
     return (
@@ -332,17 +244,17 @@ export default function OrganizationsList() {
   }
 
   // Return component Error state
-  if (isErrorString(loadingErr)) {
+  if (error) {
     return (
       <>
         <OrgListHeader />
-        <RequestError message={loadingErr} />
+        <RequestError message={error as string} />
       </>
     );
   }
 
   // Return component Empty state
-  if (!loading && !organizationsList?.length) {
+  if (!loading && !organizationsTableDetails?.length) {
     return (
       <>
         <OrgListHeader />
@@ -370,6 +282,9 @@ export default function OrganizationsList() {
       <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
       <PageSection variant={PageSectionVariants.light}>
         <OrganizationToolBar
+          search={search}
+          setSearch={setSearch}
+          total={totalResults}
           createOrgModal={createOrgModal}
           isOrganizationModalOpen={isOrganizationModalOpen}
           setOrganizationModalOpen={setOrganizationModalOpen}

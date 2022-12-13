@@ -5,14 +5,11 @@ import {SearchInput} from 'src/components/toolbar/SearchInput';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {Kebab} from 'src/components/toolbar/Kebab';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {searchOrgsState} from 'src/atoms/UserState';
-import {useRecoilState} from 'recoil';
 import * as React from 'react';
 import ColumnNames from './ColumnNames';
+import {SearchState} from 'src/components/toolbar/SearchTypes';
 
 export function OrganizationToolBar(props: OrganizationToolBarProps) {
-  const [search, setSearch] = useRecoilState(searchOrgsState);
-
   return (
     <Toolbar>
       <ToolbarContent>
@@ -25,10 +22,10 @@ export function OrganizationToolBar(props: OrganizationToolBarProps) {
         />
         <SearchDropdown
           items={[ColumnNames.name]}
-          searchState={search}
-          setSearchState={setSearch}
+          searchState={props.search}
+          setSearchState={props.setSearch}
         />
-        <SearchInput searchState={search} onChange={setSearch} />
+        <SearchInput searchState={props.search} onChange={props.setSearch} />
         <ToolbarButton
           id="create-organization-button"
           buttonValue="Create Organization"
@@ -73,6 +70,9 @@ type OrganizationToolBarProps = {
   page: number;
   setPage: (pageNumber) => void;
   setPerPage: (perPageNumber) => void;
+  total: number;
+  search: SearchState;
+  setSearch: (searchState) => void;
   setSelectedOrganization: (selectedOrgList) => void;
   paginatedOrganizationsList: any[];
   onSelectOrganization: (Org, rowIndex, isSelecting) => void;

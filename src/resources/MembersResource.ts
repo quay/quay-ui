@@ -14,13 +14,18 @@ export interface ITeam {
   avatar: IAvatar;
 }
 
-export async function fetchAllMembers(orgnames: string[]) {
-  return await Promise.all(orgnames.map((org) => fetchMembersForOrg(org)));
+export async function fetchAllMembers(orgnames: string[], signal: AbortSignal) {
+  return await Promise.all(
+    orgnames.map((org) => fetchMembersForOrg(org, signal)),
+  );
 }
 
-export async function fetchMembersForOrg(orgname: string): Promise<IMember[]> {
+export async function fetchMembersForOrg(
+  orgname: string,
+  signal: AbortSignal,
+): Promise<IMember[]> {
   const getMembersUrl = `/api/v1/organization/${orgname}/members`;
-  const response = await axios.get(getMembersUrl);
+  const response = await axios.get(getMembersUrl, {signal});
   assertHttpCode(response.status, 200);
   return response.data?.members;
 }

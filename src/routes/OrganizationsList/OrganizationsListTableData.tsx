@@ -2,7 +2,6 @@ import {Td} from '@patternfly/react-table';
 import {Skeleton} from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {Link} from 'react-router-dom';
-import {useEffect, useState} from 'react';
 import {fetchOrg} from 'src/resources/OrganizationResource';
 import {
   fetchRepositoriesForNamespace,
@@ -13,7 +12,8 @@ import {fetchRobotsForNamespace} from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import ColumnNames from './ColumnNames';
 import {OrganizationsTableItem} from './OrganizationsList';
-import {AxiosError} from 'axios';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {useEffect} from 'react';
 
 interface CountProps {
   count: string | number;
@@ -42,11 +42,44 @@ function RepoLastModifiedDate(props: RepoLastModifiedDateProps) {
 // Get and assemble data from multiple endpoints to show in Org table
 // Only necessary because current API structure does not return all required data
 export default function OrgTableData(props: OrganizationsTableItem) {
-  const [teamCount, setTeamCount] = useState<string | number>(null);
-  const [memberCount, setMemberCount] = useState<string | number>(null);
-  const [robotCount, setRobotCount] = useState<string | number>(null);
-  const [repoCount, setRepoCount] = useState<string | number>(null);
-  const [lastModifiedDate, setLastModifiedDate] = useState<number>(0);
+  // const queryClient = useQueryClient();
+  // useEffect(() => {
+  //   return () => {
+  //     queryClient.cancelQueries(['organization', props.name]);
+  //     queryClient.cancelQueries(['organization', props.name, 'members']);
+  //     queryClient.cancelQueries(['organization', props.name, 'robots']);
+  //     queryClient.cancelQueries(['organization', props.name, 'repositories']);
+  //   };
+  // }, [props.name]);
+  // Get organization
+  const {data: organization} = useQuery(
+    ['organization', props.name],
+    ({signal}) => fetchOrg(props.name, signal),
+    {enabled: !props.isUser},
+  );
+
+  // Get members
+  const {data: members} = useQuery(
+    ['organization', props.name, 'members'],
+    ({signal}) => fetchMembersForOrg(props.name, signal),
+    {placeholderData: props.isUser ? [] : undefined},
+  );
+  const memberCount = props.isUser ? 0 : members ? members.length : null;
+
+  // Get robots
+  const {data: robots} = useQuery(
+    ['organization', props.name, 'robots'],
+    ({signal}) => fetchRobotsForNamespace(props.name, false, signal),
+  );
+  const robotCount = robots ? robots.length : null;
+
+  // Get repositories
+  const {data: repositories} = useQuery(
+    ['organization', props.name, 'repositories'],
+    ({signal}) => fetchRepositoriesForNamespace(props.name, signal),
+  );
+  const repoCount = repositories ? repositories.length : null;
+
   const getLastModifiedRepoTime = (repos: IRepository[]) => {
     // get the repo with the most recent last modified
     if (!repos || !repos.length) {
@@ -56,88 +89,18 @@ export default function OrgTableData(props: OrganizationsTableItem) {
     const recentRepo = repos.reduce((prev, curr) =>
       prev.last_modified < curr.last_modified ? curr : prev,
     );
-    return recentRepo.last_modified;
+    return recentRepo.last_modified || -1;
   };
+  const lastModifiedDate = getLastModifiedRepoTime(repositories);
 
-  useEffect(() => {
-    let teamCountVal = null;
-    let memberCountVal = null;
-    let robotCountVal = null;
-    let repoCountVal = null;
-    let lastModifiedVal = null;
-
-    // Grab data for Team column
-    const fetchTeamCount = async () => {
-      try {
-        if (!props.isUser) {
-          const data = await fetchOrg(props.name);
-          teamCountVal = data?.teams ? Object.keys(data?.teams)?.length : 0;
-        } else {
-          teamCountVal = 'N/A';
-        }
-      } catch (err) {
-        console.error(err);
-        teamCountVal = 'Error';
-      } finally {
-        setTeamCount(teamCountVal);
-      }
-    };
-
-    // Grab data for Member column
-    const fetchMemberCount = async () => {
-      try {
-        if (!props.isUser) {
-          const data = await fetchMembersForOrg(props.name);
-          memberCountVal = data.length;
-        } else {
-          memberCountVal = 'N/A';
-        }
-      } catch (err) {
-        console.error(err);
-        memberCountVal =
-          err instanceof AxiosError && err.response?.status === 403
-            ? 'N/A'
-            : 'Error';
-      } finally {
-        setMemberCount(memberCountVal);
-      }
-    };
-
-    // Grab data for Robot column
-    const fetchRobotCount = async () => {
-      try {
-        const data = await fetchRobotsForNamespace(props.name);
-        robotCountVal = data.length;
-      } catch (err) {
-        console.error(err);
-        robotCountVal = 'Error';
-      } finally {
-        setRobotCount(robotCountVal);
-      }
-    };
-
-    // Grab data for Repo and LastModified columns
-    const fetchRepoCount = async () => {
-      try {
-        const data = await fetchRepositoriesForNamespace(props.name);
-        repoCountVal = data.length;
-        lastModifiedVal = getLastModifiedRepoTime(data);
-      } catch (err) {
-        console.error(err);
-        repoCountVal = 'Error';
-        lastModifiedVal = 0;
-      } finally {
-        setRepoCount(repoCountVal);
-        setLastModifiedDate(lastModifiedVal);
-      }
-    };
-
-    // Trigger async calls
-    fetchTeamCount();
-    fetchMemberCount();
-    fetchRobotCount();
-    fetchRepoCount();
-  }, []);
+  let teamCountVal: string;
+  if (!props.isUser) {
+    teamCountVal = organization?.teams
+      ? Object.keys(organization?.teams)?.length.toString()
+      : '0';
+  } else {
+    teamCountVal = 'N/A';
+  }
 
   return (
     <>
@@ -148,7 +111,7 @@ export default function OrgTableData(props: OrganizationsTableItem) {
         <Count count={repoCount}></Count>
       </Td>
       <Td dataLabel={ColumnNames.teamsCount}>
-        <Count count={teamCount}></Count>
+        <Count count={teamCountVal}></Count>
       </Td>
       <Td dataLabel={ColumnNames.membersCount}>
         <Count count={memberCount}></Count>

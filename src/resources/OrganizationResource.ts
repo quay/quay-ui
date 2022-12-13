@@ -16,14 +16,15 @@ export interface IOrganization {
   public?: boolean;
   is_org_admin?: boolean;
   preferred_namespace?: boolean;
+  teams?: string[];
 }
 
-export async function fetchOrg(orgname: string) {
+export async function fetchOrg(orgname: string, signal: AbortSignal) {
   const getOrgUrl = `/api/v1/organization/${orgname}`;
   // TODO: Add return type
-  const response: AxiosResponse = await axios.get(getOrgUrl);
+  const response: AxiosResponse = await axios.get(getOrgUrl, {signal});
   assertHttpCode(response.status, 200);
-  return response.data;
+  return response.data as IOrganization;
 }
 
 export interface SuperUserOrganizations {
@@ -37,10 +38,6 @@ export async function fetchOrgsAsSuperUser() {
   );
   assertHttpCode(response.status, 200);
   return response.data?.organizations;
-}
-
-export async function fetchAllOrgs(orgnames: string[]) {
-  return await Promise.all(orgnames.map((org) => fetchOrg(org)));
 }
 
 export class OrgDeleteError extends Error {

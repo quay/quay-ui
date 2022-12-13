@@ -36,9 +36,10 @@ export interface IQuotaReport {
 export async function fetchAllRepos(
   namespaces: string[],
   flatten = false,
-): Promise<IRepository[] | Map<string, IRepository[]>> {
+  signal: AbortSignal,
+): Promise<IRepository[] | IRepository[][]> {
   const namespacedRepos = await Promise.all(
-    namespaces.map((ns) => fetchRepositoriesForNamespace(ns)),
+    namespaces.map((ns) => fetchRepositoriesForNamespace(ns, signal)),
   );
   // Flatten responses to a single list of all repositories
   if (flatten) {
@@ -51,13 +52,26 @@ export async function fetchAllRepos(
   }
 }
 
-export async function fetchRepositoriesForNamespace(ns: string) {
+export async function fetchRepositoriesForNamespace(
+  ns: string,
+  signal: AbortSignal,
+) {
   // TODO: Add return type to AxiosResponse
   const response: AxiosResponse = await axios.get(
     `/api/v1/repository?last_modified=true&namespace=${ns}&public=true`,
+    {signal},
   );
   assertHttpCode(response.status, 200);
-  return response.data?.repositories;
+  return response.data?.repositories as IRepository[];
+}
+
+export async function fetchRepositories() {
+  // TODO: Add return type to AxiosResponse
+  const response: AxiosResponse = await axios.get(
+    `/api/v1/repository?last_modified=true&public=true`,
+  );
+  assertHttpCode(response.status, 200);
+  return response.data?.repositories as IRepository[];
 }
 
 export interface RepositoryDetails {

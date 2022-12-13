@@ -24,6 +24,7 @@ jobs:
         run: |
           wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY} -O /usr/local/bin/yq
           chmod +x /usr/local/bin/yq
+
       - name: Update images
         run: |
           yq e -i '
@@ -37,6 +38,7 @@ jobs:
           docker-compose up -d redis quay-db
           docker exec -t quay-db bash -c 'while ! pg_isready; do echo "waiting for postgres"; sleep 2; done'
           DOCKER_USER="1001:0" docker-compose up -d quay
+          
       - name: Cypress run
         uses: cypress-io/github-action@v4.2.0
         with:

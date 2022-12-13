@@ -4,14 +4,26 @@ import reportWebVitals from './reportWebVitals';
 import {RecoilRoot} from 'recoil';
 import '@patternfly/react-core/dist/styles/base.css';
 import '@patternfly/patternfly/patternfly-addons.css';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 
 // Load App after patternfly so custom CSS that overrides patternfly doesn't require !important
 import App from './App';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>,
   document.getElementById('root'),

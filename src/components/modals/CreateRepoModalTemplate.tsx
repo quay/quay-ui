@@ -12,17 +12,14 @@ import {
   Flex,
   FlexItem,
 } from '@patternfly/react-core';
-import {
-  createNewRepository,
-  IRepository,
-} from 'src/resources/RepositoryResource';
+import {IRepository} from 'src/resources/RepositoryResource';
 import {useRef, useState} from 'react';
 import FormError from 'src/components/errors/FormError';
 import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import {IOrganization} from 'src/resources/OrganizationResource';
-import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import {useCreateRepository} from 'src/hooks/UseCreateRepository';
 
 enum visibilityType {
   PUBLIC = 'PUBLIC',
@@ -36,7 +33,6 @@ export default function CreateRepositoryModalTemplate(
     return null;
   }
   const [err, setErr] = useState<string>();
-  const refresh = useRefreshRepoList();
   const quayConfig = useQuayConfig();
 
   const [currentOrganization, setCurrentOrganization] = useState({
@@ -44,6 +40,15 @@ export default function CreateRepositoryModalTemplate(
     // the name is set to 1st value from the Namespace dropdown
     name: props.orgName !== null ? props.orgName : null,
     isDropdownOpen: false,
+  });
+
+  const {createRepository} = useCreateRepository({
+    onSuccess: () => {
+      props.handleModalToggle();
+    },
+    onError: (error) => {
+      setErr(addDisplayError('Unable to create repository', error));
+    },
   });
 
   const [validationState, setValidationState] = useState({
@@ -88,20 +93,13 @@ export default function CreateRepositoryModalTemplate(
     if (!validateInput()) {
       return;
     }
-    try {
-      await createNewRepository(
-        currentOrganization.name,
-        newRepository.name,
-        repoVisibility.toLowerCase(),
-        newRepository.description,
-        'image',
-      );
-      refresh();
-      props.handleModalToggle();
-    } catch (error: any) {
-      console.error(error);
-      setErr(addDisplayError('Unable to create repository', error));
-    }
+    await createRepository({
+      namespace: currentOrganization.name,
+      repository: newRepository.name,
+      visibility: repoVisibility.toLowerCase(),
+      description: newRepository.description,
+      repo_kind: 'image',
+    });
   };
 
   const handleNamespaceSelection = (e, value) => {
@@ -258,9 +256,4 @@ interface CreateRepositoryModalTemplateProps {
   updateListHandler: (value: IRepository) => void;
   username: string;
   organizations: IOrganization[];
-}
-
-interface ErrorModalProps {
-  isOpen: boolean;
-  toggle?: () => void;
 }

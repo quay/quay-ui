@@ -14,21 +14,13 @@ import {
   Tbody,
   Td,
 } from '@patternfly/react-table';
-import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil';
-import {
-  bulkDeleteRepositories,
-  fetchAllRepos,
-  IRepository,
-} from 'src/resources/RepositoryResource';
-import {ReactElement, useEffect, useState} from 'react';
+import {useRecoilState, useRecoilValue} from 'recoil';
+import {IRepository} from 'src/resources/RepositoryResource';
+import {ReactElement, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import CreateRepositoryModalTemplate from 'src/components/modals/CreateRepoModalTemplate';
 import {getRepoDetailPath} from 'src/routes/NavigationPath';
-import {
-  selectedReposState,
-  searchRepoState,
-  refreshPageState,
-} from 'src/atoms/RepositoryState';
+import {selectedReposState, searchRepoState} from 'src/atoms/RepositoryState';
 import {formatDate, formatSize} from 'src/libs/utils';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {RepositoryToolBar} from 'src/routes/RepositoriesList/RepositoryToolBar';
@@ -46,9 +38,10 @@ import ErrorModal from 'src/components/errors/ErrorModal';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import ColumnNames from './ColumnNames';
-import {useRefreshRepoList} from 'src/hooks/UseRefreshPage';
-import {fetchUser, IUserResource} from 'src/resources/UserResource';
 import {LoadingPage} from 'src/components/LoadingPage';
+import {useCurrentUser} from 'src/hooks/UseCurrentUser';
+import {useRepositories} from 'src/hooks/UseRepositories';
+import {useDeleteRepositories} from 'src/hooks/UseDeleteRepositories';
 
 function getReponameFromURL(pathname: string): string {
   return pathname.includes('organization') ? pathname.split('/')[2] : null;
@@ -75,23 +68,40 @@ function RepoListHeader(props: RepoListHeaderProps) {
 
 export default function RepositoriesList() {
   const currentOrg = getReponameFromURL(useLocation().pathname);
-  const [loadingErr, setLoadingErr] = useState<string>();
   const [isCreateRepoModalOpen, setCreateRepoModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [makePublicModalOpen, setmakePublicModal] = useState(false);
   const [makePrivateModalOpen, setmakePrivateModal] = useState(false);
-  const [repositoryList, setRepositoryList] = useState<IRepository[]>([]);
-  const [loading, setLoading] = useState(true);
-  const refresh = useRefreshRepoList();
-  const pageRefreshIndex = useRecoilValue(refreshPageState);
   const [err, setErr] = useState<string[]>();
+
   const quayConfig = useQuayConfig();
-  const search = useRecoilValue(searchRepoState);
-  const resetSearch = useResetRecoilState(searchRepoState);
-  const [userState, setUserState] = useState<IUserResource>({
-    username: '',
-    organizations: [],
-  } as IUserResource);
+  const {user} = useCurrentUser();
+  const {
+    repos,
+    loading,
+    error,
+    setPerPage,
+    setPage,
+    search,
+    setSearch,
+    page,
+    perPage,
+    totalResults,
+  } = useRepositories(currentOrg);
+
+  repos.sort((r1, r2) => {
+    return r1.last_modified > r2.last_modified ? -1 : 1;
+  });
+
+  const repositoryList: RepoListTableItem[] = repos.map((repo) => {
+    return {
+      namespace: repo.namespace,
+      name: repo.name,
+      is_public: repo.is_public,
+      last_modified: repo.last_modified,
+      size: repo.quota_report?.quota_bytes,
+    } as RepoListTableItem;
+  });
 
   // Filtering Repositories after applied filter
   const filteredRepos =
@@ -103,9 +113,6 @@ export default function RepositoriesList() {
         })
       : repositoryList;
 
-  // Pagination related states
-  const [perPage, setPerPage] = useState<number>(10);
-  const [page, setPage] = useState<number>(1);
   const paginatedRepositoryList = filteredRepos.slice(
     page * perPage - perPage,
     page * perPage - perPage + perPage,
@@ -156,10 +163,12 @@ export default function RepositoriesList() {
     setDeleteModalOpen(!isDeleteModalOpen);
   };
 
-  const handleRepoDeletion = async (repos: IRepository[]) => {
-    try {
-      await bulkDeleteRepositories(repos);
-    } catch (err) {
+  const {deleteRepositories} = useDeleteRepositories({
+    onSuccess: () => {
+      setSelectedRepoNames([]);
+      setDeleteModalOpen(!isDeleteModalOpen);
+    },
+    onError: (err) => {
       if (err instanceof BulkOperationError) {
         const errMessages = [];
         // TODO: Would like to use for .. of instead of foreach
@@ -173,12 +182,10 @@ export default function RepositoriesList() {
       } else {
         setErr([addDisplayError('Failed to delete repository', err)]);
       }
-    } finally {
-      refresh();
       setSelectedRepoNames([]);
       setDeleteModalOpen(!isDeleteModalOpen);
-    }
-  };
+    },
+  });
 
   const kebabItems: ReactElement[] = [
     <DropdownItem key="delete" onClick={handleDeleteModalToggle}>
@@ -200,63 +207,6 @@ export default function RepositoriesList() {
       Make Private
     </DropdownItem>,
   ];
-
-  async function fetchRepos() {
-    // clearing previous states
-    setLoading(true);
-    resetSearch();
-    setRepositoryList([]);
-    setSelectedRepoNames([]);
-    try {
-      const user = await fetchUser();
-      setUserState(user);
-
-      // check if view is global vs scoped to a organization
-      // TODO: we inculde username as part of org list
-      // fix this after we have MyQuay page
-      const listOfOrgNames: string[] = currentOrg
-        ? [currentOrg]
-        : user.organizations.map((org) => org.name).concat(user.username);
-
-      const repos = (await fetchAllRepos(
-        listOfOrgNames,
-        true,
-      )) as IRepository[];
-
-      // default sort by last modified
-      // TODO (syahmed): redo this when we have user selectable sorting
-      repos.sort((r1, r2) => {
-        return r1.last_modified > r2.last_modified ? -1 : 1;
-      });
-
-      // TODO: Here we're formatting repo's into the correct
-      // type. Once we know the return type from the repo's
-      // API we should pass 'repos' directly into 'setRepositoryList'
-      const formattedRepos: RepoListTableItem[] = repos.map((repo) => {
-        return {
-          namespace: repo.namespace,
-          name: repo.name,
-          is_public: repo.is_public,
-          last_modified: repo.last_modified,
-          size: repo.quota_report?.quota_bytes,
-        } as RepoListTableItem;
-      });
-      setRepositoryList(formattedRepos);
-    } catch (err) {
-      console.error(err);
-      setLoadingErr(addDisplayError('Unable to get repositories', err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    fetchRepos();
-  }, [pageRefreshIndex]);
-
-  const updateListHandler = (value: IRepository) => {
-    setRepositoryList((prev) => [...prev, value]);
-  };
 
   /* Mapper object used to render bulk delete table
     - keys are actual column names of the table
@@ -285,9 +235,9 @@ export default function RepositoriesList() {
       isModalOpen={isCreateRepoModalOpen}
       handleModalToggle={() => setCreateRepoModalOpen(!isCreateRepoModalOpen)}
       orgName={currentOrg}
-      updateListHandler={updateListHandler}
-      username={userState.username}
-      organizations={userState.organizations}
+      updateListHandler={() => null}
+      username={user.username}
+      organizations={user.organizations}
     />
   );
 
@@ -295,7 +245,7 @@ export default function RepositoriesList() {
     <BulkDeleteModalTemplate
       mapOfColNamesToTableData={mapOfColNamesToTableData}
       handleModalToggle={handleDeleteModalToggle}
-      handleBulkDeletion={handleRepoDeletion}
+      handleBulkDeletion={deleteRepositories}
       isModalOpen={isDeleteModalOpen}
       selectedItems={repositoryList.filter((repo) =>
         selectedRepoNames.some(
@@ -317,11 +267,11 @@ export default function RepositoriesList() {
   }
 
   // Return component Error state
-  if (isErrorString(loadingErr)) {
+  if (isErrorString(error as any)) {
     return (
       <>
         <RepoListHeader shouldRender={currentOrg === null} />
-        <RequestError message={loadingErr} />
+        <RequestError message={error as any} />
       </>
     );
   }
@@ -335,6 +285,7 @@ export default function RepositoriesList() {
         body="Either no repositories exist yet or you may not have permission to view any. If you have permission, try creating a new repository."
         button={
           <ToolbarButton
+            id=""
             buttonValue="Create Repository"
             Modal={createRepoModal}
             isModalOpen={isCreateRepoModalOpen}
@@ -351,6 +302,9 @@ export default function RepositoriesList() {
       <PageSection variant={PageSectionVariants.light}>
         <ErrorModal title="Org deletion failed" error={err} setError={setErr} />
         <RepositoryToolBar
+          search={search}
+          setSearch={setSearch}
+          total={totalResults}
           currentOrg={currentOrg}
           createRepoModal={createRepoModal}
           isCreateRepoModalOpen={isCreateRepoModalOpen}
