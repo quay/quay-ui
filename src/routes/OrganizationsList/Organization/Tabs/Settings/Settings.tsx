@@ -103,9 +103,9 @@ const GeneralSettings = () => {
   );
 };
 
-const BillingInformation = () => {
-  return <h1>Hello</h1>;
-};
+// const BillingInformation = () => {
+//   return <h1>Hello</h1>;
+// };
 
 export default function Settings() {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -120,11 +120,11 @@ export default function Settings() {
       id: 'generalsettings',
       content: <GeneralSettings />,
     },
-    {
-      name: 'Billing Information',
-      id: 'billinginformation',
-      content: <BillingInformation />,
-    },
+    // {
+    //   name: 'Billing Information',
+    //   id: 'billinginformation',
+    //   content: <BillingInformation />,
+    // },
   ];
 
   return (
