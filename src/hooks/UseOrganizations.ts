@@ -24,7 +24,7 @@ export function useOrganizations() {
 
   // Get super user orgs
   const {data: superUserOrganizations} = useQuery(
-    ['organization', 'superuser'],
+    ['organization', 'superuser', 'superuserorgs'],
     fetchOrgsAsSuperUser,
     {
       enabled: isSuperUser,
@@ -33,7 +33,7 @@ export function useOrganizations() {
 
   // Get super user users
   const {data: superUserUsers} = useQuery(
-    ['organization', 'superuser'],
+    ['organization', 'superuser', 'superuserorgs'],
     fetchUsersAsSuperUser,
     {
       enabled: isSuperUser,
