@@ -1,4 +1,4 @@
-import {Page} from '@patternfly/react-core';
+import {Banner, Flex, FlexItem, Page} from '@patternfly/react-core';
 
 import {Navigate, Outlet, Route, Routes} from 'react-router-dom';
 
@@ -16,6 +16,7 @@ import {useQuayConfig} from 'src/hooks/UseQuayConfig';
 import SiteUnavailableError from 'src/components/errors/SiteUnavailableError';
 import NotFound from 'src/components/errors/404';
 import {useCurrentUser} from 'src/hooks/UseCurrentUser';
+import {InfoCircleIcon} from '@patternfly/react-icons';
 
 const NavigationRoutes = [
   {
@@ -62,6 +63,21 @@ export function StandaloneMain() {
         isManagedSidebar
         defaultManagedSidebarIsOpen={true}
       >
+        <Banner variant="info">
+          <Flex
+            spaceItems={{default: 'spaceItemsSm'}}
+            justifyContent={{default: 'justifyContentCenter'}}
+          >
+            <FlexItem>
+              <InfoCircleIcon />
+            </FlexItem>
+            <FlexItem>
+              Please use{' '}
+              <a href="https://forms.gle/M2CtyneF3iaMT5UVA">this form</a> to
+              provide feedback on your experience
+            </FlexItem>
+          </Flex>
+        </Banner>
         <Routes>
           <Route index element={<Navigate to="/organization" replace />} />
           {NavigationRoutes.map(({path, Component}, key) => (
