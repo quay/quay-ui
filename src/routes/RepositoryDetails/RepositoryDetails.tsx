@@ -28,6 +28,8 @@ import {
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 import RequestError from 'src/components/errors/RequestError';
+import {useQuayConfig} from 'src/hooks/UseQuayConfig';
+import Conditional from 'src/components/empty/Conditional';
 
 enum TabIndex {
   Tags = 'tags',
@@ -46,6 +48,7 @@ function getTabIndex(tab: string) {
 }
 
 export default function RepositoryDetails() {
+  const config = useQuayConfig();
   const [activeTabKey, setActiveTabKey] = useState(TabIndex.Tags);
   const navigate = useNavigate();
   const location = useLocation();
@@ -155,16 +158,18 @@ export default function RepositoryDetails() {
                       repoDetails={repoDetails}
                     />
                   </Tab>
-                  <Tab
-                    eventKey={TabIndex.Settings}
-                    title={<TabTitleText>Settings</TabTitleText>}
-                  >
-                    <Settings
-                      org={organization}
-                      repo={repository}
-                      setDrawerContent={setDrawerContent}
-                    />
-                  </Tab>
+                  <Conditional if={config?.features.UI_V2_REPO_SETTINGS}>
+                    <Tab
+                      eventKey={TabIndex.Settings}
+                      title={<TabTitleText>Settings</TabTitleText>}
+                    >
+                      <Settings
+                        org={organization}
+                        repo={repository}
+                        setDrawerContent={setDrawerContent}
+                      />
+                    </Tab>
+                  </Conditional>
                 </Tabs>
               </ErrorBoundary>
             </PageSection>
