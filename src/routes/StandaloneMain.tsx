@@ -73,8 +73,14 @@ export function StandaloneMain() {
             </FlexItem>
             <FlexItem>
               Please use{' '}
-              <a href="https://forms.gle/M2CtyneF3iaMT5UVA">this form</a> to
-              provide feedback on your experience
+              <a
+                href="https://forms.gle/M2CtyneF3iaMT5UVA"
+                target="_blank"
+                rel="noreferrer"
+              >
+                this form
+              </a>{' '}
+              to provide feedback on your experience
             </FlexItem>
           </Flex>
         </Banner>
