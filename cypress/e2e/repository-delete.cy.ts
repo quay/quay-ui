@@ -6,6 +6,13 @@ describe('Repository Details Page', () => {
       .then((token) => {
         cy.loginByCSRF(token);
       });
+    // Enable the repository settings feature
+    cy.intercept('GET', '/config', (req) =>
+      req.reply((res) => {
+        res.body.features['UI_V2_REPO_SETTINGS'] = true;
+        return res;
+      }),
+    ).as('getConfig');
     cy.visit('/repository/testorg/testrepo?tab=settings');
     cy.contains('Delete repository').click();
   });
