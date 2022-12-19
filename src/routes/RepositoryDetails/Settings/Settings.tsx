@@ -1,6 +1,7 @@
 import {Flex, FlexItem, Tab, Tabs, TabTitleText} from '@patternfly/react-core';
 import {useState} from 'react';
 import {DrawerContentType} from 'src/routes/RepositoryDetails/Types';
+import DeleteRepository from './DeleteRepository';
 import Permissions from './Permissions';
 import Notifications from './Notifications';
 
@@ -29,6 +30,11 @@ export default function Settings(props: SettingsProps) {
           setDrawerContent={props.setDrawerContent}
         />
       ),
+    },
+    {
+      name: <div style={{color: 'red'}}>Delete repository</div>,
+      id: 'deleterepository',
+      content: <DeleteRepository org={props.org} repo={props.repo} />,
     },
   ];
 
