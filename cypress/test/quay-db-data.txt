@@ -5244,7 +5244,7 @@ COPY public.accesstokenkind (id, name) FROM stdin;
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-2d66ad598b56
+7bca88923f2c
 \.
 
 
@@ -5608,6 +5608,11 @@ COPY public.logentry3 (id, kind_id, account_id, performer_id, repository_id, dat
 17	22	28	1	5	2022-11-30 21:23:26.32246	172.20.0.1	{"username": "user2", "repo": "testrepo", "namespace": "testorg"}
 18	15	28	1	\N	2022-11-30 21:23:53.670728	172.20.0.1	{"robot": "testrobot2", "description": "", "unstructured_metadata": null}
 19	32	28	1	\N	2022-11-30 21:24:13.085006	172.20.0.1	{"team": "testteam2"}
+20	6	28	1	5	2022-12-14 18:50:25.878608	172.18.0.1	{"repo": "testrepo", "namespace": "testorg", "notification_id": "a5a83554-b024-4522-8b63-509266b1e45e", "event": "build_failure", "method": "flowdock"}
+21	6	28	1	5	2022-12-14 18:50:56.412989	172.18.0.1	{"repo": "testrepo", "namespace": "testorg", "notification_id": "2a4aeb62-3bea-4bb7-83ca-75a34dec3367", "event": "build_queued", "method": "hipchat"}
+22	6	28	1	5	2022-12-14 18:51:19.966575	172.18.0.1	{"repo": "testrepo", "namespace": "testorg", "notification_id": "70a8f966-1dc1-47b8-9b51-3cf71d0f9ad2", "event": "vulnerability_found", "method": "slack"}
+23	6	28	1	5	2022-12-14 18:53:14.486603	172.18.0.1	{"repo": "testrepo", "namespace": "testorg", "notification_id": "1efd38da-6ab4-4e09-822d-3b1742a00b1c", "event": "repo_mirror_sync_started", "method": "webhook"}
+24	6	28	1	5	2022-12-14 18:54:27.270995	172.18.0.1	{"repo": "testrepo", "namespace": "testorg", "notification_id": "1d07e6db-be20-405a-8780-9d83bf1d16da", "event": "repo_mirror_sync_success", "method": "email"}
 \.
 
 
@@ -5691,6 +5696,8 @@ COPY public.logentrykind (id, name) FROM stdin;
 73	repo_mirror_sync_test_failed
 74	repo_mirror_sync_test_started
 75	change_repo_state
+76	create_proxy_cache_config
+77	delete_proxy_cache_config
 \.
 
 
@@ -5942,8 +5949,8 @@ COPY public.quayservice (id, name) FROM stdin;
 --
 
 COPY public.queueitem (id, queue_name, body, available_after, available, processing_expires, retries_remaining, state_id) FROM stdin;
-1	namespacegc/2/	{"marker_id": 1, "original_username": "quay"}	2022-11-30 21:26:51.497982	t	2022-12-01 00:21:51.470842	5	a7c201f0-a472-48a7-8032-65e9ba2c766f
-2	namespacegc/3/	{"marker_id": 2, "original_username": "clair"}	2022-11-30 21:26:56.605709	t	2022-12-01 00:21:56.51308	5	c54c092e-4c5b-4c14-a687-6fa70a2b79c5
+2	namespacegc/3/	{"marker_id": 2, "original_username": "clair"}	2022-12-14 18:56:59.815905	t	2022-12-14 21:51:59.768648	5	960e152c-7f72-4913-9077-be4d06d4bc0d
+1	namespacegc/2/	{"marker_id": 1, "original_username": "quay"}	2022-12-14 18:57:04.89912	t	2022-12-14 21:52:04.832757	5	ef3aadd2-df78-49ac-9ff9-3145cae338ae
 \.
 
 
@@ -6012,6 +6019,7 @@ COPY public.repositoryactioncount (id, repository_id, count, date) FROM stdin;
 --
 
 COPY public.repositoryauthorizedemail (id, repository_id, email, code, confirmed) FROM stdin;
+1	5	user1@redhat.com	J9VE21W29UAZ8UU0	t
 \.
 
 
@@ -6046,6 +6054,11 @@ COPY public.repositorykind (id, name) FROM stdin;
 --
 
 COPY public.repositorynotification (id, uuid, repository_id, event_id, method_id, title, config_json, event_config_json, number_of_failures) FROM stdin;
+1	a5a83554-b024-4522-8b63-509266b1e45e	5	1	2		{"flow_api_token": "testtoken"}	{}	0
+2	2a4aeb62-3bea-4bb7-83ca-75a34dec3367	5	2	3	hipchat-notification	{"notification_token": "testtoken", "room_id": "123"}	{}	0
+3	70a8f966-1dc1-47b8-9b51-3cf71d0f9ad2	5	6	5	slack-notification	{"url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"}	{}	3
+4	1efd38da-6ab4-4e09-822d-3b1742a00b1c	5	8	6	webhook-notification	{"url": "https://doesnotexist", "template": "{\\"foo\\":\\"bar\\"}"}	{}	3
+5	1d07e6db-be20-405a-8780-9d83bf1d16da	5	9	1	email-notification	{"email": "user1@redhat.com"}	{}	3
 \.
 
 
@@ -6134,10 +6147,7 @@ COPY public.role (id, name) FROM stdin;
 --
 
 COPY public.servicekey (id, name, kid, service, jwk, metadata, created_date, expiration_date, rotation_duration, approval_id) FROM stdin;
-3	http://localhost:8080	wymy28RvVXS0McHaIj1wHjC1EyhlDczyo4gw0etqOX0	quay	{"n": "vjW8tgIpHoHptN3RslleeLDBbGeQmh_Usp5TvKWDOKJZFOQboxaqXCnFVsB_Ua_HX0Qxz5Rk1LnO1s0rWHwDenoHG_Yt_ph5gd97H2zLQdSt6oZ2dGFYvBIK8-MbZ-vzk5vN7Vgg7BQleIEl-pmeHBhlv9jzAnoFCToEgsSvT72FU0MNM1bx_cKdMdHDxp8mCbFxgwxfecHznf50MJVm9SdDedtFvJ8gUf_QjWdhxQ5JxqwmwYNqp5-h4RyPKySuTXtcwb2-tIIr0Rux3IS4DCnWEykM3BeD_grQMRkysS_kwsMWuGPOk72hRk3Q9Ug01tV5wD4XzzuuTdGFinzKrQ", "e": "AQAB", "kty": "RSA", "kid": "wymy28RvVXS0McHaIj1wHjC1EyhlDczyo4gw0etqOX0"}	{"created_by": "CLI tool"}	2022-11-15 13:34:27.001785	2022-11-15 15:34:26.969059	\N	3
-4	http://localhost:8080	ZN_lSn1MoxnNCzytTOzLMWCk-orZMuADii9Sq-8x-IY	quay	{"n": "nl6bWQNChlr6m7uK2h7fSwAHwYKrGLNdX8SvqHkvtNknxKCIsEpFIr7a_Fe3ZTk-vyB4aT-m32LiL8XXvptI25BnpZ2zCPhZDAM4rtH0E8AyJ0C31JpNNhUtq_fjFhgnxkCiO_zDdBtUP8r-TafHxL9nb9NmsgYblXQY4JGNtCUbF_r5OmJZQ7VHzUveDP15af62hKMeIVt9BmHHqozrKgac_EKlh1JAAckQrpJHhHt77OUw08hFDXmjS6Kbqi8y99unwPdMCKi4fHC-cRN5Rav02JLTFy8CpT8C10P-elgVykaHWWyb-IJtXKfP3brgfFvTFJmm33N6UhINr_lf6Q", "e": "AQAB", "kty": "RSA", "kid": "ZN_lSn1MoxnNCzytTOzLMWCk-orZMuADii9Sq-8x-IY"}	{"created_by": "CLI tool"}	2022-11-21 18:40:02.350605	2022-11-21 20:40:02.300317	\N	4
-5	http://localhost:8080	W5XCs7v0wlWNdxINw__qqEGaaHA1REQDheowzey_mwk	quay	{"n": "1TPNyRNsQQgOc0Mb2uFJRbWn_a--Tfl62zYDtXS5X1C45S5PSwqnKQalLPudSaCvjV9E4Ez53OgEFLmq7At3r-6zuIfWsSnpDjYAjcH7yMCmreJ45b1TWOxOXLUpNj7XS4Lh1akVaHgJ12kfIztwqIYm2f4GGmKdzwXoOMvPEY-3ph7vmGfOdURZLM9hT-0mx5tjFCeC1oh1GOdwLn5i0UJd3yXyt0kWC6xV5nksUCr01QOg8wSyxyCelR2-ohVr40H5znsgHfPIQe6jhL6o9yCzoYSVDmD5vRmBdvTlAIP1DGhhWxFVGHGGPNw_Qnzlib3Iui2NbHUHBDbt2G0Ezw", "e": "AQAB", "kty": "RSA", "kid": "W5XCs7v0wlWNdxINw__qqEGaaHA1REQDheowzey_mwk"}	{"created_by": "CLI tool"}	2022-11-21 18:43:45.386442	2022-11-21 20:43:45.335226	\N	5
-6	http://localhost:8080	tRXwIjs2xAQHUZ3Qu0Akdj94ghiGT0SC0uiztOQKV0k	quay	{"n": "vMUcyTKhjv7fJY5CBsodDchHfdMV6hxprj4uoGV-0FWnRR4ZAH4-csSzlkIihMvRY095YbHgi9bJJp03Mkcz9juMHN7tvA_Ew328f6hP6aExEBfTFbB49Ky2cuKrDL0hi0waqYOfm35JVb2xY4yHTdXPaMa9IvcEqsaM4ih2T5GRfKneCC35ffdufqBYvmVBrM0jAXLGvi7K2_UFBcH2pjm_aEJ0EzNhQEqgig2z6mbb-w77CQYjDfrrwPIMfsY4fIyCkQjzAe-7Yt5Cuf_TH7BkPv1ZNnCfo4kPSOeV6MY7tygaZXxkvKINU24YXLgETmHPasqZ7fttPR5P6VimNw", "e": "AQAB", "kty": "RSA", "kid": "tRXwIjs2xAQHUZ3Qu0Akdj94ghiGT0SC0uiztOQKV0k"}	{"created_by": "CLI tool"}	2022-11-21 18:47:59.573251	2022-11-21 20:47:59.495676	\N	6
+7	http://localhost:8080	P8HCej8ZzT3H5ZYy7MxTvhg1sHbcala08GAhxKi2bBw	quay	{"n": "kDMkzNJQ-5dIQESnv0C08ngyDkxlS_RmCm_261oE8PTmimZx4yLxTOqreuW9XIspHaWwjlGUno-R0-4jP5eio0O09TKMS4vc9btPbNM6afhnzn7zVs5qvgdgmESTMtxuV03e8axLxEHY_jM-RKgSxgfB-akC3THj0N-7wRBZl3k7l4CWi4UUDsrHl5RUQSwyA75HRGaK5pDQFeJuIiP2ePKuKCMHOKunqXrUVrsIKScn47i4fpJyhICYTHhHJBGp8Q9UTRSZ57aaIhpjOe3gV3_gGw_nFTD1gOA-IWfmhr70z1SPI52DqLxweq4Ye1L1NiT8miRvVYSlFCszXQJVDw", "e": "AQAB", "kty": "RSA", "kid": "P8HCej8ZzT3H5ZYy7MxTvhg1sHbcala08GAhxKi2bBw"}	{"created_by": "CLI tool"}	2022-12-14 18:48:53.987846	2022-12-14 20:48:53.80133	\N	7
 \.
 
 
@@ -6151,6 +6161,7 @@ COPY public.servicekeyapproval (id, approver_id, approval_type, approved_date, n
 4	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-21 18:40:02.364779	
 5	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-21 18:43:45.399899	
 6	\N	ServiceKeyApprovalType.AUTOMATIC	2022-11-21 18:47:59.585515	
+7	\N	ServiceKeyApprovalType.AUTOMATIC	2022-12-14 18:48:54.002141	
 \.
 
 
@@ -6671,7 +6682,7 @@ SELECT pg_catalog.setval('public.logentry2_id_seq', 1, false);
 -- Name: logentry3_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.logentry3_id_seq', 19, true);
+SELECT pg_catalog.setval('public.logentry3_id_seq', 24, true);
 
 
 --
@@ -6685,7 +6696,7 @@ SELECT pg_catalog.setval('public.logentry_id_seq', 1, false);
 -- Name: logentrykind_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.logentrykind_id_seq', 75, true);
+SELECT pg_catalog.setval('public.logentrykind_id_seq', 77, true);
 
 
 --
@@ -6762,7 +6773,7 @@ SELECT pg_catalog.setval('public.namespacegeorestriction_id_seq', 1, false);
 -- Name: notification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.notification_id_seq', 1, false);
+SELECT pg_catalog.setval('public.notification_id_seq', 1, true);
 
 
 --
@@ -6881,7 +6892,7 @@ SELECT pg_catalog.setval('public.repositoryactioncount_id_seq', 5, true);
 -- Name: repositoryauthorizedemail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repositoryauthorizedemail_id_seq', 1, false);
+SELECT pg_catalog.setval('public.repositoryauthorizedemail_id_seq', 1, true);
 
 
 --
@@ -6909,7 +6920,7 @@ SELECT pg_catalog.setval('public.repositorykind_id_seq', 1, false);
 -- Name: repositorynotification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.repositorynotification_id_seq', 1, false);
+SELECT pg_catalog.setval('public.repositorynotification_id_seq', 5, true);
 
 
 --
@@ -6965,14 +6976,14 @@ SELECT pg_catalog.setval('public.role_id_seq', 3, true);
 -- Name: servicekey_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.servicekey_id_seq', 6, true);
+SELECT pg_catalog.setval('public.servicekey_id_seq', 7, true);
 
 
 --
 -- Name: servicekeyapproval_id_seq; Type: SEQUENCE SET; Schema: public; Owner: quay
 --
 
-SELECT pg_catalog.setval('public.servicekeyapproval_id_seq', 6, true);
+SELECT pg_catalog.setval('public.servicekeyapproval_id_seq', 7, true);
 
 
 --
