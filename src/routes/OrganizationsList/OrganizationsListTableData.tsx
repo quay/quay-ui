@@ -3,17 +3,14 @@ import {Skeleton} from '@patternfly/react-core';
 import './css/Organizations.scss';
 import {Link} from 'react-router-dom';
 import {fetchOrg} from 'src/resources/OrganizationResource';
-import {
-  fetchRepositoriesForNamespace,
-  IRepository,
-} from 'src/resources/RepositoryResource';
+import {IRepository} from 'src/resources/RepositoryResource';
 import {fetchMembersForOrg} from 'src/resources/MembersResource';
 import {fetchRobotsForNamespace} from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import ColumnNames from './ColumnNames';
 import {OrganizationsTableItem} from './OrganizationsList';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {useEffect} from 'react';
+import {useRepositories} from 'src/hooks/UseRepositories';
 
 interface CountProps {
   count: string | number;
@@ -74,11 +71,9 @@ export default function OrgTableData(props: OrganizationsTableItem) {
   const robotCount = robots ? robots.length : null;
 
   // Get repositories
-  const {data: repositories} = useQuery(
-    ['organization', props.name, 'repositories'],
-    ({signal}) => fetchRepositoriesForNamespace(props.name, signal),
+  const {repos: repositories, totalResults: repoCount} = useRepositories(
+    props.name,
   );
-  const repoCount = repositories ? repositories.length : null;
 
   const getLastModifiedRepoTime = (repos: IRepository[]) => {
     // get the repo with the most recent last modified

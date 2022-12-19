@@ -19,29 +19,72 @@ export function useRepositories(organization?: string) {
     query: '',
   });
   const [currentOrganization, setCurrentOrganization] = useState(organization);
+  const [nextPageToken, setNextPageToken] = useState('');
+  const [pageNumFetched, setPageNumFetched] = useState(1);
+  const [repos, setRepos] = useState([]);
 
   const listOfOrgNames: string[] = currentOrganization
     ? [currentOrganization]
     : user?.organizations.map((org) => org.name).concat(user.username);
+
+  const setNextPageParams = (nextPageToken) => {
+    setNextPageToken(nextPageToken || '');
+    setPageNumFetched(pageNumFetched + 1);
+  };
 
   const {
     data: repositories,
     isLoading: loading,
     isPlaceholderData,
     error,
-  } = useQuery(
-    ['organization', organization, 'repositories'],
-    currentOrganization
-      ? ({signal}) => fetchRepositoriesForNamespace(currentOrganization, signal)
-      : ({signal}) => fetchAllRepos(listOfOrgNames, true, signal),
-    {
-      placeholderData: [],
+  } = useQuery({
+    queryKey: [
+      'organization',
+      organization || 'all',
+      'repositories',
+      pageNumFetched,
+    ],
+    queryFn: ({signal}) => {
+      return currentOrganization
+        ? fetchRepositoriesForNamespace(
+            currentOrganization,
+            signal,
+            nextPageToken,
+            setNextPageParams,
+          )
+        : fetchAllRepos(
+            listOfOrgNames,
+            true,
+            signal,
+            nextPageToken,
+            setNextPageParams,
+          );
     },
-  );
+    onSuccess: async (result) => {
+      const newList = result;
+      if (!Array.isArray(result)) {
+        const newList = repos.concat(result?.result);
+        if (result?.next_page) {
+          setNextPageParams(result?.next_page);
+        }
+        setRepos(newList);
+        return newList;
+      } else {
+        const newList = result.reduce(
+          (allRepos, result) => allRepos.concat(result.result),
+          [],
+        );
+      }
+      setRepos(newList);
+      return newList;
+    },
+    keepPreviousData: true,
+    placeholderData: [],
+  });
 
   return {
     // Data
-    repos: repositories,
+    repos: repos,
 
     // Fetching State
     loading: loading || isPlaceholderData || !listOfOrgNames,
@@ -58,6 +101,6 @@ export function useRepositories(organization?: string) {
     setCurrentOrganization,
 
     // Useful Metadata
-    totalResults: repositories.length,
+    totalResults: repos?.length,
   };
 }
