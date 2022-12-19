@@ -12,6 +12,7 @@ describe('Repository Settings - Notifications', () => {
     cy.intercept('GET', '/config', (req) =>
       req.reply((res) => {
         res.body.features['UI_V2_REPO_SETTINGS'] = true;
+        res.body.features['MAILING'] = true;
         return res;
       }),
     ).as('getConfig');
