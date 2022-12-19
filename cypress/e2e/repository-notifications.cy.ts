@@ -23,7 +23,7 @@ describe('Repository Settings - Notifications', () => {
     const flowdockRow = cy.get('tr:contains("(Untitled)")');
     flowdockRow.within(() => {
       cy.get(`[data-label="title"]`).should('have.text', '(Untitled)');
-      cy.get(`[data-label="event"]`).should('have.text', ' Image build failed');
+      cy.get(`[data-label="event"]`).should('have.text', 'Image build failed');
       cy.get(`[data-label="notification"]`).should(
         'have.text',
         'Flowdock Team Notification',
@@ -36,7 +36,7 @@ describe('Repository Settings - Notifications', () => {
         'have.text',
         'hipchat-notification',
       );
-      cy.get(`[data-label="event"]`).should('have.text', ' Image build queued');
+      cy.get(`[data-label="event"]`).should('have.text', 'Image build queued');
       cy.get(`[data-label="notification"]`).should(
         'have.text',
         'HipChat Room Notification',
@@ -48,7 +48,7 @@ describe('Repository Settings - Notifications', () => {
       cy.get(`[data-label="title"]`).should('have.text', 'slack-notification');
       cy.get(`[data-label="event"]`).should(
         'have.text',
-        ' Package Vulnerability Found',
+        'Package Vulnerability Found',
       );
       cy.get(`[data-label="notification"]`).should(
         'have.text',
@@ -67,7 +67,7 @@ describe('Repository Settings - Notifications', () => {
       );
       cy.get(`[data-label="event"]`).should(
         'have.text',
-        ' Repository mirror started',
+        'Repository mirror started',
       );
       cy.get(`[data-label="notification"]`).should('have.text', 'Webhook POST');
       cy.get(`[data-label="status"]`).should(
@@ -80,7 +80,7 @@ describe('Repository Settings - Notifications', () => {
       cy.get(`[data-label="title"]`).should('have.text', 'email-notification');
       cy.get(`[data-label="event"]`).should(
         'have.text',
-        ' Repository mirror successful',
+        'Repository mirror successful',
       );
       cy.get(`[data-label="notification"]`).should(
         'contain.text',
@@ -161,7 +161,7 @@ describe('Repository Settings - Notifications', () => {
   //     const newnotificationRow = cy.get('tr:contains("newnotification")');
   //     newnotificationRow.within(()=>{
   //         cy.get(`[data-label="title"]`).should('have.text', 'newnotification');
-  //         cy.get(`[data-label="event"]`).should('have.text', ' Push to Repository');
+  //         cy.get(`[data-label="event"]`).should('have.text', 'Push to Repository');
   //         cy.get(`[data-label="notification"]`).should('contain.text', 'Red Hat Quay Notification');
   //         cy.get(`[data-label="status"]`).should('have.text', 'Enabled');
   //     })
@@ -181,7 +181,7 @@ describe('Repository Settings - Notifications', () => {
     const newnotificationRow = cy.get('tr:contains("newnotification")');
     newnotificationRow.within(() => {
       cy.get(`[data-label="title"]`).should('have.text', 'newnotification');
-      cy.get(`[data-label="event"]`).should('have.text', ' Push to Repository');
+      cy.get(`[data-label="event"]`).should('have.text', 'Push to Repository');
       cy.get(`[data-label="notification"]`).should(
         'contain.text',
         'Flowdock Team Notification',
@@ -205,7 +205,7 @@ describe('Repository Settings - Notifications', () => {
     const newnotificationRow = cy.get('tr:contains("newnotification")');
     newnotificationRow.within(() => {
       cy.get(`[data-label="title"]`).should('have.text', 'newnotification');
-      cy.get(`[data-label="event"]`).should('have.text', ' Push to Repository');
+      cy.get(`[data-label="event"]`).should('have.text', 'Push to Repository');
       cy.get(`[data-label="notification"]`).should(
         'contain.text',
         'HipChat Room Notification',
@@ -230,7 +230,7 @@ describe('Repository Settings - Notifications', () => {
     const newnotificationRow = cy.get('tr:contains("newnotification")');
     newnotificationRow.within(() => {
       cy.get(`[data-label="title"]`).should('have.text', 'newnotification');
-      cy.get(`[data-label="event"]`).should('have.text', ' Push to Repository');
+      cy.get(`[data-label="event"]`).should('have.text', 'Push to Repository');
       cy.get(`[data-label="notification"]`).should(
         'contain.text',
         'Slack Notification',
@@ -256,7 +256,7 @@ describe('Repository Settings - Notifications', () => {
     const newnotificationRow = cy.get('tr:contains("newnotification")');
     newnotificationRow.within(() => {
       cy.get(`[data-label="title"]`).should('have.text', 'newnotification');
-      cy.get(`[data-label="event"]`).should('have.text', ' Push to Repository');
+      cy.get(`[data-label="event"]`).should('have.text', 'Push to Repository');
       cy.get(`[data-label="notification"]`).should(
         'contain.text',
         'Webhook POST',
