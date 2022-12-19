@@ -10,7 +10,7 @@ import {
 import {useState} from 'react';
 import {useRepositoryPermissions} from 'src/hooks/UseRepositoryPermissions';
 import PermissionsToolbar from './PermissionsToolbar';
-import ColumnNames from './ColumnNames';
+import {PermissionsColumnNames} from './ColumnNames';
 import PermissionsDropdown from './PermissionsDropdown';
 import {RepoMember} from 'src/resources/RepositoryResource';
 import PermissionsKebab from './PermissionsKebab';
@@ -62,7 +62,7 @@ export default function Permissions(props: PermissionsProps) {
         setPage={setPage}
         perPage={perPage}
         setPerPage={setPerPage}
-        searchOptions={[ColumnNames.account]}
+        searchOptions={[PermissionsColumnNames.account]}
         search={search}
         setSearch={setSearch}
         onItemSelect={onSelectMember}
@@ -73,9 +73,9 @@ export default function Permissions(props: PermissionsProps) {
         <Thead>
           <Tr>
             <Th />
-            <Th>{ColumnNames.account}</Th>
-            <Th>{ColumnNames.type}</Th>
-            <Th>{ColumnNames.permissions}</Th>
+            <Th>{PermissionsColumnNames.account}</Th>
+            <Th>{PermissionsColumnNames.type}</Th>
+            <Th>{PermissionsColumnNames.permissions}</Th>
             <Th />
           </Tr>
         </Thead>

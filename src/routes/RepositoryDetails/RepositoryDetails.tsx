@@ -29,7 +29,7 @@ import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
 import RequestError from 'src/components/errors/RequestError';
 import {useQuayConfig} from 'src/hooks/UseQuayConfig';
-import Conditional from 'src/components/empty/Conditional';
+import CreateNotification from './Settings/NotificationsCreateNotification';
 
 enum TabIndex {
   Tags = 'tags',
@@ -81,6 +81,13 @@ export default function RepositoryDetails() {
     [DrawerContentType.None]: null,
     [DrawerContentType.AddPermission]: (
       <AddPermissions
+        org={organization}
+        repo={repository}
+        closeDrawer={closeDrawer}
+      />
+    ),
+    [DrawerContentType.CreateNotification]: (
+      <CreateNotification
         org={organization}
         repo={repository}
         closeDrawer={closeDrawer}
@@ -158,18 +165,20 @@ export default function RepositoryDetails() {
                       repoDetails={repoDetails}
                     />
                   </Tab>
-                  <Conditional if={config?.features.UI_V2_REPO_SETTINGS}>
-                    <Tab
-                      eventKey={TabIndex.Settings}
-                      title={<TabTitleText>Settings</TabTitleText>}
-                    >
-                      <Settings
-                        org={organization}
-                        repo={repository}
-                        setDrawerContent={setDrawerContent}
-                      />
-                    </Tab>
-                  </Conditional>
+                  <Tab
+                    eventKey={TabIndex.Settings}
+                    title={<TabTitleText>Settings</TabTitleText>}
+                    isHidden={
+                      config?.features.UI_V2_REPO_SETTINGS != true ||
+                      !repoDetails?.can_admin
+                    }
+                  >
+                    <Settings
+                      org={organization}
+                      repo={repository}
+                      setDrawerContent={setDrawerContent}
+                    />
+                  </Tab>
                 </Tabs>
               </ErrorBoundary>
             </PageSection>
