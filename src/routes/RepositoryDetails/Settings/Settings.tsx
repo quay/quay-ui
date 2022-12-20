@@ -2,6 +2,7 @@ import {Flex, FlexItem, Tab, Tabs, TabTitleText} from '@patternfly/react-core';
 import {useState} from 'react';
 import {DrawerContentType} from 'src/routes/RepositoryDetails/Types';
 import Permissions from './Permissions';
+import Notifications from './Notifications';
 
 export default function Settings(props: SettingsProps) {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -12,6 +13,17 @@ export default function Settings(props: SettingsProps) {
       id: 'userandrobotpermissions',
       content: (
         <Permissions
+          org={props.org}
+          repo={props.repo}
+          setDrawerContent={props.setDrawerContent}
+        />
+      ),
+    },
+    {
+      name: 'Events and notifications',
+      id: 'eventsandnotifications',
+      content: (
+        <Notifications
           org={props.org}
           repo={props.repo}
           setDrawerContent={props.setDrawerContent}
