@@ -12,7 +12,7 @@ export interface IRepository {
   namespace: string;
   name: string;
   description?: string;
-  is_public: boolean;
+  is_public?: boolean;
   kind?: string;
   state?: string;
   size?: number;

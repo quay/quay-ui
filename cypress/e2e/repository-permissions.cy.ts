@@ -88,7 +88,7 @@ describe('Repository Settings - Permissions', () => {
     cy.contains('1 - 3 of 3').should('exist');
     cy.get('#permissions-select-all').click();
     cy.contains('Actions').click();
-    cy.contains('Delete').click();
+    cy.get('#bulk-delete-permissions').contains('Delete').click();
     cy.get('table').within(() => {
       cy.contains('user1').should('not.exist');
       cy.contains('testorg+testrobot').should('not.exist');
