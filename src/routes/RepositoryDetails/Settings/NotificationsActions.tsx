@@ -97,6 +97,7 @@ export default function Actions(props: ActionsProps) {
           </Conditional>,
           <DropdownItem
             key="notifications-bulk-delete"
+            id="bulk-delete-notifications"
             onClick={() => {
               deleteNotifications(props.selectedItems.map((n) => n.uuid));
             }}

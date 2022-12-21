@@ -140,7 +140,7 @@ describe('Repository Settings - Notifications', () => {
   it('Bulk deletes notification', () => {
     cy.get('#notifications-select-all').click();
     cy.contains('Actions').click();
-    cy.contains('Delete').click();
+    cy.get('#bulk-delete-notifications').contains('Delete').click();
     cy.contains('No notifications found');
     cy.contains('No notifications have been setup for this repository');
   });
