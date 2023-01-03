@@ -128,7 +128,7 @@ describe('Repository Settings - Permissions', () => {
     cy.contains('Add Permissions').click();
     cy.get('#add-permission-form').within(() => {
       cy.get('input').type('user');
-      cy.contains('user2').click();
+      cy.get('li:contains("user2")').click();
       cy.contains('admin').click();
       cy.contains('Read').click();
       cy.contains('Submit').click();
