@@ -23,7 +23,7 @@ import {DrawerContentType} from './Types';
 import AddPermissions from './Settings/PermissionsAddPermission';
 import {
   fetchRepositoryDetails,
-  RepositoryDetails,
+  RepositoryDetails as IRepositoryDetails,
 } from 'src/resources/RepositoryResource';
 import ErrorBoundary from 'src/components/errors/ErrorBoundary';
 import {addDisplayError, isErrorString} from 'src/resources/ErrorHandling';
@@ -57,6 +57,7 @@ export default function RepositoryDetails() {
   const [drawerContent, setDrawerContent] = useState<DrawerContentType>(
     DrawerContentType.None,
   );
+  const [repoDetails, setRepoDetails] = useState<IRepositoryDetails>();
   const [err, setErr] = useState<string>();
 
   const drawerRef = useRef<HTMLDivElement>();

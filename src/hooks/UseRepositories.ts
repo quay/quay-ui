@@ -13,35 +13,72 @@ export function useRepositories(organization?: string) {
 
   // Keep state of current search in this hook
   const [page, setPage] = useState(1);
+  const [nextPageToken, setNextPageToken] = useState('');
   const [perPage, setPerPage] = useState(10);
+  const [repos, setRepos] = useState([]);
   const [search, setSearch] = useState<SearchState>({
     field: ColumnNames.name,
     query: '',
   });
   const [currentOrganization, setCurrentOrganization] = useState(organization);
 
+  const setNextPageParams = (nextPageToken) => {
+    setNextPageToken(nextPageToken || '');
+    setPage(page + 1);
+  };
+
   const listOfOrgNames: string[] = currentOrganization
     ? [currentOrganization]
     : user?.organizations.map((org) => org.name).concat(user.username);
 
   const {
-    data: repositories,
+    data,
     isLoading: loading,
     isPlaceholderData,
     error,
-  } = useQuery(
-    ['organization', organization, 'repositories'],
-    currentOrganization
-      ? ({signal}) => fetchRepositoriesForNamespace(currentOrganization, signal)
-      : ({signal}) => fetchAllRepos(listOfOrgNames, true, signal),
-    {
-      placeholderData: [],
+  } = useQuery({
+    queryKey: ['organization', organization || 'all', 'repositories', page],
+    keepPreviousData: true,
+    placeholderData: [],
+    queryFn: ({signal}) => {
+      return currentOrganization
+        ? fetchRepositoriesForNamespace(
+            currentOrganization,
+            signal,
+            nextPageToken,
+            setNextPageParams,
+          )
+        : fetchAllRepos(
+            listOfOrgNames,
+            true,
+            signal,
+            nextPageToken,
+            setNextPageParams,
+          );
     },
-  );
+    onSuccess: async (result) => {
+      const newList = result;
+      if (!Array.isArray(result)) {
+        const newList = repos.concat(result?.result);
+        if (result?.next_page) {
+          setNextPageParams(result?.next_page);
+        }
+        setRepos(newList);
+        return newList;
+      } else {
+        const newList = result.reduce(
+          (allRepos, result) => allRepos.concat(result.result),
+          [],
+        );
+      }
+      setRepos(newList);
+      return newList;
+    },
+  });
 
   return {
     // Data
-    repos: repositories,
+    repos: repos,
 
     // Fetching State
     loading: loading || isPlaceholderData || !listOfOrgNames,
@@ -58,6 +95,6 @@ export function useRepositories(organization?: string) {
     setCurrentOrganization,
 
     // Useful Metadata
-    totalResults: repositories.length,
+    totalResults: repos.length,
   };
 }

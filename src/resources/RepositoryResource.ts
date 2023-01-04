@@ -37,14 +37,24 @@ export async function fetchAllRepos(
   namespaces: string[],
   flatten = false,
   signal: AbortSignal,
+  next_page_token = null,
+  setNextPageParams: (next_page) => void,
 ): Promise<IRepository[] | IRepository[][]> {
   const namespacedRepos = await Promise.all(
-    namespaces.map((ns) => fetchRepositoriesForNamespace(ns, signal)),
+    namespaces.map((ns) => {
+      return fetchRepositoriesForNamespace(
+        ns,
+        signal,
+        next_page_token,
+        setNextPageParams,
+      );
+    }),
   );
+
   // Flatten responses to a single list of all repositories
   if (flatten) {
     return namespacedRepos.reduce(
-      (allRepos, namespacedRepos) => allRepos.concat(namespacedRepos),
+      (allRepos, namespacedRepos) => allRepos.concat(namespacedRepos.result),
       [],
     );
   } else {
@@ -55,14 +65,32 @@ export async function fetchAllRepos(
 export async function fetchRepositoriesForNamespace(
   ns: string,
   signal: AbortSignal,
+  next_page_token: string = null,
+  setNextPageParams: (next_page) => void,
 ) {
   // TODO: Add return type to AxiosResponse
-  const response: AxiosResponse = await axios.get(
-    `/api/v1/repository?last_modified=true&namespace=${ns}&public=true`,
-    {signal},
-  );
+  const url = next_page_token
+    ? `/api/v1/repository?next_page=${next_page_token}&last_modified=true&namespace=${ns}&public=true`
+    : `/api/v1/repository?last_modified=true&namespace=${ns}&public=true`;
+  const response: AxiosResponse = await axios.get(url, {signal});
   assertHttpCode(response.status, 200);
-  return response.data?.repositories as IRepository[];
+
+  const next_page = response.data?.next_page;
+  const repos = response.data?.repositories as IRepository[];
+
+  while (next_page) {
+    const resp = await fetchRepositoriesForNamespace(
+      ns,
+      signal,
+      next_page,
+      setNextPageParams,
+    );
+    return {result: repos.concat(resp.result)};
+  }
+  return {
+    result: repos as IRepository[],
+    pageParams: next_page,
+  };
 }
 
 export async function fetchRepositories() {
