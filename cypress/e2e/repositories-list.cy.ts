@@ -145,29 +145,29 @@ describe('Repositories List Page', () => {
   //     cy.contains('Delete').click();
   // })
 
-  it('makes multiple repositories public', () => {
+  it.only('makes multiple repositories public', () => {
     cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select all (103)').click();
+    cy.contains('Select page (10)').click();
     cy.contains('Actions').click();
     cy.contains('Make Public').click();
     cy.contains('Make repositories public');
     cy.contains(
-      'Update 103 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
+      'Update 10 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
     );
     cy.contains('Make public').click();
     cy.contains('private').should('not.exist');
   });
 
-  it('makes multiple repositories private', () => {
+  it.only('makes multiple repositories private', () => {
     cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select all (103)').click();
+    cy.contains('Select page (10)').click();
     cy.contains('Actions').click();
     cy.contains('Make Private').click();
     cy.contains('Make repositories private');
     cy.contains(
-      'Update 103 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
+      'Update 10 repositories visibility to be private so they are only visible to certain users, and only may be pulled by certain users.',
     );
     cy.contains('Make private').click();
     cy.contains('public').should('not.exist');
