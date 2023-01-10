@@ -1,4 +1,13 @@
-import {Button, Flex, FlexItem, Spinner} from '@patternfly/react-core';
+import {
+  Button,
+  ClipboardCopy,
+  ClipboardCopyVariant,
+  Flex,
+  FlexItem,
+  Spinner,
+  TextArea,
+  TextInput,
+} from '@patternfly/react-core';
 import {BellIcon, BugIcon, UploadIcon} from '@patternfly/react-icons';
 import {
   TableComposable,
@@ -10,6 +19,7 @@ import {
 } from '@patternfly/react-table';
 import {useState} from 'react';
 import Empty from 'src/components/empty/Empty';
+import ReadonlySecret from 'src/components/ReadonlySecret';
 import {useEvents} from 'src/hooks/UseEvents';
 import {useNotificationMethods} from 'src/hooks/UseNotificationMethods';
 import {useNotifications} from 'src/hooks/UseNotifications';
@@ -166,19 +176,91 @@ function NotificationTitle({notification}: {notification: RepoNotification}) {
   const notificationMethod = notificationMethods.find(
     (m) => m.type == notification.method,
   );
-  if (notificationMethod.type == NotificationMethodType.email) {
-    return (
-      <Flex direction={{default: 'column'}}>
-        <FlexItem style={{marginBottom: 0}}>
-          {notificationMethod.title}
-        </FlexItem>
+  let notificationConfig = null;
+  switch (notificationMethod.type) {
+    case NotificationMethodType.email:
+      notificationConfig = (
         <FlexItem id="configured-email" style={{color: 'grey'}}>
           email: {notification.config?.email}
         </FlexItem>
-      </Flex>
-    );
+      );
+      break;
+    case NotificationMethodType.flowdock:
+      notificationConfig = (
+        <FlexItem id="flow-api-token" style={{color: 'grey'}}>
+          <ReadonlySecret
+            label="Flow API Token"
+            secret={notification.config?.flow_api_token}
+          />
+        </FlexItem>
+      );
+      break;
+    case NotificationMethodType.hipchat:
+      notificationConfig = (
+        <>
+          <FlexItem
+            id="hipchat-room-id"
+            style={{color: 'grey', marginBottom: '0px'}}
+          >
+            Room ID #: {notification.config?.room_id}
+          </FlexItem>
+          <FlexItem id="hipchat-token" style={{color: 'grey'}}>
+            <ReadonlySecret
+              label="Room Notification Token"
+              secret={notification.config?.notification_token}
+            />
+          </FlexItem>
+        </>
+      );
+      break;
+    case NotificationMethodType.slack:
+      notificationConfig = (
+        <FlexItem id="slack-url" style={{color: 'grey'}}>
+          Webhook URL: {notification.config?.url}
+        </FlexItem>
+      );
+      break;
+    case NotificationMethodType.webhook:
+      notificationConfig = (
+        <>
+          <FlexItem
+            id="webhook-url"
+            style={{color: 'grey', marginBottom: '0px'}}
+          >
+            Webhook URL: {notification.config?.url}
+          </FlexItem>
+          <FlexItem id="webhook-body" style={{color: 'grey'}}>
+            POST body template (optional):
+            <ClipboardCopy
+              isCode
+              isReadOnly
+              hoverTip="Copy"
+              clickTip="Copied"
+              variant={ClipboardCopyVariant.expansion}
+            >
+              {notification.config?.template}
+            </ClipboardCopy>
+          </FlexItem>
+        </>
+      );
+      break;
+    // TODO: Quay notifications not supported in new UI until
+    // notification header has been implemented
+    // case NotificationMethodType.quaynotification:
+    //   return (
+    //     <Flex direction={{default: 'column'}}>
+    //       <FlexItem style={{marginBottom: 0}}>
+    //         {notificationMethod.title}
+    //       </FlexItem>
+    //     </Flex>
+    //   );
   }
-  return <>{notificationMethod.title}</>;
+  return (
+    <Flex direction={{default: 'column'}}>
+      <FlexItem style={{marginBottom: 0}}>{notificationMethod.title}</FlexItem>
+      {notificationConfig}
+    </Flex>
+  );
 }
 
 function NotificationStatus({notification}: {notification: RepoNotification}) {
