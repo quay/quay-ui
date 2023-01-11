@@ -115,7 +115,11 @@ export default function CreateRobotAccountModal(
         height={600}
         width={1170}
         footer={
-          <Footer onSubmit={onSubmit} isDrawerExpanded={isDrawerExpanded} />
+          <Footer
+            onSubmit={onSubmit}
+            isDrawerExpanded={isDrawerExpanded}
+            isDataValid={validateRobotName}
+          />
         }
         hasNoBodyPadding={isDrawerExpanded ? true : false}
       />

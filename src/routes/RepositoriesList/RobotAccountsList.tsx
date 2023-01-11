@@ -176,13 +176,13 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
         <TableComposable aria-label="Expandable table" variant={undefined}>
           <Thead>
             <Tr>
-              <Th />
-              <Th />
-              <Th>{RobotAccountColumnNames.robotAccountName}</Th>
-              <Th>{RobotAccountColumnNames.teams}</Th>
-              <Th>{RobotAccountColumnNames.repositories}</Th>
-              <Th>{RobotAccountColumnNames.lastAccessed}</Th>
-              <Th>{RobotAccountColumnNames.created}</Th>
+              <Th width={10} />
+              <Th width={10} />
+              <Th width={15}>{RobotAccountColumnNames.robotAccountName}</Th>
+              <Th width={15}>{RobotAccountColumnNames.teams}</Th>
+              <Th width={15}>{RobotAccountColumnNames.repositories}</Th>
+              <Th width={15}>{RobotAccountColumnNames.lastAccessed}</Th>
+              <Th width={15}>{RobotAccountColumnNames.created}</Th>
             </Tr>
           </Thead>
           {paginatedRobotAccountList.map((robotAccount, rowIndex) => {
@@ -240,7 +240,11 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                 </Tr>
                 {robotAccount.description ? (
                   <Tr isExpanded={isRobotExpanded(robotAccount)}>
-                    <Td dataLabel="Robot Account description" noPadding={false}>
+                    <Td
+                      dataLabel="Robot Account description"
+                      noPadding={false}
+                      colSpan={7}
+                    >
                       <ExpandableRowContent>
                         {robotAccount.description}
                       </ExpandableRowContent>

@@ -33,7 +33,11 @@ export default function Footer(props: FooterProps) {
               )}
               {activeStep.name == 'Robot name and description' ||
               activeStep.name == 'Review and Finish' ? (
-                <Button variant="secondary" onClick={props.onSubmit}>
+                <Button
+                  isDisabled={!props.isDataValid()}
+                  variant="secondary"
+                  onClick={props.onSubmit}
+                >
                   Review and Finish
                 </Button>
               ) : null}
@@ -51,4 +55,5 @@ export default function Footer(props: FooterProps) {
 interface FooterProps {
   onSubmit: () => void;
   isDrawerExpanded: boolean;
+  isDataValid: () => boolean;
 }

@@ -37,12 +37,12 @@ export default function Organization() {
       component: <RepositoriesList />,
     },
     {
-      name: 'Settings',
-      component: <Settings />,
-    },
-    {
       name: 'Robot accounts',
       component: <RobotAccountsList orgName={orgName} />,
+    },
+    {
+      name: 'Settings',
+      component: <Settings />,
     },
     // Commenting till needed.
     // {
