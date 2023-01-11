@@ -55,7 +55,6 @@ export default function AddToTeam(props: AddToTeamProps) {
   const {createNewTeamHook} = useTeams(props.namespace);
 
   const createNewTeam = () => {
-    console.log('in create new team');
     props.setDrawerExpanded(true);
   };
 
@@ -75,7 +74,6 @@ export default function AddToTeam(props: AddToTeamProps) {
   };
 
   const onCreateNewTeam = async () => {
-    console.log('in onCreateNewTeam');
     try {
       await createNewTeamHook({
         namespace: props.namespace,

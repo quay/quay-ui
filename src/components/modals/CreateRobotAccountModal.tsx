@@ -1,14 +1,22 @@
-import {Modal, ModalVariant, Wizard} from '@patternfly/react-core';
-import {useState} from 'react';
+import {
+  DropdownItem,
+  Modal,
+  ModalVariant,
+  Wizard,
+} from '@patternfly/react-core';
+import React, {useState} from 'react';
 import NameAndDescription from './robotAccountWizard/NameAndDescription';
 import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
 
 import Footer from './robotAccountWizard/Footer';
 import AddToTeam from './robotAccountWizard/AddToTeam';
+import AddToRepository from './robotAccountWizard/AddToRepository';
 import {addDisplayError} from 'src/resources/ErrorHandling';
 import {useQuery} from '@tanstack/react-query';
 import {fetchOrg} from 'src/resources/OrganizationResource';
 import {useQueryClient} from '@tanstack/react-query';
+import DefaultPermissions from './robotAccountWizard/DefaultPermissions';
+import ReviewAndFinish from './robotAccountWizard/ReviewAndFinish';
 
 export default function CreateRobotAccountModal(
   props: CreateRobotAccountModalProps,
@@ -61,6 +69,37 @@ export default function CreateRobotAccountModal(
     return /^[a-z][a-z0-9_]{1,254}$/.test(robotName);
   };
 
+  const RepoPermissionDropdownItems = [
+    <DropdownItem
+      key="None"
+      component="button"
+      description="No permissions on the repository"
+    >
+      None
+    </DropdownItem>,
+    <DropdownItem
+      key="Read"
+      component="button"
+      description="Can view and pull from the repository"
+    >
+      Read
+    </DropdownItem>,
+    <DropdownItem
+      key="Write"
+      component="button"
+      description="Can view, pull and push to the repository"
+    >
+      Write
+    </DropdownItem>,
+    <DropdownItem
+      key="Admin"
+      component="button"
+      description="Full admin access, pull and push to the repository"
+    >
+      Admin
+    </DropdownItem>,
+  ];
+
   const steps = [
     {
       name: 'Robot name and description',
@@ -89,11 +128,34 @@ export default function CreateRobotAccountModal(
         />
       ),
     },
-    {name: 'Add to repository (optional)', component: <p>Step 3</p>},
-    {name: 'Default permissions (optional)', component: <p>Step 4</p>},
-    {name: 'Review and Finish', component: <p>Review Step</p>},
+    {
+      name: 'Add to repository (optional)',
+      component: (
+        <AddToRepository
+          namespace={props.namespace}
+          dropdownItems={RepoPermissionDropdownItems}
+        />
+      ),
+    },
+    {
+      name: 'Default permissions (optional)',
+      component: (
+        <DefaultPermissions
+          robotName={robotName}
+          repoPermissions={RepoPermissionDropdownItems}
+        />
+      ),
+    },
+    {
+      name: 'Review and Finish',
+      component: (
+        <ReviewAndFinish
+          robotName={robotName}
+          robotDescription={robotDescription}
+        />
+      ),
+    },
   ];
-  console.log('isDrawerExpanded in create robot modal', isDrawerExpanded);
 
   return (
     <Modal
