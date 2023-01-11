@@ -81,9 +81,11 @@ export default function AddToTeam(props: AddToTeamProps) {
         namespace: props.namespace,
         name: newTeamName,
         description: newTeamDescription,
+      }).then(function () {
+        setNewTeamName('');
+        setNewTeamDescription('');
+        props.setDrawerExpanded(false);
       });
-      setNewTeamName('');
-      setNewTeamDescription('');
     } catch (error) {
       console.error(error);
       setErr(addDisplayError('Unable to create team', error));
@@ -104,7 +106,11 @@ export default function AddToTeam(props: AddToTeamProps) {
         validateName={validateTeamName}
       />
       <div className="drawer-footer">
-        <Button variant="primary" onClick={onCreateNewTeam}>
+        <Button
+          variant="primary"
+          onClick={onCreateNewTeam}
+          isDisabled={!validateTeamName()}
+        >
           Add team account
         </Button>
         <Button variant="link" onClick={() => props.setDrawerExpanded(false)}>
