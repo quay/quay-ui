@@ -17,6 +17,7 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import {useEffect, useState} from 'react';
+import Conditional from 'src/components/empty/Conditional';
 import Empty from 'src/components/empty/Empty';
 import ReadonlySecret from 'src/components/ReadonlySecret';
 import {useEvents} from 'src/hooks/UseEvents';
@@ -276,18 +277,24 @@ function NotificationConfig({notification}: {notification: RepoNotification}) {
           >
             Webhook URL: {notification.config?.url}
           </FlexItem>
-          <FlexItem id="webhook-body" style={{color: 'grey'}}>
-            POST body template (optional):
-            <ClipboardCopy
-              isCode
-              isReadOnly
-              hoverTip="Copy"
-              clickTip="Copied"
-              variant={ClipboardCopyVariant.expansion}
-            >
-              {notification.config?.template}
-            </ClipboardCopy>
-          </FlexItem>
+          {console.log(
+            'notification.config?.template',
+            notification.config?.template,
+          )}
+          <Conditional if={notification.config?.template != ''}>
+            <FlexItem id="webhook-body" style={{color: 'grey'}}>
+              POST body template (optional):
+              <ClipboardCopy
+                isCode
+                isReadOnly
+                hoverTip="Copy"
+                clickTip="Copied"
+                variant={ClipboardCopyVariant.expansion}
+              >
+                {notification.config?.template}
+              </ClipboardCopy>
+            </FlexItem>
+          </Conditional>
         </>
       );
     // TODO: Quay notifications not supported in new UI until
