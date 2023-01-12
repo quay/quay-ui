@@ -145,7 +145,7 @@ describe('Repositories List Page', () => {
   //     cy.contains('Delete').click();
   // })
 
-  it.only('makes multiple repositories public', () => {
+  it('makes multiple repositories public', () => {
     cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
     cy.contains('Select page (10)').click();
@@ -159,7 +159,7 @@ describe('Repositories List Page', () => {
     cy.contains('private').should('not.exist');
   });
 
-  it.only('makes multiple repositories private', () => {
+  it('makes multiple repositories private', () => {
     cy.visit('/repository');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
     cy.contains('Select page (10)').click();
