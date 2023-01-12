@@ -111,8 +111,8 @@ describe('Repository Settings - Visibility', () => {
       cy.contains('Quay Developer').should('exist');
       cy.contains('Up to 5 private repositories').should('exist');
       cy.contains('user1@redhat.com').should('exist');
-      cy.get('#billing-name').type('user1');
-      cy.get('#billing-street').type('1 broadway');
+      cy.get('input[placeholder="Name"]').type('user1');
+      cy.get('input[placeholder="Address"]').type('1 broadway');
       cy.get('#billing-zip').type('10004');
       cy.contains('Payment Info').click();
       cy.get('#card_number').type('4242 4242 4242 4242');
@@ -178,8 +178,8 @@ describe('Repository Settings - Visibility', () => {
       cy.contains('Quay Micro Subscription').should('exist');
       cy.contains('Up to 10 private repositories').should('exist');
       cy.contains('user1@redhat.com').should('exist');
-      cy.get('#billing-name').type('user1');
-      cy.get('#billing-street').type('1 broadway');
+      cy.get('input[placeholder="Name"]').type('user1');
+      cy.get('input[placeholder="Address"]').type('1 broadway');
       cy.get('#billing-zip').type('10004');
       cy.contains('Payment Info').click();
       cy.get('#card_number').type('4242 4242 4242 4242');
