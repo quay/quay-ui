@@ -2,16 +2,13 @@ import {NotificationEvent} from 'src/hooks/UseEvents';
 import {NotificationMethod} from 'src/hooks/UseNotificationMethods';
 import {
   ActionGroup,
-  Alert,
-  AlertActionCloseButton,
   Button,
   FormGroup,
-  Modal,
-  ModalVariant,
   TextInput,
 } from '@patternfly/react-core';
 import {useEffect, useState} from 'react';
 import {useUpdateNotifications} from 'src/hooks/UseUpdateNotifications';
+import {ExclamationCircleIcon} from '@patternfly/react-icons';
 
 export default function CreateHipchatNotification(
   props: CreateHipchatNotification,
@@ -26,12 +23,6 @@ export default function CreateHipchatNotification(
     resetCreatingNotification,
   } = useUpdateNotifications(props.org, props.repo);
 
-  const isFormComplete =
-    props.method != undefined &&
-    props.event != undefined &&
-    token != '' &&
-    roomId != '';
-
   const createNotification = async () => {
     create({
       config: {
@@ -45,6 +36,18 @@ export default function CreateHipchatNotification(
     });
   };
 
+  const isValidRoomId = (roomId: string) => {
+    const regex = /^[0-9]+$/;
+    return regex.test(roomId);
+  };
+
+  const isFormComplete =
+    props.method != undefined &&
+    props.event != undefined &&
+    token != '' &&
+    roomId != '' &&
+    isValidRoomId(roomId);
+
   useEffect(() => {
     if (successCreatingNotification) {
       resetCreatingNotification();
@@ -52,9 +55,23 @@ export default function CreateHipchatNotification(
     }
   }, [successCreatingNotification]);
 
+  useEffect(() => {
+    if (errorCreatingNotification) {
+      props.setError('Unable to create notification');
+      resetCreatingNotification();
+    }
+  }, [errorCreatingNotification]);
+
   return (
     <>
-      <FormGroup fieldId="room-id-number" label="Room ID #" required>
+      <FormGroup
+        fieldId="room-id-number"
+        label="Room ID #"
+        isRequired
+        helperTextInvalid="Must be a number"
+        helperTextInvalidIcon={<ExclamationCircleIcon />}
+        validated={roomId == '' || isValidRoomId(roomId) ? 'default' : 'error'}
+      >
         <TextInput
           required
           id="room-id-number-field"
@@ -65,7 +82,7 @@ export default function CreateHipchatNotification(
       <FormGroup
         fieldId="room-notification-token"
         label="Room Notification Token"
-        required
+        isRequired
       >
         <TextInput
           required

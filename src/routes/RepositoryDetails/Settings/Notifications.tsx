@@ -5,11 +5,10 @@ import {
   Flex,
   FlexItem,
   Spinner,
-  TextArea,
-  TextInput,
 } from '@patternfly/react-core';
-import {BellIcon, BugIcon, UploadIcon} from '@patternfly/react-icons';
+import {BellIcon} from '@patternfly/react-icons';
 import {
+  ExpandableRowContent,
   TableComposable,
   Tbody,
   Td,
@@ -17,7 +16,7 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Empty from 'src/components/empty/Empty';
 import ReadonlySecret from 'src/components/ReadonlySecret';
 import {useEvents} from 'src/hooks/UseEvents';
@@ -42,6 +41,7 @@ export default function Notifications({
   const [selectedNotifications, setSelectedNotifications] = useState<
     RepoNotification[]
   >([]);
+  const [expandedUuids, setExpandedUuids] = useState<string[]>([]);
   const {
     notifications,
     loading,
@@ -56,6 +56,15 @@ export default function Notifications({
     resetFilter,
   } = useNotifications(org, repo);
 
+  const isExpanded = (uuid: string) => expandedUuids.includes(uuid);
+  const setExpanded = (uuid: string, isExpanding = true) =>
+    setExpandedUuids((prevExpanded) => {
+      const otherExpandedRepoNames = prevExpanded.filter((u) => u !== uuid);
+      return isExpanding
+        ? [...otherExpandedRepoNames, uuid]
+        : otherExpandedRepoNames;
+    });
+
   const onSelectNotification = (
     notification: RepoNotification,
     rowIndex: number,
@@ -66,6 +75,13 @@ export default function Notifications({
       return isSelecting ? [...others, notification] : others;
     });
   };
+
+  // Close drawer if navigating away from notification settings
+  useEffect(() => {
+    return () => {
+      props.setDrawerContent(DrawerContentType.None);
+    };
+  }, []);
 
   if (loading) {
     return <Spinner />;
@@ -117,6 +133,7 @@ export default function Notifications({
         <Thead>
           <Tr>
             <Th />
+            <Th />
             <Th>{NotificationsColumnNames.title}</Th>
             <Th>{NotificationsColumnNames.event}</Th>
             <Th>{NotificationsColumnNames.notification}</Th>
@@ -124,9 +141,23 @@ export default function Notifications({
             <Th />
           </Tr>
         </Thead>
-        <Tbody>
-          {paginatedNotifications?.map((notification, rowIndex) => (
-            <Tr key={notification.uuid}>
+        {paginatedNotifications?.map((notification, rowIndex) => (
+          <Tbody
+            key={notification.uuid}
+            isExpanded={isExpanded(notification.uuid)}
+          >
+            <Tr>
+              <Td
+                expand={{
+                  rowIndex,
+                  isExpanded: isExpanded(notification.uuid),
+                  onToggle: () =>
+                    setExpanded(
+                      notification.uuid,
+                      !isExpanded(notification.uuid),
+                    ),
+                }}
+              />
               <Td
                 select={{
                   rowIndex,
@@ -157,8 +188,15 @@ export default function Notifications({
                 />
               </Td>
             </Tr>
-          ))}
-        </Tbody>
+            <Tr isExpanded={isExpanded(notification.uuid)}>
+              <Td colSpan={7} id="notification-config-details">
+                <ExpandableRowContent>
+                  <NotificationConfig notification={notification} />
+                </ExpandableRowContent>
+              </Td>
+            </Tr>
+          </Tbody>
+        ))}
       </TableComposable>
     </>
   );
@@ -167,8 +205,11 @@ export default function Notifications({
 function EventTitle({type}: {type: NotificationEventType}) {
   const {events} = useEvents();
   const event = events.find((e) => e.type == type);
-  // TODO: Icon returned from `events` needs to be added here
-  return <>{event.title}</>;
+  return (
+    <>
+      {event.icon} <span style={{fontSize: '.8em'}}>{event.title}</span>
+    </>
+  );
 }
 
 function NotificationTitle({notification}: {notification: RepoNotification}) {
@@ -176,17 +217,26 @@ function NotificationTitle({notification}: {notification: RepoNotification}) {
   const notificationMethod = notificationMethods.find(
     (m) => m.type == notification.method,
   );
-  let notificationConfig = null;
-  switch (notificationMethod.type) {
+  return (
+    <Flex direction={{default: 'column'}}>
+      <FlexItem style={{marginBottom: 0}}>
+        <i className="fa fa-lg quay-icon"></i>
+        {notificationMethod.title}
+      </FlexItem>
+    </Flex>
+  );
+}
+
+function NotificationConfig({notification}: {notification: RepoNotification}) {
+  switch (notification.method) {
     case NotificationMethodType.email:
-      notificationConfig = (
+      return (
         <FlexItem id="configured-email" style={{color: 'grey'}}>
           email: {notification.config?.email}
         </FlexItem>
       );
-      break;
     case NotificationMethodType.flowdock:
-      notificationConfig = (
+      return (
         <FlexItem id="flow-api-token" style={{color: 'grey'}}>
           <ReadonlySecret
             label="Flow API Token"
@@ -194,9 +244,8 @@ function NotificationTitle({notification}: {notification: RepoNotification}) {
           />
         </FlexItem>
       );
-      break;
     case NotificationMethodType.hipchat:
-      notificationConfig = (
+      return (
         <>
           <FlexItem
             id="hipchat-room-id"
@@ -212,16 +261,14 @@ function NotificationTitle({notification}: {notification: RepoNotification}) {
           </FlexItem>
         </>
       );
-      break;
     case NotificationMethodType.slack:
-      notificationConfig = (
+      return (
         <FlexItem id="slack-url" style={{color: 'grey'}}>
           Webhook URL: {notification.config?.url}
         </FlexItem>
       );
-      break;
     case NotificationMethodType.webhook:
-      notificationConfig = (
+      return (
         <>
           <FlexItem
             id="webhook-url"
@@ -243,7 +290,6 @@ function NotificationTitle({notification}: {notification: RepoNotification}) {
           </FlexItem>
         </>
       );
-      break;
     // TODO: Quay notifications not supported in new UI until
     // notification header has been implemented
     // case NotificationMethodType.quaynotification:
@@ -255,19 +301,13 @@ function NotificationTitle({notification}: {notification: RepoNotification}) {
     //     </Flex>
     //   );
   }
-  return (
-    <Flex direction={{default: 'column'}}>
-      <FlexItem style={{marginBottom: 0}}>{notificationMethod.title}</FlexItem>
-      {notificationConfig}
-    </Flex>
-  );
 }
 
 function NotificationStatus({notification}: {notification: RepoNotification}) {
   return isNotificationEnabled(notification) ? (
     <>Enabled</>
   ) : (
-    <>Disabled due to 3 failed attempts in a row</>
+    <>Disabled (3 failed attempts)</>
   );
 }
 

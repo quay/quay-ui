@@ -22,7 +22,7 @@ describe('Repository Settings - Permissions', () => {
     const user1Row = cy.get('tr:contains("user1")');
     user1Row.within(() => {
       cy.get(`[data-label="membername"]`).should('have.text', 'user1');
-      cy.get(`[data-label="type"]`).should('have.text', 'user');
+      cy.get(`[data-label="type"]`).should('have.text', ' User ');
       cy.get(`[data-label="role"]`).should('have.text', 'admin');
     });
     const robotRow = cy.get('tr:contains("testorg+testrobot")');
@@ -31,13 +31,13 @@ describe('Repository Settings - Permissions', () => {
         'have.text',
         'testorg+testrobot',
       );
-      cy.get(`[data-label="type"]`).should('have.text', 'robot');
+      cy.get(`[data-label="type"]`).should('have.text', ' Robot ');
       cy.get(`[data-label="role"]`).should('have.text', 'read');
     });
     const teamRow = cy.get('tr:contains("testteam")');
     teamRow.within(() => {
       cy.get(`[data-label="membername"]`).should('have.text', 'testteam');
-      cy.get(`[data-label="type"]`).should('have.text', 'team');
+      cy.get(`[data-label="type"]`).should('have.text', ' Team ');
       cy.get(`[data-label="role"]`).should('have.text', 'read');
     });
   });
@@ -136,7 +136,7 @@ describe('Repository Settings - Permissions', () => {
     const user2Row = cy.get('tr:contains("user2")');
     user2Row.within(() => {
       cy.get(`[data-label="membername"]`).should('have.text', 'user2');
-      cy.get(`[data-label="type"]`).should('have.text', 'user');
+      cy.get(`[data-label="type"]`).should('have.text', ' User ');
       cy.get(`[data-label="role"]`).should('have.text', 'read');
     });
     cy.contains('Add Permissions').click();
@@ -153,7 +153,7 @@ describe('Repository Settings - Permissions', () => {
         'have.text',
         'testorg+testrobot2',
       );
-      cy.get(`[data-label="type"]`).should('have.text', 'robot');
+      cy.get(`[data-label="type"]`).should('have.text', ' Robot ');
       cy.get(`[data-label="role"]`).should('have.text', 'read');
     });
     cy.contains('Add Permissions').click();
@@ -167,7 +167,7 @@ describe('Repository Settings - Permissions', () => {
     const testteam2Row = cy.get('tr:contains("testteam2")');
     testteam2Row.within(() => {
       cy.get(`[data-label="membername"]`).should('have.text', 'testteam2');
-      cy.get(`[data-label="type"]`).should('have.text', 'team');
+      cy.get(`[data-label="type"]`).should('have.text', ' Team ');
       cy.get(`[data-label="role"]`).should('have.text', 'read');
     });
   });
