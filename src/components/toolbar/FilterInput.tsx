@@ -15,6 +15,7 @@ export function FilterInput(props: FilterInputProps) {
         value={props.searchState.query}
         onChange={setSearchState}
         onClear={() => setSearchState('')}
+        id={props.id}
       />
     </ToolbarItem>
   );
@@ -23,4 +24,5 @@ export function FilterInput(props: FilterInputProps) {
 interface FilterInputProps {
   searchState: SearchState;
   onChange: SetterOrUpdater<SearchState>;
+  id?: string;
 }

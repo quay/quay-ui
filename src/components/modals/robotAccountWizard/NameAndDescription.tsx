@@ -41,7 +41,7 @@ export default function NameAndDescription(props: NameAndDescriptionProps) {
         <TextInput
           isRequired
           type="text"
-          id="form-name"
+          id="robot-wizard-form-name"
           name="form-name"
           value={props.name}
           onChange={handleNameChange}
@@ -55,7 +55,7 @@ export default function NameAndDescription(props: NameAndDescriptionProps) {
       >
         <TextInput
           type="text"
-          id="form-description"
+          id="robot-wizard-form-description"
           name="form-description"
           value={props.description}
           onChange={(robotDescription: string) =>

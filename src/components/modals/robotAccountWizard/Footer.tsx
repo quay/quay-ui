@@ -37,11 +37,12 @@ export default function Footer(props: FooterProps) {
                   isDisabled={!props.isDataValid()}
                   variant="secondary"
                   onClick={props.onSubmit}
+                  id="create-robot-submit"
                 >
                   Review and Finish
                 </Button>
               ) : null}
-              <Button variant="link" onClick={onClose}>
+              <Button variant="link" onClick={onClose} id="create-robot-cancel">
                 Cancel
               </Button>
             </>

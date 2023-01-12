@@ -27,6 +27,7 @@ import {
 import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
 import {ReactElement, useState} from 'react';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
+import RobotAccountKebab from './RobotAccountKebab';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
   const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
@@ -153,7 +154,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       <PageSection variant={PageSectionVariants.light}>
         <RobotAccountsToolBar
           selectedItems={selectedRobotAccounts}
-          allItemsList={robotAccountsForOrg}
+          allItemsList={filteredRobotAccounts}
           setSelectedRobotAccounts={setSelectedRobotAccounts}
           itemsPerPageList={paginatedRobotAccountList}
           onItemSelect={onSelectRobot}
@@ -176,13 +177,16 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
         <TableComposable aria-label="Expandable table" variant={undefined}>
           <Thead>
             <Tr>
-              <Th width={10} />
-              <Th width={10} />
-              <Th width={15}>{RobotAccountColumnNames.robotAccountName}</Th>
-              <Th width={15}>{RobotAccountColumnNames.teams}</Th>
-              <Th width={15}>{RobotAccountColumnNames.repositories}</Th>
-              <Th width={15}>{RobotAccountColumnNames.lastAccessed}</Th>
-              <Th width={15}>{RobotAccountColumnNames.created}</Th>
+              <Th />
+              <Th />
+              <Th modifier="wrap">
+                {RobotAccountColumnNames.robotAccountName}
+              </Th>
+              <Th modifier="wrap">{RobotAccountColumnNames.teams}</Th>
+              <Th modifier="wrap">{RobotAccountColumnNames.repositories}</Th>
+              <Th modifier="wrap">{RobotAccountColumnNames.lastAccessed}</Th>
+              <Th modifier="wrap">{RobotAccountColumnNames.created}</Th>
+              <Th />
             </Tr>
           </Thead>
           {paginatedRobotAccountList.map((robotAccount, rowIndex) => {
@@ -236,6 +240,12 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.created}>
                     {robotAccount.created}
+                  </Td>
+                  <Td data-label="kebab">
+                    <RobotAccountKebab
+                      robotAccount={robotAccount}
+                      namespace={props.orgName}
+                    />
                   </Td>
                 </Tr>
                 {robotAccount.description ? (

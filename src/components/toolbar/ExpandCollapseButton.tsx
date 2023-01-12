@@ -25,18 +25,23 @@ export function ExpandCollapseButton(props: ExpandCollapseButtonProps) {
 
   return (
     <ToolbarItem>
-      <ToggleGroup aria-label="Default with single selectable">
+      <ToggleGroup
+        aria-label="Default with single selectable"
+        id="expand-collapse-tab"
+      >
         <ToggleGroupItem
           text="Expand"
           buttonId="Expand"
           isSelected={tableMode === 'Expand'}
           onChange={onTableModeChange}
+          id="expand-tab"
         />
         <ToggleGroupItem
           text="Collapse"
           buttonId="Collapse"
           isSelected={tableMode === 'Collapse'}
           onChange={onTableModeChange}
+          id="collapse-tab"
         />
       </ToggleGroup>
     </ToolbarItem>

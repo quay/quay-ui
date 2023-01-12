@@ -22,9 +22,15 @@ export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
           allItemsList={props.allItemsList}
           itemsPerPageList={props.itemsPerPageList}
           onItemSelect={props.onItemSelect}
+          id="robot-account-dropdown-checkbox"
         />
-        <FilterInput searchState={search} onChange={setSearch} />
+        <FilterInput
+          searchState={search}
+          onChange={setSearch}
+          id="robot-account-search"
+        />
         <ToolbarButton
+          id="create-robot-account-btn"
           buttonValue={props.buttonText}
           Modal={props.pageModal}
           isModalOpen={props.isModalOpen}

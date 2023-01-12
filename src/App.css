@@ -61,3 +61,7 @@ html, body, #root,  .App {
 .fit-content {
     width: fit-content;
 }
+
+.red-color {
+    color: red !important;
+}
