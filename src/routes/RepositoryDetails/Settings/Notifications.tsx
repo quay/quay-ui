@@ -277,10 +277,6 @@ function NotificationConfig({notification}: {notification: RepoNotification}) {
           >
             Webhook URL: {notification.config?.url}
           </FlexItem>
-          {console.log(
-            'notification.config?.template',
-            notification.config?.template,
-          )}
           <Conditional if={notification.config?.template != ''}>
             <FlexItem id="webhook-body" style={{color: 'grey'}}>
               POST body template (optional):
