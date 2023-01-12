@@ -25,10 +25,14 @@ describe('Repository Settings - Notifications', () => {
     flowdockRow.within(() => {
       cy.get(`[data-label="title"]`).should('have.text', '(Untitled)');
       cy.get(`[data-label="event"]`).should('have.text', 'Image build failed');
-      cy.get(`[data-label="notification"]`).should(
-        'have.text',
-        'Flowdock Team Notification',
-      );
+      cy.get(`[data-label="notification"]`).within(() => {
+        cy.contains('Flowdock Team Notification').should('exist');
+        cy.contains('Flow API Token:').should('exist');
+        cy.get('input').should('have.attr', 'type').and('equal', 'password');
+        cy.get('button').click();
+        cy.get('input').should('have.attr', 'type').and('equal', 'text');
+        cy.get('input').should('have.attr', 'value').and('equal', 'testtoken');
+      });
       cy.get(`[data-label="status"]`).should('have.text', 'Enabled');
     });
     const hipchatRow = cy.get('tr:contains("hipchat-notification")');
@@ -38,10 +42,15 @@ describe('Repository Settings - Notifications', () => {
         'hipchat-notification',
       );
       cy.get(`[data-label="event"]`).should('have.text', 'Image build queued');
-      cy.get(`[data-label="notification"]`).should(
-        'have.text',
-        'HipChat Room Notification',
-      );
+      cy.get(`[data-label="notification"]`).within(() => {
+        cy.contains('HipChat Room Notification').should('exist');
+        cy.contains('Room ID #: 123').should('exist');
+        cy.contains('Room Notification Token:').should('exist');
+        cy.get('input').should('have.attr', 'type').and('equal', 'password');
+        cy.get('button').click();
+        cy.get('input').should('have.attr', 'type').and('equal', 'text');
+        cy.get('input').should('have.attr', 'value').and('equal', 'testtoken');
+      });
       cy.get(`[data-label="status"]`).should('have.text', 'Enabled');
     });
     const slackRow = cy.get('tr:contains("slack-notification")');
@@ -51,10 +60,12 @@ describe('Repository Settings - Notifications', () => {
         'have.text',
         'Package Vulnerability Found',
       );
-      cy.get(`[data-label="notification"]`).should(
-        'have.text',
-        'Slack Notification',
-      );
+      cy.get(`[data-label="notification"]`).within(() => {
+        cy.contains('Slack Notification').should('exist');
+        cy.contains(
+          'Webhook URL: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
+        ).should('exist');
+      });
       cy.get(`[data-label="status"]`).should(
         'have.text',
         'Disabled due to 3 failed attempts in a row',
@@ -70,7 +81,14 @@ describe('Repository Settings - Notifications', () => {
         'have.text',
         'Repository mirror started',
       );
-      cy.get(`[data-label="notification"]`).should('have.text', 'Webhook POST');
+      cy.get(`[data-label="notification"]`).within(() => {
+        cy.contains('Webhook POST').should('exist');
+        cy.contains('Webhook URL: https://doesnotexist').should('exist');
+        cy.contains('POST body template (optional):').should('exist');
+        cy.get('input')
+          .should('have.attr', 'value')
+          .and('equal', '{"foo":"bar"}');
+      });
       cy.get(`[data-label="status"]`).should(
         'have.text',
         'Disabled due to 3 failed attempts in a row',
