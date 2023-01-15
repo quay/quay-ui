@@ -14,3 +14,8 @@ export const searchRobotAccountState = atom<SearchState>({
     field: RobotAccountColumnNames.robotAccountName,
   },
 });
+
+export const selectedRobotDefaultPermission = atom({
+  key: 'selectedRobotDefaultPermission',
+  default: 'None',
+});

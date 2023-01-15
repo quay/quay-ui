@@ -13,3 +13,15 @@ export async function createNewTeamForNamespac(
   assertHttpCode(response.status, 200);
   return response.data?.name;
 }
+
+export async function updateTeamForRobot(
+  namespace: string,
+  teamName: string,
+  robotName: string,
+) {
+  const robotNameWithOrg = `${namespace}+${robotName}`;
+  const createTeamUrl = `/api/v1/organization/${namespace}/team/${teamName}/members/${robotNameWithOrg}`;
+  const response: AxiosResponse = await axios.put(createTeamUrl, {});
+  assertHttpCode(response.status, 200);
+  return response.data?.name;
+}

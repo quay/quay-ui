@@ -1,10 +1,12 @@
 import {useRecoilState} from 'recoil';
-import {searchRepoState, selectedReposState} from 'src/atoms/RepositoryState';
+import {searchRepoState} from 'src/atoms/RepositoryState';
 import React, {useEffect, useState} from 'react';
 import {
-  DropdownItem,
   PageSection,
   PanelFooter,
+  Text,
+  TextContent,
+  TextVariants,
   ToggleGroup,
   ToggleGroupItem,
   ToggleGroupItemProps,
@@ -23,7 +25,6 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import {useRepositories} from 'src/hooks/UseRepositories';
 import {DropdownWithDescription} from 'src/components/toolbar/DropdownWithDescription';
 
 const ColumnNames = {
@@ -35,21 +36,13 @@ const ColumnNames = {
 type TableModeType = 'All' | 'Selected';
 
 export default function AddToRepository(props: AddToRepositoryProps) {
-  const [selectedItems, setSelectedItems] = useRecoilState(selectedReposState);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [tableMode, setTableMode] = useState<TableModeType>('All');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [tableItems, setTableItems] = useState([]);
-  const [dropdownToggle, setDropdownToggle] = useState('None');
   const [search, setSearch] = useRecoilState(searchRepoState);
 
-  // Fetching repos
-  const {repos: repos, totalResults: repoCount} = useRepositories(
-    props.namespace,
-  );
-
-  repos.sort((r1, r2) => {
+  props.repos.sort((r1, r2) => {
     return r1.last_modified > r2.last_modified ? -1 : 1;
   });
 
@@ -59,32 +52,38 @@ export default function AddToRepository(props: AddToRepositoryProps) {
   ) => {
     const id = event.currentTarget.id;
     setTableMode(id as TableModeType);
+    if (id == 'All') {
+      setTableItems(props.repos);
+    } else if (id == 'Selected') {
+      const selectedItems = [];
+      props.repos.map(function (repo) {
+        if (props.selectedRepos.includes(repo.name)) {
+          selectedItems.push(repo);
+        }
+      });
+      setTableItems(selectedItems);
+    }
   };
 
-  const setItemSelected = (item, isSelecting = true) =>
-    setSelectedItems((prevSelected) => {
+  const setItemSelected = (item, isSelecting = true) => {
+    props.setSelectedRepos((prevSelected) => {
       const otherSelectedItems = prevSelected.filter((r) => r !== item.name);
       return isSelecting
         ? [...otherSelectedItems, item.name]
         : otherSelectedItems;
     });
+  };
 
   // Logic for handling row-wise checkbox selection in <Td>
-  const isItemSelected = (item) => selectedItems.includes(item.name);
+  const isItemSelected = (item) => props.selectedRepos.includes(item.name);
 
   const onSelectItem = (item, rowIndex: number, isSelecting: boolean) => {
     setItemSelected(item, isSelecting);
-    setSelectedRows((prevSelected) => {
-      const otherSelectedItems = prevSelected.filter((r) => r !== item.name);
-      return isSelecting ? [...otherSelectedItems, item] : otherSelectedItems;
-    });
   };
 
   useEffect(() => {
     if (tableMode == 'All') {
-      setTableItems(repos);
-    } else if (tableMode == 'Selected') {
-      setTableItems(selectedRows);
+      setTableItems(props.repos);
     }
   });
 
@@ -101,15 +100,45 @@ export default function AddToRepository(props: AddToRepositoryProps) {
     page * perPage - perPage + perPage,
   );
 
+  const updateRepoPerms = (permission, repo) => {
+    // Remove item if already present
+    props.setSelectedRepoPerms(
+      props.selectedRepoPerms.filter((item) => item.name !== repo.name),
+    );
+    if (permission == 'None') {
+      return;
+    }
+    props.setSelectedRepoPerms((prevSelected) => {
+      const newPerms = {
+        name: repo.name,
+        permission: permission,
+        last_modified: repo.last_modified,
+      };
+      return [...prevSelected, newPerms];
+    });
+  };
+
+  const fetchRepoPermission = (repo) => {
+    for (const repoPerm of props.selectedRepoPerms) {
+      if (repoPerm.name == repo.name) {
+        return repoPerm.permission;
+      }
+    }
+    return 'None';
+  };
+
   return (
     <>
+      <TextContent>
+        <Text component={TextVariants.h1}>Add to repository (optional)</Text>
+      </TextContent>
       <PageSection>
         <Toolbar>
           <ToolbarContent>
             <DropdownCheckbox
-              selectedItems={selectedItems}
-              deSelectAll={setSelectedItems}
-              allItemsList={repos}
+              selectedItems={props.selectedRepos}
+              deSelectAll={props.setSelectedRepos}
+              allItemsList={props.repos}
               itemsPerPageList={paginatedItems}
               onItemSelect={onSelectItem}
             />
@@ -165,6 +194,9 @@ export default function AddToRepository(props: AddToRepositoryProps) {
                   <Td dataLabel={ColumnNames.permissions}>
                     <DropdownWithDescription
                       dropdownItems={props.dropdownItems}
+                      selectedVal={fetchRepoPermission(repo)}
+                      onSelect={updateRepoPerms}
+                      repo={repo}
                     />
                   </Td>
                   <Td dataLabel={ColumnNames.lastUpdated}>
@@ -194,4 +226,9 @@ export default function AddToRepository(props: AddToRepositoryProps) {
 interface AddToRepositoryProps {
   namespace: string;
   dropdownItems: any[];
+  selectedRepos?: any[];
+  repos: any[];
+  setSelectedRepos: (repos) => void;
+  selectedRepoPerms: any[];
+  setSelectedRepoPerms: (repoPerm) => void;
 }

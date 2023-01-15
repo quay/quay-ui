@@ -40,6 +40,40 @@ export async function fetchRobotsForNamespace(
   return response.data?.robots;
 }
 
+export async function addDefaultPermsForRobot(
+  orgname: string,
+  robotname: string,
+  permission: string,
+  isUser = false,
+): Promise<IRobot[]> {
+  const robotNameWithOrg = `${orgname}+${robotname}`;
+  const updatePermsUrl = `/api/v1/organization/${orgname}/prototypes`;
+  const delegate = {
+    name: robotNameWithOrg,
+    kind: 'user',
+    is_robot: true,
+  };
+  const payload = {delegate: delegate, role: permission.toLowerCase()};
+  const response: AxiosResponse = await axios.post(updatePermsUrl, payload);
+  assertHttpCode(response.status, 200);
+  return response.data;
+}
+
+export async function updateRepoPermsForRobot(
+  orgname: string,
+  robotname: string,
+  reponame: string,
+  permission: string,
+  isUser = false,
+): Promise<IRobot[]> {
+  const robotNameWithOrg = `${orgname}+${robotname}`;
+  const updatePermsUrl = `/api/v1/repository/${orgname}/${reponame}/permissions/user/${robotNameWithOrg}`;
+  const payload = {role: permission.toLowerCase()};
+  const response: AxiosResponse = await axios.put(updatePermsUrl, payload);
+  assertHttpCode(response.status, 200);
+  return response.data;
+}
+
 export async function createNewRobotForNamespace(
   orgname: string,
   robotname: string,

@@ -17,11 +17,13 @@ import {
   ToolbarItem,
   DropdownItem,
   Button,
-  ActionGroup,
+  Text,
+  TextVariants,
+  TextContent,
 } from '@patternfly/react-core';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {useRecoilState, useRecoilValue} from 'recoil';
-import {selectedTeamsState, searchTeamState} from 'src/atoms/TeamState';
+import {useRecoilState} from 'recoil';
+import {searchTeamState} from 'src/atoms/TeamState';
 import React, {useEffect, useState} from 'react';
 import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
 import {FilterWithDropdown} from 'src/components/toolbar/FilterWithDropdown';
@@ -41,8 +43,6 @@ const ColumnNames = {
 type TableModeType = 'All' | 'Selected';
 
 export default function AddToTeam(props: AddToTeamProps) {
-  const [selectedItems, setSelectedItems] = useRecoilState(selectedTeamsState);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [tableMode, setTableMode] = useState<TableModeType>('All');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -126,30 +126,27 @@ export default function AddToTeam(props: AddToTeamProps) {
     setTableMode(id as TableModeType);
   };
 
-  const setItemSelected = (item, isSelecting = true) =>
-    setSelectedItems((prevSelected) => {
-      const otherSelectedItems = prevSelected.filter((r) => r !== item.name);
-      return isSelecting
-        ? [...otherSelectedItems, item.name]
-        : otherSelectedItems;
+  const setItemSelected = (item, isSelecting = true) => {
+    props.setSelectedTeams((prevSelected) => {
+      const otherSelectedItems = prevSelected.filter(
+        (r) => r.name !== item.name,
+      );
+      return isSelecting ? [...otherSelectedItems, item] : otherSelectedItems;
     });
+  };
 
   // Logic for handling row-wise checkbox selection in <Td>
-  const isItemSelected = (item) => selectedItems.includes(item.name);
+  const isItemSelected = (item) => props.selectedTeams.includes(item.name);
 
   const onSelectItem = (item, rowIndex: number, isSelecting: boolean) => {
     setItemSelected(item, isSelecting);
-    setSelectedRows((prevSelected) => {
-      const otherSelectedItems = prevSelected.filter((r) => r !== item.name);
-      return isSelecting ? [...otherSelectedItems, item] : otherSelectedItems;
-    });
   };
 
   useEffect(() => {
     if (tableMode == 'All') {
       setTableItems(props.items);
     } else if (tableMode == 'Selected') {
-      setTableItems(selectedRows);
+      setTableItems(props.selectedTeams);
     }
   });
 
@@ -175,14 +172,18 @@ export default function AddToTeam(props: AddToTeamProps) {
       />
     );
   }
+
   return (
     <>
+      <TextContent>
+        <Text component={TextVariants.h1}>Add to team (optional)</Text>
+      </TextContent>
       <PageSection>
         <Toolbar>
           <ToolbarContent>
             <DropdownCheckbox
-              selectedItems={selectedItems}
-              deSelectAll={setSelectedItems}
+              selectedItems={props.selectedTeams}
+              deSelectAll={props.setSelectedTeams}
               allItemsList={props.items}
               itemsPerPageList={paginatedItems}
               onItemSelect={onSelectItem}
@@ -276,5 +277,7 @@ interface AddToTeamProps {
   items: any[];
   namespace: string;
   isDrawerExpanded: boolean;
-  setDrawerExpanded: (boolean) => void;
+  setDrawerExpanded?: (boolean) => void;
+  selectedTeams?: any[];
+  setSelectedTeams?: (teams) => void;
 }

@@ -1,7 +1,9 @@
 import {
-  DropdownItem,
   Modal,
   ModalVariant,
+  Text,
+  TextContent,
+  TextVariants,
   Wizard,
 } from '@patternfly/react-core';
 import React, {useState} from 'react';
@@ -17,6 +19,14 @@ import {fetchOrg} from 'src/resources/OrganizationResource';
 import {useQueryClient} from '@tanstack/react-query';
 import DefaultPermissions from './robotAccountWizard/DefaultPermissions';
 import ReviewAndFinish from './robotAccountWizard/ReviewAndFinish';
+import {useRecoilState} from 'recoil';
+import {
+  selectedReposState,
+  selectedReposPermissionState,
+} from 'src/atoms/RepositoryState';
+import {selectedTeamsState} from 'src/atoms/TeamState';
+import {selectedRobotDefaultPermission} from 'src/atoms/RobotAccountState';
+import {useRepositories} from 'src/hooks/UseRepositories';
 
 export default function CreateRobotAccountModal(
   props: CreateRobotAccountModalProps,
@@ -25,11 +35,30 @@ export default function CreateRobotAccountModal(
     return null;
   }
 
-  const {createNewRobot} = useRobotAccounts(props.namespace);
+  const {
+    createNewRobot,
+    updateRepoPermsForRobot,
+    updateTeamsForRobot,
+    addDefaultPermsForRobot,
+  } = useRobotAccounts(props.namespace);
+
+  // Fetching repos
+  const {repos: repos, totalResults: repoCount} = useRepositories(
+    props.namespace,
+  );
+
   const [robotName, setRobotName] = useState('');
   const [robotDescription, setrobotDescription] = useState('');
   const [err, setErr] = useState<string>();
   const [teams, setTeams] = useState([]);
+  const [selectedRepoPerms, setSelectedRepoPerms] = useRecoilState(
+    selectedReposPermissionState,
+  );
+  const [selectedTeams, setSelectedTeams] = useRecoilState(selectedTeamsState);
+  const [selectedRepos, setSelectedRepos] = useRecoilState(selectedReposState);
+  const [robotDefaultPerm, setRobotdefaultPerm] = useRecoilState(
+    selectedRobotDefaultPermission,
+  );
   const [isDrawerExpanded, setDrawerExpanded] = useState(false);
   const queryClient = useQueryClient();
 
@@ -57,7 +86,45 @@ export default function CreateRobotAccountModal(
         robotname: robotName,
         description: robotDescription,
         isUser: false,
-      });
+      })
+        .then(() => {
+          const reposToUpdate = filteredRepos();
+          if (reposToUpdate) {
+            Promise.allSettled(
+              reposToUpdate.map((repo) =>
+                updateRepoPermsForRobot({
+                  namespace: props.namespace,
+                  robotname: robotName,
+                  reponame: repo.name,
+                  permission: repo.permission,
+                  isUser: false,
+                }),
+              ),
+            );
+          }
+        })
+        .then(() => {
+          if (selectedTeams) {
+            Promise.allSettled(
+              selectedTeams.map((team) =>
+                updateTeamsForRobot({
+                  namespace: props.namespace,
+                  teamname: team.name,
+                  robotname: robotName,
+                }),
+              ),
+            );
+          }
+        })
+        .then(() => {
+          if (robotDefaultPerm) {
+            addDefaultPermsForRobot({
+              namespace: props.namespace,
+              robotname: robotName,
+              permission: robotDefaultPerm,
+            });
+          }
+        });
       props.handleModalToggle();
     } catch (error) {
       console.error(error);
@@ -65,56 +132,58 @@ export default function CreateRobotAccountModal(
     }
   };
 
+  // addDefaultPermsForRobotMutator
   const validateRobotName = () => {
     return /^[a-z][a-z0-9_]{1,254}$/.test(robotName);
   };
 
   const RepoPermissionDropdownItems = [
-    <DropdownItem
-      key="None"
-      component="button"
-      description="No permissions on the repository"
-    >
-      None
-    </DropdownItem>,
-    <DropdownItem
-      key="Read"
-      component="button"
-      description="Can view and pull from the repository"
-    >
-      Read
-    </DropdownItem>,
-    <DropdownItem
-      key="Write"
-      component="button"
-      description="Can view, pull and push to the repository"
-    >
-      Write
-    </DropdownItem>,
-    <DropdownItem
-      key="Admin"
-      component="button"
-      description="Full admin access, pull and push to the repository"
-    >
-      Admin
-    </DropdownItem>,
+    {
+      name: 'None',
+      description: 'No permissions on the repository',
+    },
+    {
+      name: 'Read',
+      description: 'Can view and pull from the repository',
+    },
+    {
+      name: 'Write',
+      description: 'Can view, pull, and push to the repository',
+    },
+    {
+      name: 'Admin',
+      description: 'Full admin access to the organization',
+    },
   ];
+
+  const filteredRepos = () => {
+    return selectedRepoPerms.filter((repo) =>
+      selectedRepos.includes(repo.name),
+    );
+  };
 
   const steps = [
     {
       name: 'Robot name and description',
       component: (
-        <NameAndDescription
-          name={robotName}
-          setName={setRobotName}
-          description={robotDescription}
-          setDescription={setrobotDescription}
-          nameLabel="Provide a name for your robot account:"
-          descriptionLabel="Provide an optional description for your new robot:"
-          helperText="Enter a description to provide extra information to your teammates about this robot account. Max length: 255"
-          nameHelperText="Choose a name to inform your teammates about this robot account. Must match ^[a-z][a-z0-9_]{1,254}$."
-          validateName={validateRobotName}
-        />
+        <>
+          <TextContent>
+            <Text component={TextVariants.h1}>
+              Provide robot account name and description
+            </Text>
+          </TextContent>
+          <NameAndDescription
+            name={robotName}
+            setName={setRobotName}
+            description={robotDescription}
+            setDescription={setrobotDescription}
+            nameLabel="Provide a name for your robot account:"
+            descriptionLabel="Provide an optional description for your new robot:"
+            helperText="Enter a description to provide extra information to your teammates about this robot account. Max length: 255"
+            nameHelperText="Choose a name to inform your teammates about this robot account. Must match ^[a-z][a-z0-9_]{1,254}$."
+            validateName={validateRobotName}
+          />
+        </>
       ),
     },
     {
@@ -125,6 +194,8 @@ export default function CreateRobotAccountModal(
           namespace={props.namespace}
           isDrawerExpanded={isDrawerExpanded}
           setDrawerExpanded={setDrawerExpanded}
+          selectedTeams={selectedTeams}
+          setSelectedTeams={setSelectedTeams}
         />
       ),
     },
@@ -134,6 +205,11 @@ export default function CreateRobotAccountModal(
         <AddToRepository
           namespace={props.namespace}
           dropdownItems={RepoPermissionDropdownItems}
+          repos={repos}
+          selectedRepos={selectedRepos}
+          setSelectedRepos={setSelectedRepos}
+          selectedRepoPerms={selectedRepoPerms}
+          setSelectedRepoPerms={setSelectedRepoPerms}
         />
       ),
     },
@@ -143,6 +219,8 @@ export default function CreateRobotAccountModal(
         <DefaultPermissions
           robotName={robotName}
           repoPermissions={RepoPermissionDropdownItems}
+          robotDefaultPerm={robotDefaultPerm}
+          setRobotdefaultPerm={setRobotdefaultPerm}
         />
       ),
     },
@@ -152,6 +230,9 @@ export default function CreateRobotAccountModal(
         <ReviewAndFinish
           robotName={robotName}
           robotDescription={robotDescription}
+          selectedTeams={selectedTeams}
+          selectedRepos={filteredRepos()}
+          robotdefaultPerm={robotDefaultPerm}
         />
       ),
     },

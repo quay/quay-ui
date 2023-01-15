@@ -1,7 +1,12 @@
 import {useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {fetchRobotsForNamespace} from 'src/resources/RobotsResource';
-import {createNewRobotForNamespace} from 'src/resources/RobotsResource';
+import {
+  addDefaultPermsForRobot,
+  createNewRobotForNamespace,
+  fetchRobotsForNamespace,
+  updateRepoPermsForRobot,
+} from 'src/resources/RobotsResource';
+import {updateTeamForRobot} from '../resources/TeamResources';
 
 export function useRobotAccounts(name: string) {
   const [page, setPage] = useState(1);
@@ -43,6 +48,55 @@ export function useRobotAccounts(name: string) {
     },
   );
 
+  const addDefaultPermsForRobotMutator = useMutation(
+    async ({
+      namespace,
+      robotname,
+      permission,
+    }: addDefaultPermsForRobotParams) => {
+      return addDefaultPermsForRobot(namespace, robotname, permission);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['Namespace', namespace, 'robots']);
+      },
+    },
+  );
+
+  const updateRepoPermsForRobotMutator = useMutation(
+    async ({
+      namespace,
+      robotname,
+      reponame,
+      permission,
+      isUser,
+    }: updateRobotRepoPermsParams) => {
+      return updateRepoPermsForRobot(
+        namespace,
+        robotname,
+        reponame,
+        permission,
+        isUser,
+      );
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['Namespace', namespace, 'robots']);
+      },
+    },
+  );
+
+  const updateTeamsForRobotMutator = useMutation(
+    async ({namespace, teamname, robotname}: updateTeamsForRobotParams) => {
+      return updateTeamForRobot(namespace, teamname, robotname);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['organization', namespace, 'teams']);
+      },
+    },
+  );
+
   return {
     robotAccountsForOrg: robotAccountsForOrg,
     loading: loading,
@@ -55,6 +109,12 @@ export function useRobotAccounts(name: string) {
     namespace,
     createNewRobot: async (params: createNewRobotForNamespaceParams) =>
       createRobotAccountMutator.mutate(params),
+    updateRepoPermsForRobot: async (params: updateRobotRepoPermsParams) =>
+      updateRepoPermsForRobotMutator.mutate(params),
+    updateTeamsForRobot: async (params: updateTeamsForRobotParams) =>
+      updateTeamsForRobotMutator.mutate(params),
+    addDefaultPermsForRobot: async (params: addDefaultPermsForRobotParams) =>
+      addDefaultPermsForRobotMutator.mutate(params),
   };
 }
 
@@ -63,4 +123,24 @@ interface createNewRobotForNamespaceParams {
   robotname: string;
   description: string;
   isUser?: boolean;
+}
+
+interface updateRobotRepoPermsParams {
+  namespace: string;
+  robotname: string;
+  reponame: string;
+  permission: string;
+  isUser?: boolean;
+}
+
+interface updateTeamsForRobotParams {
+  namespace: string;
+  teamname: string;
+  robotname: string;
+}
+
+interface addDefaultPermsForRobotParams {
+  namespace: string;
+  robotname: string;
+  permission: string;
 }

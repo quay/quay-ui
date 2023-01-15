@@ -1,40 +1,45 @@
 import {useState} from 'react';
-import {Dropdown, DropdownToggle} from '@patternfly/react-core';
+import {Dropdown, DropdownItem, DropdownToggle} from '@patternfly/react-core';
 import * as React from 'react';
 
 export function DropdownWithDescription(props: DropdownWithDescriptionProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownToggle, setDropdownToggle] = useState('None');
+  const [dropdownToggle, setDropdownToggle] = useState(props.selectedVal);
 
-  const onToggle = (isOpen: boolean) => {
-    setIsOpen(isOpen);
-  };
-
-  const onFocus = () => {
-    const element = document.getElementById('toggle-descriptions');
-    element.focus();
-  };
-
-  const onSelect = (event) => {
+  const dropdownOnSelect = (name) => {
+    setDropdownToggle(name);
+    props.onSelect(name, props.repo);
     setIsOpen(false);
-    onFocus();
-    setDropdownToggle(event.target.innerText);
   };
 
   return (
     <Dropdown
-      onSelect={onSelect}
+      onSelect={() => setIsOpen(false)}
       toggle={
-        <DropdownToggle id="toggle-descriptions" onToggle={onToggle}>
+        <DropdownToggle
+          id="toggle-descriptions"
+          onToggle={(isOpen) => setIsOpen(isOpen)}
+        >
           {dropdownToggle}
         </DropdownToggle>
       }
       isOpen={isOpen}
-      dropdownItems={props.dropdownItems}
+      dropdownItems={props.dropdownItems.map((item) => (
+        <DropdownItem
+          key={item.name}
+          description={item.description}
+          onClick={() => dropdownOnSelect(item.name)}
+        >
+          {item.name}
+        </DropdownItem>
+      ))}
     />
   );
 }
 
 interface DropdownWithDescriptionProps {
   dropdownItems: any[];
+  selectedVal: string;
+  onSelect?: (item, repo) => void;
+  repo: Record<string, unknown>;
 }

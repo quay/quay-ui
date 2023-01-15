@@ -19,3 +19,8 @@ export const refreshPageState = atom({
   key: 'refreshRepoPageState',
   default: 0,
 });
+
+export const selectedReposPermissionState = atom({
+  key: 'selectedReposPermissionState',
+  default: [],
+});

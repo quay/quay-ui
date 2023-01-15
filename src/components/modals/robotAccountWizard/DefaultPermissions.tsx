@@ -11,6 +11,10 @@ import React from 'react';
 import {DropdownWithDescription} from 'src/components/toolbar/DropdownWithDescription';
 
 export default function DefaultPermissions(props: DefaultPermissionsProps) {
+  const updateDefaultPermission = (permission, repo) => {
+    props.setRobotdefaultPerm(permission);
+  };
+
   return (
     <>
       <TextContent>
@@ -45,7 +49,11 @@ export default function DefaultPermissions(props: DefaultPermissionsProps) {
           <FormGroup label="Permission" fieldId="robot-permission" isRequired />
         </Form>
       </TextContent>
-      <DropdownWithDescription dropdownItems={props.repoPermissions} />
+      <DropdownWithDescription
+        dropdownItems={props.repoPermissions}
+        onSelect={updateDefaultPermission}
+        selectedVal={props.robotDefaultPerm}
+      />
     </>
   );
 }
@@ -53,4 +61,6 @@ export default function DefaultPermissions(props: DefaultPermissionsProps) {
 interface DefaultPermissionsProps {
   robotName: string;
   repoPermissions: any[];
+  robotDefaultPerm: string;
+  setRobotdefaultPerm: (perm) => void;
 }
