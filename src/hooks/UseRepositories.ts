@@ -46,15 +46,8 @@ export function useRepositories(organization?: string) {
             currentOrganization,
             signal,
             nextPageToken,
-            setNextPageParams,
           )
-        : fetchAllRepos(
-            listOfOrgNames,
-            true,
-            signal,
-            nextPageToken,
-            setNextPageParams,
-          );
+        : fetchAllRepos(listOfOrgNames, true, signal, nextPageToken);
     },
     onSuccess: async (result) => {
       const newList = result;

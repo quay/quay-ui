@@ -38,16 +38,10 @@ export async function fetchAllRepos(
   flatten = false,
   signal: AbortSignal,
   next_page_token = null,
-  setNextPageParams: (next_page) => void,
 ): Promise<IRepository[] | IRepository[][]> {
   const namespacedRepos = await Promise.all(
     namespaces.map((ns) => {
-      return fetchRepositoriesForNamespace(
-        ns,
-        signal,
-        next_page_token,
-        setNextPageParams,
-      );
+      return fetchRepositoriesForNamespace(ns, signal, next_page_token);
     }),
   );
 
@@ -66,7 +60,6 @@ export async function fetchRepositoriesForNamespace(
   ns: string,
   signal: AbortSignal,
   next_page_token: string = null,
-  setNextPageParams: (next_page) => void,
 ) {
   // TODO: Add return type to AxiosResponse
   const url = next_page_token
@@ -79,17 +72,11 @@ export async function fetchRepositoriesForNamespace(
   const repos = response.data?.repositories as IRepository[];
 
   if (next_page) {
-    const resp = await fetchRepositoriesForNamespace(
-      ns,
-      signal,
-      next_page,
-      setNextPageParams,
-    );
+    const resp = await fetchRepositoriesForNamespace(ns, signal, next_page);
     return {result: repos.concat(resp.result)};
   }
   return {
     result: repos as IRepository[],
-    pageParams: next_page,
   };
 }
 
