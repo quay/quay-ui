@@ -78,7 +78,7 @@ export async function fetchRepositoriesForNamespace(
   const next_page = response.data?.next_page;
   const repos = response.data?.repositories as IRepository[];
 
-  while (next_page) {
+  if (next_page) {
     const resp = await fetchRepositoriesForNamespace(
       ns,
       signal,
