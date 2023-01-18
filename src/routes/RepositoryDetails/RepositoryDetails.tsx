@@ -168,10 +168,10 @@ export default function RepositoryDetails() {
                   <Tab
                     eventKey={TabIndex.Settings}
                     title={<TabTitleText>Settings</TabTitleText>}
-                    isHidden={
-                      config?.features.UI_V2_REPO_SETTINGS != true ||
-                      !repoDetails?.can_admin
-                    }
+                    // isHidden={
+                    //   config?.features.UI_V2_REPO_SETTINGS != true ||
+                    //   !repoDetails?.can_admin
+                    // }
                   >
                     <Settings
                       org={organization}

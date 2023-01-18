@@ -5,7 +5,7 @@ import {
   deleteDefaultPermission,
   fetchDefaultPermissions,
   updateDefaultPermission,
-} from 'src/resources/OrganizationResource';
+} from 'src/resources/DefaultPermissionResource';
 import {
   permissionColumnNames,
   repoPermissions,

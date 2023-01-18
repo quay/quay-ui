@@ -1,11 +1,8 @@
 import {
   ActionGroup,
   Button,
-  Drawer,
   DrawerActions,
   DrawerCloseButton,
-  DrawerContent,
-  DrawerContentBody,
   DrawerHead,
   DrawerPanelBody,
   DrawerPanelContent,
@@ -23,9 +20,11 @@ import {
   SelectVariant,
 } from '@patternfly/react-core';
 import {DesktopIcon, UsersIcon} from '@patternfly/react-icons';
-import {useState, Ref} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {useState, Ref, useEffect} from 'react';
 import {useEntities} from 'src/hooks/UseEntities';
-import {fetchRobotsForDefaultPermissionDropdown} from 'src/resources/OrganizationResource';
+import {fetchRobotsForDefaultPermissionDropdown} from 'src/resources/DefaultPermissionResource';
+import {fetchRobotsForNamespace} from 'src/resources/RobotsResource';
 import {DrawerContentType} from '../../Organization';
 import {repoPermissions} from './DefaultPermissions';
 
@@ -44,6 +43,8 @@ export default function CreatePermissionDrawer(
     setSearchTerm,
     setEntities,
   } = useEntities(props.orgName);
+
+  const [robotAccnt, setRobotAccnt] = useState<string[]>([]);
 
   const [createdBy, setCreatedBy] = useState(userType.SPECIFIC_USER);
   const [repositoryCreator, setRepositoryCreator] = useState({
@@ -68,6 +69,26 @@ export default function CreatePermissionDrawer(
   const handleAnyUserSelection = () => {
     setCreatedBy(userType.ANYONE);
   };
+
+  useEffect(() => {
+    // const {data} = useQuery(['robotAccnt', props.orgName], ({signal}) =>
+    //   fetchRobotsForNamespace(props.orgName, false, signal),
+    // );
+
+    const fetchData = async () => {
+      await fetchRobotsForNamespace(props.orgName, false).then((response) => {
+        console.log('response', response);
+        setRobotAccnt((prev) => [...prev, response.name]);
+      });
+
+      // if (data) {
+      //   data.then (robot =>           setRobotAccnt((prev) => [...prev, robot.name]))
+      // }
+    };
+    if (!searchTerm && repositoryCreator.isDropdownOpen) {
+      fetchData();
+    }
+  }, [searchTerm]);
 
   const permissionRadioButtons = (
     <>
@@ -157,24 +178,24 @@ export default function CreatePermissionDrawer(
     </DropdownItem>
   ));
 
-  const handleRepoCreatorDropdown = async () => {
-    const robotAccnts = await fetchRobotsForDefaultPermissionDropdown(
-      props.orgName,
-    );
+  const handleRepoCreatorDropdown = () => {
+    // const robotAccnts = await fetchRobotsForDefaultPermissionDropdown(
+    //   props.orgName,
+    // );
 
-    console.log('entities before', entities);
-    if (robotAccnts.length > 0 && searchTerm === null) {
-      for (const item of robotAccnts) {
-        setEntities((prev) => [
-          ...prev,
-          {
-            name: item.name,
-            is_robot: true,
-          },
-        ]);
-      }
-    }
-    console.log('entities after', entities);
+    // console.log('entities before', entities);
+    // if (robotAccnts.length > 0 && searchTerm === null) {
+    //   for (const item of robotAccnts) {
+    //     setEntities((prev) => [
+    //       ...prev,
+    //       {
+    //         name: item.name,
+    //         is_robot: true,
+    //       },
+    //     ]);
+    //   }
+    // }
+    // console.log('entities after', entities);
     setRepositoryCreator((prev) => ({
       ...prev,
       isDropdownOpen: !prev.isDropdownOpen,
@@ -187,43 +208,58 @@ export default function CreatePermissionDrawer(
 
   const dropdownForCreator = (
     <Select
-      isOpen={true}
-      selections={searchTerm}
+      isOpen={repositoryCreator.isDropdownOpen}
+      // selections={searchTerm}
       onSelect={(e, value) => {
         setSearchTerm(value as string);
-        setRepositoryCreator((prev) => ({
-          creator: value as string,
-          isDropdownOpen: !prev.isDropdownOpen,
-        }));
+        console.log('selected:', value);
+        // setRepositoryCreator((prev) => ({
+        //   creator: value as string,
+        //   isDropdownOpen: !prev.isDropdownOpen,
+        // }));
       }}
       onToggle={() => {
-        // handleRepoCreatorDropdown();
+        console.log('toggled');
+        setRepositoryCreator((prev) => ({
+          ...prev,
+          isDropdownOpen: !prev.isDropdownOpen,
+        }));
       }}
       variant={SelectVariant.typeahead}
       typeAheadAriaLabel="Search user/robot"
       onTypeaheadInputChanged={(value) => {
         setSearchTerm(value);
+        // handleRepoCreatorDropdown();
       }}
-      shouldResetOnSelect={true}
+      // shouldResetOnSelect={true}
       onClear={() => {
         setSearchTerm('');
       }}
       isGrouped
     >
-      <SelectGroup label="Robot Accounts" key="group1">
-        {entities.map((e) => (
-          <SelectOption key={e.name} value={e.name} />
-        ))}
+      <SelectGroup key="group1">
+        {entities
+          // .filter((entitity) => entitity?.is_robot)
+          .map((e) => (
+            <SelectOption key={e.name} value={e.name} />
+          ))}
       </SelectGroup>
-
-      <SelectOption
-        key="Create robot account"
-        value="Create robot account"
-        component="button"
-        onClick={handleCreateRobotAccount}
-      >
-        <DesktopIcon />
-      </SelectOption>
+      {!searchTerm && repositoryCreator.isDropdownOpen && (
+        <SelectGroup label="Robot accounts" key="group2">
+          {robotAccnt?.map((e) => (
+            <SelectOption key={e} value={e} />
+          ))}
+          <SelectOption
+            key="Create robot account"
+            value="Create robot account"
+            component="button"
+            onClick={handleCreateRobotAccount}
+            isFocused={true}
+          >
+            <DesktopIcon /> &nbsp; Create robot account
+          </SelectOption>
+        </SelectGroup>
+      )}
     </Select>
   );
 
