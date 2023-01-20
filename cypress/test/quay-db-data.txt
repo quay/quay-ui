@@ -6142,11 +6142,11 @@ COPY public.repomirrorrule (id, uuid, repository_id, creation_date, rule_type, r
 --
 
 COPY public.repository (id, namespace_user_id, name, visibility_id, description, badge_token, kind_id, trust_enabled, state) FROM stdin;
-1	1	hello-world	2	\N	b6c6a402-af02-4cc1-a4a9-48155b049f19	1	f	0
+1	1	hello-world	1	\N	b6c6a402-af02-4cc1-a4a9-48155b049f19	1	f	0
 2	1	nested/repo	2		637a151b-62db-4c26-a160-0ba01d1c96d4	1	f	0
 3	2	alpine	1		9d24b211-b0af-47e2-9a88-543483b68461	1	f	0
 4	4	clair-jwt	1		cc957b5d-c4f8-4359-9bc9-f6e667a216da	1	f	0
-5	28	testrepo	2		8f1a8b8a-a83c-404b-bdd0-c087d3226560	1	f	0
+5	28	testrepo	1		8f1a8b8a-a83c-404b-bdd0-c087d3226560	1	f	0
 6	4	repo1	1	This is the description of repo1	6c0cd2e2-d93c-43fa-9ca0-f181d1d1bf01	1	f	0
 7	4	repo2	1	This is the description of repo2	35b48635-6610-482f-88f8-6e85dbecc7c7	1	f	0
 8	4	repo3	1	This is the description of repo3	9ccd98aa-8f64-4370-9d11-525860943177	1	f	0

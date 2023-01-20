@@ -1,6 +1,7 @@
 import {defineConfig} from 'cypress';
 
 export default defineConfig({
+  chromeWebSecurity: false, // Required for stripe integration tests
   e2e: {
     env: {
       REACT_QUAY_APP_API_URL: 'http://localhost:8080',
