@@ -1,6 +1,10 @@
 import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'src/libs/axios';
-import {assertHttpCode, BulkOperationError} from './ErrorHandling';
+import {
+  assertHttpCode,
+  BulkOperationError,
+  ResourceError,
+} from './ErrorHandling';
 
 export interface IAvatar {
   name: string;
@@ -108,3 +112,16 @@ export async function createOrg(name: string, email?: string) {
   assertHttpCode(response.status, 201);
   return response.data;
 }
+
+// API calls for Org -> Default Permissions tab
+
+// export async function searchRepositoryCreatorDropdown(
+//   org: string,
+//   searchQuery: string,
+// ) {
+//   const userAndRobotResponse = await axios.get(
+//     `/api/v1/entities/${searchQuery}?namespace=${org}`,
+//   );
+//   assertHttpCode(userAndRobotResponse.status, 200);
+//   return userAndRobotResponse.data?.results;
+// }

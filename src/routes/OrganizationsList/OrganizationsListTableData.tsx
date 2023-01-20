@@ -12,8 +12,7 @@ import {fetchRobotsForNamespace} from 'src/resources/RobotsResource';
 import {formatDate} from 'src/libs/utils';
 import ColumnNames from './ColumnNames';
 import {OrganizationsTableItem} from './OrganizationsList';
-import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {useEffect} from 'react';
+import {useQuery} from '@tanstack/react-query';
 
 interface CountProps {
   count: string | number;

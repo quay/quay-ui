@@ -6,8 +6,8 @@ export interface IRobot {
   name: string;
   created: string;
   last_accessed: string;
-  teams: string[];
-  repositories: string[];
+  teams?: string[];
+  repositories?: string[];
   description: string;
 }
 
@@ -20,11 +20,16 @@ export async function fetchAllRobots(orgnames: string[], signal: AbortSignal) {
 export async function fetchRobotsForNamespace(
   orgname: string,
   isUser = false,
-  signal: AbortSignal,
+  signal?: AbortSignal,
 ): Promise<IRobot[]> {
   const userOrOrgPath = isUser ? 'user' : `organization/${orgname}`;
   const getRobotsUrl = `/api/v1/${userOrOrgPath}/robots?permissions=true&token=false`;
-  const response: AxiosResponse = await axios.get(getRobotsUrl, {signal});
+  let response: AxiosResponse;
+  if (signal) {
+    response = await axios.get(getRobotsUrl, {signal});
+  } else {
+    response = await axios.get(getRobotsUrl);
+  }
   assertHttpCode(response.status, 200);
   return response.data?.robots;
 }

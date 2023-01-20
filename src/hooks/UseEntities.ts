@@ -20,7 +20,7 @@ export function useEntities(org: string) {
   // request
   useEffect(() => {
     const delay = setTimeout(() => {
-      if (searchTerm != null && searchTerm != '') {
+      if (searchTerm != null) {
         search();
       }
     }, 1000);
@@ -32,5 +32,6 @@ export function useEntities(org: string) {
     isError: isError,
     searchTerm: searchTerm,
     setSearchTerm: setSearchTerm,
+    setEntities: setEntities,
   };
 }

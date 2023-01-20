@@ -56,10 +56,10 @@ export async function fetchUsersAsSuperUser() {
 }
 
 export interface Entity {
-  avatar: IAvatar;
-  is_org_member: boolean;
+  avatar?: IAvatar;
+  is_org_member?: boolean;
   name: string;
-  kind: string;
+  kind?: string;
   is_robot?: boolean;
 }
 
