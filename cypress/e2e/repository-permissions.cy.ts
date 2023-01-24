@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-describe('Repository Details Page', () => {
+describe('Repository Settings - Permissions', () => {
   beforeEach(() => {
     cy.exec('npm run quay:seed');
     cy.request('GET', `${Cypress.env('REACT_QUAY_APP_API_URL')}/csrf_token`)
@@ -8,6 +8,13 @@ describe('Repository Details Page', () => {
       .then((token) => {
         cy.loginByCSRF(token);
       });
+    // Enable the repository settings feature
+    cy.intercept('GET', '/config', (req) =>
+      req.reply((res) => {
+        res.body.features['UI_V2_REPO_SETTINGS'] = true;
+        return res;
+      }),
+    ).as('getConfig');
     cy.visit('/repository/testorg/testrepo?tab=settings');
   });
 
@@ -81,7 +88,7 @@ describe('Repository Details Page', () => {
     cy.contains('1 - 3 of 3').should('exist');
     cy.get('#permissions-select-all').click();
     cy.contains('Actions').click();
-    cy.contains('Delete').click();
+    cy.get('#bulk-delete-permissions').contains('Delete').click();
     cy.get('table').within(() => {
       cy.contains('user1').should('not.exist');
       cy.contains('testorg+testrobot').should('not.exist');
@@ -121,7 +128,7 @@ describe('Repository Details Page', () => {
     cy.contains('Add Permissions').click();
     cy.get('#add-permission-form').within(() => {
       cy.get('input').type('user');
-      cy.contains('user2').click();
+      cy.get('li:contains("user2")').click();
       cy.contains('admin').click();
       cy.contains('Read').click();
       cy.contains('Submit').click();
