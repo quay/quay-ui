@@ -7,7 +7,7 @@ import {
   Thead,
   Tr,
 } from '@patternfly/react-table';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useRepositoryPermissions} from 'src/hooks/UseRepositoryPermissions';
 import PermissionsToolbar from './PermissionsToolbar';
 import {PermissionsColumnNames} from './ColumnNames';
@@ -15,6 +15,7 @@ import PermissionsDropdown from './PermissionsDropdown';
 import {RepoMember} from 'src/resources/RepositoryResource';
 import PermissionsKebab from './PermissionsKebab';
 import {DrawerContentType} from '../Types';
+import EntityIcon from 'src/components/EntityIcon';
 
 export default function Permissions(props: PermissionsProps) {
   const {
@@ -41,6 +42,13 @@ export default function Permissions(props: PermissionsProps) {
       return isSelecting ? [...others, member] : others;
     });
   };
+
+  // Close drawer if navigating away from permissions settings
+  useEffect(() => {
+    return () => {
+      props.setDrawerContent(DrawerContentType.None);
+    };
+  }, []);
 
   if (loading) {
     return <Spinner />;
@@ -93,7 +101,9 @@ export default function Permissions(props: PermissionsProps) {
                 }}
               />
               <Td data-label="membername">{member.name}</Td>
-              <Td data-label="type">{member.type}</Td>
+              <Td data-label="type">
+                <EntityIcon type={member.type} includeText />
+              </Td>
               <Td data-label="role">
                 <PermissionsDropdown member={member} />
               </Td>

@@ -8,6 +8,7 @@ import {
   ModalVariant,
   TextInput,
 } from '@patternfly/react-core';
+import {ExclamationCircleIcon} from '@patternfly/react-icons';
 import {useEffect, useState} from 'react';
 import Conditional from 'src/components/empty/Conditional';
 import {useAuthorizedEmails} from 'src/hooks/UseAuthorizedEmails';
@@ -176,13 +177,19 @@ export default function CreateEmailNotification(
       >
         Unable to verify email confirmation. Please wait a moment and retry.
       </Modal>
-      <FormGroup fieldId="email" label="E-mail address" required>
+      <FormGroup
+        fieldId="email"
+        label="E-mail address"
+        isRequired
+        validated={email == '' || isValidEmail(email) ? 'default' : 'error'}
+        helperTextInvalid="Invalid email"
+        helperTextInvalidIcon={<ExclamationCircleIcon />}
+      >
         <TextInput
           id="notification-email"
           isRequired
           value={email}
           onChange={(value) => setEmail(value)}
-          validated={email == '' || isValidEmail(email) ? 'default' : 'error'}
         />
       </FormGroup>
       <FormGroup fieldId="title" label="Title">

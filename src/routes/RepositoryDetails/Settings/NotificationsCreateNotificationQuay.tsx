@@ -49,9 +49,20 @@ export default function CreateQuayNotification(props: CreateQuayNotification) {
     }
   }, [successCreatingNotification]);
 
+  useEffect(() => {
+    if (errorCreatingNotification) {
+      props.setError('Unable to create notification');
+      resetCreatingNotification();
+    }
+  }, [errorCreatingNotification]);
+
   return (
     <>
-      <FormGroup fieldId="quayNotificationRecipient" label="Recipient" required>
+      <FormGroup
+        fieldId="quayNotificationRecipient"
+        label="Recipient"
+        isRequired
+      >
         <EntitySearch
           org={props.org}
           onSelect={(e: Entity) => setSelectedEntity(e)}

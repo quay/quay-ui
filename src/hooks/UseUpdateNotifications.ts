@@ -11,7 +11,7 @@ export function useUpdateNotifications(org: string, repo: string) {
   const queryClient = useQueryClient();
   const {
     mutate: create,
-    isError: errorCreatingNotification,
+    error: errorCreatingNotification,
     isSuccess: successCreatingNotification,
     reset: resetCreatingNotification,
   } = useMutation(
@@ -64,11 +64,18 @@ export function useUpdateNotifications(org: string, repo: string) {
       },
     },
   );
+  let errorCreationMessage = null;
+  if (errorCreatingNotification != null) {
+    errorCreationMessage = (errorCreatingNotification as any)?.response?.data
+      ?.detail
+      ? (errorCreatingNotification as any)?.response?.data?.detail
+      : 'Unable to create notification';
+  }
 
   return {
     create: create,
     successCreatingNotification: successCreatingNotification,
-    errorCreatingNotification: errorCreatingNotification,
+    errorCreatingNotification: errorCreationMessage,
     resetCreatingNotification: resetCreatingNotification,
 
     deleteNotifications: removeNotification,

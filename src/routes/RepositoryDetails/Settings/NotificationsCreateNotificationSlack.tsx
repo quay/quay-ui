@@ -12,6 +12,7 @@ import {
 } from '@patternfly/react-core';
 import {useEffect, useState} from 'react';
 import {useUpdateNotifications} from 'src/hooks/UseUpdateNotifications';
+import {ExclamationCircleIcon} from '@patternfly/react-icons';
 
 export default function CreateSlackNotification(
   props: CreateSlackNotificationProps,
@@ -25,8 +26,17 @@ export default function CreateSlackNotification(
     resetCreatingNotification,
   } = useUpdateNotifications(props.org, props.repo);
 
+  const isValidWebhookURL = (url: string) => {
+    const regex =
+      /^https:\/\/hooks\.slack\.com\/services\/[A-Z0-9]+\/[A-Z0-9]+\/[a-zA-Z0-9]+$/;
+    return regex.test(url);
+  };
+
   const isFormComplete =
-    props.method != undefined && props.event != undefined && url != '';
+    props.method != undefined &&
+    props.event != undefined &&
+    url != '' &&
+    isValidWebhookURL(url);
 
   const createNotification = async () => {
     create({
@@ -47,9 +57,23 @@ export default function CreateSlackNotification(
     }
   }, [successCreatingNotification]);
 
+  useEffect(() => {
+    if (errorCreatingNotification) {
+      props.setError('Unable to create notification');
+      resetCreatingNotification();
+    }
+  }, [errorCreatingNotification]);
+
   return (
     <>
-      <FormGroup fieldId="slack-webhook-url" label="Webhook URL" required>
+      <FormGroup
+        fieldId="slack-webhook-url"
+        label="Webhook URL"
+        isRequired
+        helperTextInvalid="Must be a valid slack url in the form ^https://hooks.slack.com/services/[A-Z0-9]+/[A-Z0-9]+/[a-zA-Z0-9]+$/"
+        helperTextInvalidIcon={<ExclamationCircleIcon />}
+        validated={url == '' || isValidWebhookURL(url) ? 'default' : 'error'}
+      >
         <TextInput
           required
           id="slack-webhook-url-field"

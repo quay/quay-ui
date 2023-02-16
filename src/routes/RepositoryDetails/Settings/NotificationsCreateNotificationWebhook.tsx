@@ -2,17 +2,14 @@ import {NotificationEvent} from 'src/hooks/UseEvents';
 import {NotificationMethod} from 'src/hooks/UseNotificationMethods';
 import {
   ActionGroup,
-  Alert,
-  AlertActionCloseButton,
   Button,
   FormGroup,
-  Modal,
-  ModalVariant,
   TextArea,
   TextInput,
 } from '@patternfly/react-core';
 import {useEffect, useState} from 'react';
 import {useUpdateNotifications} from 'src/hooks/UseUpdateNotifications';
+import {ExclamationCircleIcon} from '@patternfly/react-icons';
 
 export default function CreateWebhookNotification(
   props: CreateWebhookNotificationProps,
@@ -27,8 +24,15 @@ export default function CreateWebhookNotification(
     resetCreatingNotification,
   } = useUpdateNotifications(props.org, props.repo);
 
+  const isValidURL = (url: string) => {
+    return url.startsWith('http://') || url.startsWith('https://');
+  };
+
   const isFormComplete =
-    props.method != undefined && props.event != undefined && url != '';
+    props.method != undefined &&
+    props.event != undefined &&
+    url != '' &&
+    isValidURL(url);
 
   const createNotification = async () => {
     create({
@@ -50,9 +54,23 @@ export default function CreateWebhookNotification(
     }
   }, [successCreatingNotification]);
 
+  useEffect(() => {
+    if (errorCreatingNotification) {
+      props.setError(errorCreatingNotification as string);
+      resetCreatingNotification();
+    }
+  }, [errorCreatingNotification]);
+
   return (
     <>
-      <FormGroup fieldId="webhook-url" label="Webhook URL" required>
+      <FormGroup
+        fieldId="webhook-url"
+        label="Webhook URL"
+        isRequired
+        helperTextInvalid="URL must begin with http(s)://"
+        helperTextInvalidIcon={<ExclamationCircleIcon />}
+        validated={url == '' || isValidURL(url) ? 'default' : 'error'}
+      >
         <TextInput
           required
           id="webhook-url-field"
@@ -60,12 +78,11 @@ export default function CreateWebhookNotification(
           onChange={(value) => setUrl(value)}
         />
       </FormGroup>
-      <FormGroup fieldId="webhook-body" label="POST body template " required>
+      <FormGroup fieldId="webhook-body" label="POST JSON body template">
         <TextArea
           id="json-body-field"
           value={jsonBody}
           onChange={(value) => setJsonBody(value)}
-          isRequired
         />
       </FormGroup>
       <FormGroup fieldId="title" label="Title">

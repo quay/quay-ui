@@ -1,23 +1,29 @@
-import {Select, SelectOption, SelectVariant} from '@patternfly/react-core';
+import {
+  Select,
+  SelectOption,
+  SelectVariant,
+  Spinner,
+} from '@patternfly/react-core';
 import {useEffect, useState} from 'react';
 import {useEntities} from 'src/hooks/UseEntities';
 import {Entity, getMemberType} from 'src/resources/UserResource';
+import EntityIcon from './EntityIcon';
 
 export default function EntitySearch(props: EntitySearchProps) {
-  const [selectedEntityName, setSelectedEntityName] = useState<string>();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const {entities, isError, searchTerm, setSearchTerm} = useEntities(props.org);
+  const {entities, isLoadingEntities, isError, searchTerm, setSearchTerm} =
+    useEntities(props.org);
 
   useEffect(() => {
-    if (selectedEntityName != undefined && selectedEntityName != '') {
-      const filteredEntity = entities.filter(
-        (e) => e.name === selectedEntityName,
-      );
+    if (searchTerm != undefined && searchTerm != '') {
+      const filteredEntity = entities.filter((e) => e.name === searchTerm);
       const selectedEntity =
         filteredEntity.length > 0 ? filteredEntity[0] : null;
       props.onSelect(selectedEntity);
+    } else {
+      props.onSelect(null);
     }
-  }, [selectedEntityName]);
+  }, [searchTerm, JSON.stringify(entities)]);
 
   useEffect(() => {
     if (isError) {
@@ -32,7 +38,6 @@ export default function EntitySearch(props: EntitySearchProps) {
       selections={searchTerm}
       onSelect={(e, value) => {
         setSearchTerm(value as string);
-        setSelectedEntityName(value as string);
         setIsOpen(!isOpen);
       }}
       onToggle={() => {
@@ -46,14 +51,16 @@ export default function EntitySearch(props: EntitySearchProps) {
       onClear={() => {
         setSearchTerm('');
       }}
+      loadingVariant={isLoadingEntities ? 'spinner' : undefined}
     >
-      {entities.map((e) => (
-        <SelectOption
-          key={e.name}
-          value={e.name}
-          description={getMemberType(e)}
-        />
-      ))}
+      {isLoadingEntities
+        ? undefined
+        : entities.map((e) => (
+            <SelectOption key={e.name} value={e.name}>
+              <EntityIcon type={getMemberType(e)} includeIcon />
+              {e.name}
+            </SelectOption>
+          ))}
     </Select>
   );
 }

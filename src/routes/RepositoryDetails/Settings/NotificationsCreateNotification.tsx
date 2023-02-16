@@ -9,6 +9,7 @@ import {
   Title,
 } from '@patternfly/react-core';
 import {useState} from 'react';
+import './NotificationsCreateNotification.css';
 import Conditional from 'src/components/empty/Conditional';
 import {NotificationEvent, useEvents} from 'src/hooks/UseEvents';
 import {
@@ -46,8 +47,10 @@ export default function CreateNotification(props: CreateNotificationProps) {
             title={error}
           />
         </Conditional>
-        <FormGroup fieldId="event" label="When this event occurs" required>
+        <FormGroup fieldId="event" label="When this event occurs" isRequired>
           <Dropdown
+            className="create-notification-dropdown"
+            required
             onSelect={() => setIsEventOpen(false)}
             toggle={
               <DropdownToggle onToggle={(isOpen) => setIsEventOpen(isOpen)}>
@@ -64,8 +67,13 @@ export default function CreateNotification(props: CreateNotificationProps) {
             ))}
           />
         </FormGroup>
-        <FormGroup fieldId="method" label="Then issue a notification" required>
+        <FormGroup
+          fieldId="method"
+          label="Then issue a notification"
+          isRequired
+        >
           <Dropdown
+            className="create-notification-dropdown"
             onSelect={() => setIsMethodOpen(false)}
             toggle={
               <DropdownToggle onToggle={(isOpen) => setIsMethodOpen(isOpen)}>

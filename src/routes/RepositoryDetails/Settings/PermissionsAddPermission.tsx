@@ -66,7 +66,7 @@ export default function AddPermissions(props: AddPermissionsProps) {
         />
       </Conditional>
       <Form id="add-permission-form">
-        <FormGroup fieldId="user" label="Select a user" required>
+        <FormGroup fieldId="user" label="Select a team or user" required>
           <EntitySearch
             org={props.org}
             onError={() => setErrorFetchingEntities(true)}

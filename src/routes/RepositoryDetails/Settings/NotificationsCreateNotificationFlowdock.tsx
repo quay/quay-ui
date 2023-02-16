@@ -47,12 +47,19 @@ export default function CreateFlowdockNotification(
     }
   }, [successCreatingNotification]);
 
+  useEffect(() => {
+    if (errorCreatingNotification) {
+      props.setError('Unable to create notification');
+      resetCreatingNotification();
+    }
+  }, [errorCreatingNotification]);
+
   return (
     <>
       <FormGroup
         fieldId="flowdock-api-token"
         label="Flowdock API token"
-        required
+        isRequired
       >
         <TextInput
           required
