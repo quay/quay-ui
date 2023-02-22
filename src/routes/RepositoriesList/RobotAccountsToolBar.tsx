@@ -5,9 +5,9 @@ import {useRecoilState} from 'recoil';
 import {searchRobotAccountState} from 'src/atoms/RobotAccountState';
 import {FilterInput} from 'src/components/toolbar/FilterInput';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
-import {Kebab} from '../../components/toolbar/Kebab';
+import {Kebab} from 'src/components/toolbar/Kebab';
 import React, {ReactElement} from 'react';
-import {ToolbarPagination} from '../../components/toolbar/ToolbarPagination';
+import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {ExpandCollapseButton} from 'src/components/toolbar/ExpandCollapseButton';
 
 export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
@@ -40,11 +40,15 @@ export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
           expandTable={props.expandTable}
           collapseTable={props.collapseTable}
         />
-        <Kebab
-          isKebabOpen={props.isKebabOpen}
-          setKebabOpen={props.setKebabOpen}
-          kebabItems={props.kebabItems}
-        />
+        {props.selectedItems.length > 0 ? (
+          <Kebab
+            isKebabOpen={props.isKebabOpen}
+            setKebabOpen={props.setKebabOpen}
+            kebabItems={props.kebabItems}
+            useActions={false}
+          />
+        ) : null}
+        {props.deleteKebabIsOpen ? props.deleteModal : null}
         <ToolbarPagination
           itemsList={props.allItemsList}
           perPage={props.perPage}
@@ -71,6 +75,8 @@ type RobotAccountsToolBarProps = {
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
   kebabItems: ReactElement[];
+  deleteModal: object;
+  deleteKebabIsOpen: boolean;
   perPage: number;
   page: number;
   setPage: (pageNumber) => void;

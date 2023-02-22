@@ -17,5 +17,5 @@ export const searchRobotAccountState = atom<SearchState>({
 
 export const selectedRobotDefaultPermission = atom({
   key: 'selectedRobotDefaultPermission',
-  default: 'None',
+  default: '',
 });

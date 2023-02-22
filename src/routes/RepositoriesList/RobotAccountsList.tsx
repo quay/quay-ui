@@ -28,6 +28,10 @@ import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
 import {ReactElement, useState} from 'react';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import RobotAccountKebab from './RobotAccountKebab';
+import {useDeleteRobotAccounts} from 'src/hooks/UseDeleteRobotAccount';
+import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
+import {addDisplayError, BulkOperationError} from 'src/resources/ErrorHandling';
+import ErrorModal from 'src/components/errors/ErrorModal';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
   const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
@@ -35,7 +39,9 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const search = useRecoilValue(searchRobotAccountState);
   const [isCreateRobotModalOpen, setCreateRobotModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isTableExpanded, setTableExpanded] = useState(false);
+  const [err, setErr] = useState<string[]>();
 
   const robotAccountsList: IRobot[] = robotAccountsForOrg?.map(
     (robotAccount) => {
@@ -84,14 +90,40 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     selectedRobotAccountsState,
   );
 
+  const {deleteRobotAccounts} = useDeleteRobotAccounts({
+    namespace: props.orgName,
+    onSuccess: () => {
+      setSelectedRobotAccounts([]);
+      setDeleteModalOpen(!isDeleteModalOpen);
+    },
+    onError: (err) => {
+      if (err instanceof BulkOperationError) {
+        const errMessages = [];
+        err.getErrors().forEach((error, robot) => {
+          errMessages.push(
+            addDisplayError(
+              `Failed to delete robot account ${robot}`,
+              error.error,
+            ),
+          );
+        });
+        setErr(errMessages);
+      } else {
+        setErr([addDisplayError('Failed to delete robot account', err)]);
+      }
+      setSelectedRobotAccounts([]);
+      setDeleteModalOpen(!isDeleteModalOpen);
+    },
+  });
+
   const setRobotAccountsSelected = (robotAccount: IRobot, isSelecting = true) =>
     setSelectedRobotAccounts((prevSelected) => {
-      const otherSelectedRepoNames = prevSelected.filter(
+      const otherSelectedRobotNames = prevSelected.filter(
         (r) => r !== robotAccount.name,
       );
       return isSelecting
-        ? [...otherSelectedRepoNames, robotAccount.name]
-        : otherSelectedRepoNames;
+        ? [...otherSelectedRobotNames, robotAccount.name]
+        : otherSelectedRobotNames;
     });
 
   const isRobotAccountSelectable = (robot) => robot.name !== ''; // Arbitrary logic for this example
@@ -122,8 +154,43 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     return len.toString() + ' ' + placeholder;
   };
 
+  const mapOfColNamesToTableData = {
+    RobotAccount: {
+      label: 'name',
+      transformFunc: (item: string) => {
+        return `${item}`;
+      },
+    },
+  };
+
+  const handleBulkDeleteModalToggle = () => {
+    setKebabOpen(!isKebabOpen);
+    setDeleteModalOpen(!isDeleteModalOpen);
+  };
+
+  const bulkDeleteRobotAccounts = async () => {
+    await deleteRobotAccounts(selectedRobotAccounts);
+  };
+
+  const bulkDeleteRobotAccountModal = (
+    <BulkDeleteModalTemplate
+      mapOfColNamesToTableData={mapOfColNamesToTableData}
+      handleModalToggle={handleBulkDeleteModalToggle}
+      handleBulkDeletion={bulkDeleteRobotAccounts}
+      isModalOpen={isDeleteModalOpen}
+      selectedItems={selectedRobotAccounts}
+      resourceName={'robot accounts'}
+    />
+  );
+
   const kebabItems: ReactElement[] = [
-    <DropdownItem key="kebab-item">Action Item</DropdownItem>,
+    <DropdownItem
+      key="delete-item"
+      className="red-color"
+      onClick={handleBulkDeleteModalToggle}
+    >
+      Delete
+    </DropdownItem>,
   ];
 
   const createRobotModal = (
@@ -152,6 +219,11 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   return (
     <>
       <PageSection variant={PageSectionVariants.light}>
+        <ErrorModal
+          title="Robot Account deletion failed"
+          error={err}
+          setError={setErr}
+        />
         <RobotAccountsToolBar
           selectedItems={selectedRobotAccounts}
           allItemsList={filteredRobotAccounts}
@@ -165,6 +237,8 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           isKebabOpen={isKebabOpen}
           setKebabOpen={setKebabOpen}
           kebabItems={kebabItems}
+          deleteModal={bulkDeleteRobotAccountModal}
+          deleteKebabIsOpen={isDeleteModalOpen}
           perPage={perPage}
           page={page}
           setPage={setPage}
@@ -245,6 +319,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                     <RobotAccountKebab
                       robotAccount={robotAccount}
                       namespace={props.orgName}
+                      setError={setErr}
                     />
                   </Td>
                 </Tr>

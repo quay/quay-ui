@@ -14,9 +14,17 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
     element.focus();
   };
 
-  const {deleteRobotAccounts} = useDeleteRobotAccounts(props.namespace);
+  const {deleteRobotAccounts} = useDeleteRobotAccounts({
+    namespace: props.namespace,
+    onSuccess: () => {
+      setIsOpen(false);
+    },
+    onError: (err) => {
+      props.setError(err);
+    },
+  });
   const deleteRobotAccount = async () => {
-    await deleteRobotAccounts([props.robotAccount]);
+    await deleteRobotAccounts([props.robotAccount.name]);
   };
 
   return (
@@ -51,4 +59,5 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
 interface RobotAccountKebabProps {
   namespace: string;
   robotAccount: IRobot;
+  setError: (err) => void;
 }

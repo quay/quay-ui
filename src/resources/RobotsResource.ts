@@ -106,10 +106,10 @@ export async function deleteRobotAccount(orgname: string, robotname: string) {
 
 export async function bulkDeleteRobotAccounts(
   orgname: string,
-  robotaccounts: IRobot[],
+  robotaccounts: string[],
 ) {
   const responses = await Promise.allSettled(
-    robotaccounts.map((robot) => deleteRobotAccount(orgname, robot.name)),
+    robotaccounts.map((robot) => deleteRobotAccount(orgname, robot)),
   );
 
   // Aggregate failed responses
