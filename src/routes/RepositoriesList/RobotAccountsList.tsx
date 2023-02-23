@@ -3,6 +3,10 @@ import {
   PageSection,
   PageSectionVariants,
   PanelFooter,
+  Spinner,
+  TextContent,
+  Text,
+  TextVariants,
 } from '@patternfly/react-core';
 import {
   TableComposable,
@@ -249,6 +253,26 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     );
   }
 
+  if (paginatedRobotAccountList.length == 0) {
+    return (
+      <TableComposable aria-label="Empty state table" borders={false}>
+        <Tbody>
+          <Tr>
+            <Td colSpan={8} textCenter={true}>
+              <Spinner diameter="50px" />
+            </Td>
+          </Tr>
+          <Tr>
+            <Td colSpan={8} textCenter={true}>
+              <TextContent>
+                <Text component={TextVariants.h3}>Loading</Text>
+              </TextContent>
+            </Td>
+          </Tr>
+        </Tbody>
+      </TableComposable>
+    );
+  }
   return (
     <>
       <PageSection variant={PageSectionVariants.light}>
