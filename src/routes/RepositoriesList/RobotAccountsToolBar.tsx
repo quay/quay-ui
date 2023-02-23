@@ -9,6 +9,7 @@ import {Kebab} from 'src/components/toolbar/Kebab';
 import React, {ReactElement} from 'react';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import {ExpandCollapseButton} from 'src/components/toolbar/ExpandCollapseButton';
+import {BulkDelete} from 'src/components/toolbar/BulkDelete';
 
 export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
   const [search, setSearch] = useRecoilState(searchRobotAccountState);
@@ -41,12 +42,7 @@ export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
           collapseTable={props.collapseTable}
         />
         {props.selectedItems.length > 0 ? (
-          <Kebab
-            isKebabOpen={props.isKebabOpen}
-            setKebabOpen={props.setKebabOpen}
-            kebabItems={props.kebabItems}
-            useActions={false}
-          />
+          <BulkDelete setClicked={props.setDeleteModalOpen} />
         ) : null}
         {props.deleteKebabIsOpen ? props.deleteModal : null}
         <ToolbarPagination
@@ -77,6 +73,7 @@ type RobotAccountsToolBarProps = {
   kebabItems: ReactElement[];
   deleteModal: object;
   deleteKebabIsOpen: boolean;
+  setDeleteModalOpen: (open) => void;
   perPage: number;
   page: number;
   setPage: (pageNumber) => void;

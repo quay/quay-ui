@@ -296,6 +296,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           kebabItems={kebabItems}
           deleteModal={bulkDeleteRobotAccountModal}
           deleteKebabIsOpen={isDeleteModalOpen}
+          setDeleteModalOpen={setDeleteModalOpen}
           perPage={perPage}
           page={page}
           setPage={setPage}
