@@ -32,16 +32,30 @@ import {useDeleteRobotAccounts} from 'src/hooks/UseDeleteRobotAccount';
 import {BulkDeleteModalTemplate} from 'src/components/modals/BulkDeleteModalTemplate';
 import {addDisplayError, BulkOperationError} from 'src/resources/ErrorHandling';
 import ErrorModal from 'src/components/errors/ErrorModal';
+import Empty from 'src/components/empty/Empty';
+import {CubesIcon} from '@patternfly/react-icons';
+import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
-  const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
-    useRobotAccounts(props.orgName);
   const search = useRecoilValue(searchRobotAccountState);
   const [isCreateRobotModalOpen, setCreateRobotModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isTableExpanded, setTableExpanded] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [err, setErr] = useState<string[]>();
+
+  const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
+    useRobotAccounts({
+      name: props.orgName,
+      onSuccess: () => {
+        setLoading(false);
+      },
+      onError: (err) => {
+        setErr([addDisplayError('Unable to fetch robot accounts', err)]);
+        setLoading(false);
+      },
+    });
 
   const robotAccountsList: IRobot[] = robotAccountsForOrg?.map(
     (robotAccount) => {
@@ -215,6 +229,25 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       setRobotExpanded(robotAccount);
     });
   };
+
+  if (!loading && !robotAccountsForOrg?.length) {
+    return (
+      <Empty
+        title="There are no viewable robot accounts for this repository"
+        icon={CubesIcon}
+        body="Either no robot accounts exist yet or you may not have permission to view any. If you have the permissions, you may create robot accounts in this repository."
+        button={
+          <ToolbarButton
+            id=""
+            buttonValue="Create robot account"
+            Modal={createRobotModal}
+            isModalOpen={isCreateRobotModalOpen}
+            setModalOpen={setCreateRobotModalOpen}
+          />
+        }
+      />
+    );
+  }
 
   return (
     <>

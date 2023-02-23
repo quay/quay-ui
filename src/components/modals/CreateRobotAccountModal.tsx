@@ -35,13 +35,6 @@ export default function CreateRobotAccountModal(
     return null;
   }
 
-  const {
-    createNewRobot,
-    updateRepoPermsForRobot,
-    updateTeamsForRobot,
-    addDefaultPermsForRobot,
-  } = useRobotAccounts(props.namespace);
-
   // Fetching repos
   const {repos: repos, totalResults: repoCount} = useRepositories(
     props.namespace,
@@ -60,6 +53,23 @@ export default function CreateRobotAccountModal(
     selectedRobotDefaultPermission,
   );
   const [isDrawerExpanded, setDrawerExpanded] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const {
+    createNewRobot,
+    updateRepoPermsForRobot,
+    updateTeamsForRobot,
+    addDefaultPermsForRobot,
+  } = useRobotAccounts({
+    name: props.namespace,
+    onSuccess: () => {
+      setLoading(false);
+    },
+    onError: (err) => {
+      setErr(addDisplayError('Unable to fetch robot accounts', err));
+      setLoading(false);
+    },
+  });
   const queryClient = useQueryClient();
 
   // Fetching teams

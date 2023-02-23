@@ -8,7 +8,7 @@ import {
 } from 'src/resources/RobotsResource';
 import {updateTeamForRobot} from '../resources/TeamResources';
 
-export function useRobotAccounts(name: string) {
+export function useRobotAccounts({name, onSuccess, onError}) {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [namespace, setNamespace] = useState(name);
@@ -22,6 +22,12 @@ export function useRobotAccounts(name: string) {
     () => fetchRobotsForNamespace(namespace),
     {
       placeholderData: [],
+      onSuccess: () => {
+        onSuccess();
+      },
+      onError: (err) => {
+        onError(err);
+      },
     },
   );
 
