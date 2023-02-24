@@ -39,6 +39,7 @@ import ErrorModal from 'src/components/errors/ErrorModal';
 import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
+import {formatDate} from 'src/libs/utils';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
   const search = useRecoilValue(searchRobotAccountState);
@@ -165,11 +166,11 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     if (len == 0) {
       return 'No ' + placeholder;
     } else if (len == 1 && teams) {
-      return '1 team';
+      return <Link to="#">1 team</Link>;
     } else if (len == 1 && !teams) {
-      return '1 repository';
+      return <Link to="#">1 repository</Link>;
     }
-    return len.toString() + ' ' + placeholder;
+    return <Link to="#">{len.toString() + ' ' + placeholder}</Link>;
   };
 
   const mapOfColNamesToTableData = {
@@ -358,12 +359,10 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                     <Link to="#">{robotAccount.name}</Link>
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.teams}>
-                    <Link to="#">{getLength(robotAccount.teams, true)}</Link>
+                    {getLength(robotAccount.teams, true)}
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.repositories}>
-                    <Link to="#">
-                      {getLength(robotAccount.repositories, false)}
-                    </Link>
+                    {getLength(robotAccount.repositories, false)}
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.lastAccessed}>
                     {robotAccount.last_accessed
@@ -371,7 +370,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                       : 'Never'}
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.created}>
-                    {robotAccount.created}
+                    {formatDate(robotAccount.created)}
                   </Td>
                   <Td data-label="kebab">
                     <RobotAccountKebab

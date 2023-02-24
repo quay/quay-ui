@@ -32,6 +32,7 @@ import ToggleDrawer from 'src/components/ToggleDrawer';
 import NameAndDescription from 'src/components/modals/robotAccountWizard/NameAndDescription';
 import {useTeams} from 'src/hooks/useTeams';
 import {addDisplayError} from 'src/resources/ErrorHandling';
+import {formatDate} from 'src/libs/utils';
 
 const ColumnNames = {
   name: 'Team',
@@ -51,6 +52,27 @@ export default function AddToTeam(props: AddToTeamProps) {
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamDescription, setNewTeamDescription] = useState('');
   const [err, setErr] = useState<string>();
+
+  useEffect(() => {
+    if (tableMode == 'All') {
+      setTableItems(props.items);
+    } else if (tableMode == 'Selected') {
+      setTableItems(props.selectedTeams);
+    }
+  });
+
+  const filteredItems =
+    search.query !== ''
+      ? tableItems.filter((item) => {
+          const Itemname = item.name;
+          return Itemname.includes(search.query);
+        })
+      : tableItems;
+
+  const paginatedItems = filteredItems?.slice(
+    page * perPage - perPage,
+    page * perPage - perPage + perPage,
+  );
 
   const {createNewTeamHook} = useTeams(props.namespace);
 
@@ -136,32 +158,11 @@ export default function AddToTeam(props: AddToTeamProps) {
   };
 
   // Logic for handling row-wise checkbox selection in <Td>
-  const isItemSelected = (item) => props.selectedTeams.includes(item.name);
+  const isItemSelected = (item) => props.selectedTeams?.includes(item);
 
   const onSelectItem = (item, rowIndex: number, isSelecting: boolean) => {
     setItemSelected(item, isSelecting);
   };
-
-  useEffect(() => {
-    if (tableMode == 'All') {
-      setTableItems(props.items);
-    } else if (tableMode == 'Selected') {
-      setTableItems(props.selectedTeams);
-    }
-  });
-
-  const filteredItems =
-    search.query !== ''
-      ? tableItems.filter((item) => {
-          const Itemname = item.name;
-          return Itemname.includes(search.query);
-        })
-      : tableItems;
-
-  const paginatedItems = filteredItems?.slice(
-    page * perPage - perPage,
-    page * perPage - perPage + perPage,
-  );
 
   if (props.isDrawerExpanded) {
     return (
@@ -250,7 +251,9 @@ export default function AddToTeam(props: AddToTeamProps) {
                       : team.member_count + ' Member'}
                   </Td>
                   <Td dataLabel={ColumnNames.lastUpdated}>
-                    {team.last_updated ? team.last_updated : 'Never'}
+                    {team.last_updated
+                      ? formatDate(team.last_updated)
+                      : 'Never'}
                   </Td>
                 </Tr>
               </Tbody>
