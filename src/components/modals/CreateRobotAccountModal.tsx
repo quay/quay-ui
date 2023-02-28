@@ -14,9 +14,6 @@ import Footer from './robotAccountWizard/Footer';
 import AddToTeam from './robotAccountWizard/AddToTeam';
 import AddToRepository from './robotAccountWizard/AddToRepository';
 import {addDisplayError} from 'src/resources/ErrorHandling';
-import {useQuery} from '@tanstack/react-query';
-import {fetchOrg} from 'src/resources/OrganizationResource';
-import {useQueryClient} from '@tanstack/react-query';
 import DefaultPermissions from './robotAccountWizard/DefaultPermissions';
 import ReviewAndFinish from './robotAccountWizard/ReviewAndFinish';
 import {useRecoilState} from 'recoil';
@@ -43,7 +40,6 @@ export default function CreateRobotAccountModal(
   const [robotName, setRobotName] = useState('');
   const [robotDescription, setrobotDescription] = useState('');
   const [err, setErr] = useState<string>();
-  const [teams, setTeams] = useState([]);
   const [selectedRepoPerms, setSelectedRepoPerms] = useRecoilState(
     selectedReposPermissionState,
   );
@@ -70,24 +66,6 @@ export default function CreateRobotAccountModal(
       setLoading(false);
     },
   });
-  const queryClient = useQueryClient();
-
-  // Fetching teams
-  useQuery(
-    ['organization', props.namespace, 'teams'],
-    () => {
-      fetchOrg(props.namespace).then((response) => {
-        setTeams(Object['values'](response?.teams));
-        return response?.teams;
-      });
-      return [];
-    },
-    {
-      placeholderData: () => {
-        return queryClient.getQueryData(['organization', props.namespace]);
-      },
-    },
-  );
 
   const onSubmit = async () => {
     try {
@@ -200,7 +178,7 @@ export default function CreateRobotAccountModal(
       name: 'Add to team (optional)',
       component: (
         <AddToTeam
-          items={teams}
+          items={props.teams}
           namespace={props.namespace}
           isDrawerExpanded={isDrawerExpanded}
           setDrawerExpanded={setDrawerExpanded}
@@ -284,4 +262,5 @@ interface CreateRobotAccountModalProps {
   isModalOpen: boolean;
   handleModalToggle?: () => void;
   namespace: string;
+  teams: any[];
 }

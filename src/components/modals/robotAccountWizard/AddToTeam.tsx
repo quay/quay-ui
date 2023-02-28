@@ -21,58 +21,18 @@ import {
   TextVariants,
   TextContent,
 } from '@patternfly/react-core';
-import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
-import {useRecoilState} from 'recoil';
-import {searchTeamState} from 'src/atoms/TeamState';
 import React, {useEffect, useState} from 'react';
-import {DropdownCheckbox} from 'src/components/toolbar/DropdownCheckbox';
-import {FilterWithDropdown} from 'src/components/toolbar/FilterWithDropdown';
 import {DesktopIcon} from '@patternfly/react-icons';
 import ToggleDrawer from 'src/components/ToggleDrawer';
 import NameAndDescription from 'src/components/modals/robotAccountWizard/NameAndDescription';
 import {useTeams} from 'src/hooks/useTeams';
 import {addDisplayError} from 'src/resources/ErrorHandling';
-import {formatDate} from 'src/libs/utils';
-
-const ColumnNames = {
-  name: 'Team',
-  role: 'Role',
-  members: 'Members',
-  lastUpdated: 'Last Updated',
-};
-
-type TableModeType = 'All' | 'Selected';
+import TeamView from './TeamView';
 
 export default function AddToTeam(props: AddToTeamProps) {
-  const [tableMode, setTableMode] = useState<TableModeType>('All');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
-  const [tableItems, setTableItems] = useState([]);
-  const [search, setSearch] = useRecoilState(searchTeamState);
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamDescription, setNewTeamDescription] = useState('');
   const [err, setErr] = useState<string>();
-
-  useEffect(() => {
-    if (tableMode == 'All') {
-      setTableItems(props.items);
-    } else if (tableMode == 'Selected') {
-      setTableItems(props.selectedTeams);
-    }
-  });
-
-  const filteredItems =
-    search.query !== ''
-      ? tableItems.filter((item) => {
-          const Itemname = item.name;
-          return Itemname.includes(search.query);
-        })
-      : tableItems;
-
-  const paginatedItems = filteredItems?.slice(
-    page * perPage - perPage,
-    page * perPage - perPage + perPage,
-  );
 
   const {createNewTeamHook} = useTeams(props.namespace);
 
@@ -140,30 +100,6 @@ export default function AddToTeam(props: AddToTeamProps) {
     </>
   );
 
-  const onTableModeChange: ToggleGroupItemProps['onChange'] = (
-    _isSelected,
-    event,
-  ) => {
-    const id = event.currentTarget.id;
-    setTableMode(id as TableModeType);
-  };
-
-  const setItemSelected = (item, isSelecting = true) => {
-    props.setSelectedTeams((prevSelected) => {
-      const otherSelectedItems = prevSelected.filter(
-        (r) => r.name !== item.name,
-      );
-      return isSelecting ? [...otherSelectedItems, item] : otherSelectedItems;
-    });
-  };
-
-  // Logic for handling row-wise checkbox selection in <Td>
-  const isItemSelected = (item) => props.selectedTeams?.includes(item);
-
-  const onSelectItem = (item, rowIndex: number, isSelecting: boolean) => {
-    setItemSelected(item, isSelecting);
-  };
-
   if (props.isDrawerExpanded) {
     return (
       <ToggleDrawer
@@ -179,99 +115,15 @@ export default function AddToTeam(props: AddToTeamProps) {
       <TextContent>
         <Text component={TextVariants.h1}>Add to team (optional)</Text>
       </TextContent>
-      <PageSection>
-        <Toolbar>
-          <ToolbarContent>
-            <DropdownCheckbox
-              selectedItems={props.selectedTeams}
-              deSelectAll={props.setSelectedTeams}
-              allItemsList={props.items}
-              itemsPerPageList={paginatedItems}
-              onItemSelect={onSelectItem}
-            />
-            <FilterWithDropdown
-              searchState={search}
-              onChange={setSearch}
-              dropdownItems={dropdownItems}
-              searchInputText="Search, create team"
-            />
-            <ToolbarItem>
-              <ToggleGroup aria-label="Default with single selectable">
-                <ToggleGroupItem
-                  text="All"
-                  buttonId="All"
-                  isSelected={tableMode === 'All'}
-                  onChange={onTableModeChange}
-                />
-                <ToggleGroupItem
-                  text="Selected"
-                  buttonId="Selected"
-                  isSelected={tableMode === 'Selected'}
-                  onChange={onTableModeChange}
-                />
-              </ToggleGroup>
-            </ToolbarItem>
-            <ToolbarPagination
-              itemsList={filteredItems}
-              perPage={perPage}
-              page={page}
-              setPage={setPage}
-              setPerPage={setPerPage}
-              total={filteredItems.length}
-            />
-          </ToolbarContent>
-        </Toolbar>
-        <TableComposable aria-label="Selectable table">
-          <Thead>
-            <Tr>
-              <Th />
-              <Th>{ColumnNames.name}</Th>
-              <Th>{ColumnNames.role}</Th>
-              <Th>{ColumnNames.members}</Th>
-              <Th>{ColumnNames.lastUpdated}</Th>
-            </Tr>
-          </Thead>
-          {paginatedItems.map((team, rowIndex) => {
-            return (
-              <Tbody key={team.name}>
-                <Tr>
-                  <Td
-                    select={{
-                      rowIndex,
-                      onSelect: (_event, isSelecting) =>
-                        onSelectItem(team, rowIndex, isSelecting),
-                      isSelected: isItemSelected(team),
-                    }}
-                  />
-                  <Td dataLabel={ColumnNames.name}>{team.name}</Td>
-                  <Td dataLabel={ColumnNames.role}>{team.role}</Td>
-                  <Td dataLabel={ColumnNames.members}>
-                    {team.member_count > 1
-                      ? team.member_count + ' Members'
-                      : team.member_count + ' Member'}
-                  </Td>
-                  <Td dataLabel={ColumnNames.lastUpdated}>
-                    {team.last_updated
-                      ? formatDate(team.last_updated)
-                      : 'Never'}
-                  </Td>
-                </Tr>
-              </Tbody>
-            );
-          })}
-        </TableComposable>
-        <PanelFooter>
-          <ToolbarPagination
-            itemsList={filteredItems}
-            perPage={perPage}
-            page={page}
-            setPage={setPage}
-            setPerPage={setPerPage}
-            bottom={true}
-            total={filteredItems.length}
-          />
-        </PanelFooter>
-      </PageSection>
+      <TeamView
+        items={props.items}
+        selectedTeams={props.selectedTeams}
+        setSelectedTeams={props.setSelectedTeams}
+        showCheckbox={true}
+        dropdownItems={dropdownItems}
+        showToggleGroup={true}
+        filterWithDropdown={true}
+      />
     </>
   );
 }

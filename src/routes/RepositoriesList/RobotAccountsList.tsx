@@ -40,6 +40,10 @@ import Empty from 'src/components/empty/Empty';
 import {CubesIcon} from '@patternfly/react-icons';
 import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {formatDate} from 'src/libs/utils';
+import TeamView from 'src/components/modals/robotAccountWizard/TeamView';
+import DisplayModal from 'src/components/modals/robotAccountWizard/DisplayModal';
+import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {fetchOrg} from 'src/resources/OrganizationResource';
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
   const search = useRecoilValue(searchRobotAccountState);
@@ -48,6 +52,9 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isTableExpanded, setTableExpanded] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isTeamsModalOpen, setTeamsModalOpen] = useState<boolean>(false);
+  const [teamsViewItems, setTeamsViewItems] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [err, setErr] = useState<string[]>();
 
   const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
@@ -62,6 +69,8 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       },
     });
 
+  const queryClient = useQueryClient();
+
   const robotAccountsList: IRobot[] = robotAccountsForOrg?.map(
     (robotAccount) => {
       return {
@@ -72,6 +81,23 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
         created: robotAccount.created,
         description: robotAccount.description,
       } as IRobot;
+    },
+  );
+
+  // Fetching teams
+  useQuery(
+    ['organization', props.orgName, 'teams'],
+    () => {
+      fetchOrg(props.orgName).then((response) => {
+        setTeams(Object['values'](response?.teams));
+        return response?.teams;
+      });
+      return [];
+    },
+    {
+      placeholderData: () => {
+        return queryClient.getQueryData(['organization', props.orgName]);
+      },
     },
   );
 
@@ -155,6 +181,14 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     setRobotAccountsSelected(robotAccount, isSelecting);
   };
 
+  const fetchTeamsModal = (items) => {
+    const filteredItems = teams.filter((team) =>
+      items.some((item) => team.name === item.name),
+    );
+    setTeamsModalOpen(true);
+    setTeamsViewItems(filteredItems);
+  };
+
   const getLength = (list, teams) => {
     const len = list.length;
     let placeholder = 'teams';
@@ -166,9 +200,19 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     if (len == 0) {
       return 'No ' + placeholder;
     } else if (len == 1 && teams) {
-      return <Link to="#">1 team</Link>;
+      return (
+        <Link to="#" onClick={() => fetchTeamsModal(list)}>
+          1 team
+        </Link>
+      );
     } else if (len == 1 && !teams) {
       return <Link to="#">1 repository</Link>;
+    } else if (teams) {
+      return (
+        <Link to="#" onClick={() => fetchTeamsModal(list)}>
+          {len.toString() + ' ' + placeholder}
+        </Link>
+      );
     }
     return <Link to="#">{len.toString() + ' ' + placeholder}</Link>;
   };
@@ -217,6 +261,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       isModalOpen={isCreateRobotModalOpen}
       handleModalToggle={() => setCreateRobotModalOpen(!isCreateRobotModalOpen)}
       namespace={props.orgName}
+      teams={teams}
     />
   );
 
@@ -306,6 +351,21 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           expandTable={expandTable}
           collapseTable={collapseTable}
         />
+
+        <DisplayModal
+          isModalOpen={isTeamsModalOpen}
+          setIsModalOpen={setTeamsModalOpen}
+          title="Teams"
+          Component={
+            <TeamView
+              items={teamsViewItems}
+              showCheckbox={false}
+              showToggleGroup={false}
+              searchInputText="Search for team"
+              filterWithDropdown={false}
+            />
+          }
+        ></DisplayModal>
 
         <TableComposable aria-label="Expandable table" variant={undefined}>
           <Thead>
