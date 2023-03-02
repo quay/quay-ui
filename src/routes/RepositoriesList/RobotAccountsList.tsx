@@ -55,6 +55,9 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const [isTeamsModalOpen, setTeamsModalOpen] = useState<boolean>(false);
   const [teamsViewItems, setTeamsViewItems] = useState([]);
   const [teams, setTeams] = useState([]);
+  const [singleSelectedRobotAccount, setSingleSelectedRobotAccount] = useState(
+    [],
+  );
   const [err, setErr] = useState<string[]>();
 
   const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
@@ -87,8 +90,8 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   // Fetching teams
   useQuery(
     ['organization', props.orgName, 'teams'],
-    () => {
-      fetchOrg(props.orgName).then((response) => {
+    ({signal}) => {
+      fetchOrg(props.orgName, signal).then((response) => {
         setTeams(Object['values'](response?.teams));
         return response?.teams;
       });
@@ -229,22 +232,34 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const handleBulkDeleteModalToggle = () => {
     setKebabOpen(!isKebabOpen);
     setDeleteModalOpen(!isDeleteModalOpen);
+    setSingleSelectedRobotAccount([]);
   };
 
   const bulkDeleteRobotAccounts = async () => {
-    await deleteRobotAccounts(selectedRobotAccounts);
+    const items =
+      singleSelectedRobotAccount.length > 0
+        ? singleSelectedRobotAccount
+        : selectedRobotAccounts;
+    await deleteRobotAccounts(items);
+    setSingleSelectedRobotAccount([]);
   };
 
-  const bulkDeleteRobotAccountModal = (
-    <BulkDeleteModalTemplate
-      mapOfColNamesToTableData={mapOfColNamesToTableData}
-      handleModalToggle={handleBulkDeleteModalToggle}
-      handleBulkDeletion={bulkDeleteRobotAccounts}
-      isModalOpen={isDeleteModalOpen}
-      selectedItems={selectedRobotAccounts}
-      resourceName={'robot accounts'}
-    />
-  );
+  const bulkDeleteRobotAccountModal = () => {
+    const items =
+      singleSelectedRobotAccount.length > 0
+        ? singleSelectedRobotAccount
+        : selectedRobotAccounts;
+    return (
+      <BulkDeleteModalTemplate
+        mapOfColNamesToTableData={mapOfColNamesToTableData}
+        handleModalToggle={handleBulkDeleteModalToggle}
+        handleBulkDeletion={bulkDeleteRobotAccounts}
+        isModalOpen={isDeleteModalOpen}
+        selectedItems={items}
+        resourceName={'robot accounts'}
+      />
+    );
+  };
 
   const kebabItems: ReactElement[] = [
     <DropdownItem
@@ -434,6 +449,10 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                       robotAccount={robotAccount}
                       namespace={props.orgName}
                       setError={setErr}
+                      deleteModal={bulkDeleteRobotAccountModal}
+                      deleteKebabIsOpen={isDeleteModalOpen}
+                      setDeleteModalOpen={setDeleteModalOpen}
+                      setSelectedRobotAccount={setSingleSelectedRobotAccount}
                     />
                   </Td>
                 </Tr>

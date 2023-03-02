@@ -44,7 +44,7 @@ export function RobotAccountsToolBar(props: RobotAccountsToolBarProps) {
         {props.selectedItems.length > 0 ? (
           <BulkDelete setClicked={props.setDeleteModalOpen} />
         ) : null}
-        {props.deleteKebabIsOpen ? props.deleteModal : null}
+        {props.deleteKebabIsOpen ? props.deleteModal() : null}
         <ToolbarPagination
           itemsList={props.allItemsList}
           perPage={props.perPage}
@@ -71,7 +71,7 @@ type RobotAccountsToolBarProps = {
   isKebabOpen: boolean;
   setKebabOpen: (open) => void;
   kebabItems: ReactElement[];
-  deleteModal: object;
+  deleteModal: () => object;
   deleteKebabIsOpen: boolean;
   setDeleteModalOpen: (open) => void;
   perPage: number;

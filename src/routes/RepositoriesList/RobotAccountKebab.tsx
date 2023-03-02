@@ -1,6 +1,5 @@
 import {Dropdown, DropdownItem, KebabToggle} from '@patternfly/react-core';
 import {IRobot} from 'src/resources/RobotsResource';
-import {useDeleteRobotAccounts} from 'src/hooks/UseDeleteRobotAccount';
 import {useState} from 'react';
 
 export default function RobotAccountKebab(props: RobotAccountKebabProps) {
@@ -14,17 +13,9 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
     element.focus();
   };
 
-  const {deleteRobotAccounts} = useDeleteRobotAccounts({
-    namespace: props.namespace,
-    onSuccess: () => {
-      setIsOpen(false);
-    },
-    onError: (err) => {
-      props.setError(err);
-    },
-  });
-  const deleteRobotAccount = async () => {
-    await deleteRobotAccounts([props.robotAccount.name]);
+  const onClick = () => {
+    props.setSelectedRobotAccount([props.robotAccount.name]);
+    props.setDeleteModalOpen(true);
   };
 
   return (
@@ -43,10 +34,11 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
         dropdownItems={[
           <DropdownItem
             key="delete"
-            onClick={() => deleteRobotAccount()}
+            onClick={() => onClick()}
             className="red-color"
             id={`${props.robotAccount.name}-btn`}
           >
+            {props.deleteKebabIsOpen ? props.deleteModal() : null}
             Delete
           </DropdownItem>,
         ]}
@@ -60,4 +52,8 @@ interface RobotAccountKebabProps {
   namespace: string;
   robotAccount: IRobot;
   setError: (err) => void;
+  deleteModal: () => object;
+  deleteKebabIsOpen: boolean;
+  setDeleteModalOpen: (open) => void;
+  setSelectedRobotAccount: (robotAccount) => void;
 }
