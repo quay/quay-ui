@@ -5,8 +5,10 @@ import {
   createNewRobotForNamespace,
   fetchRobotsForNamespace,
   updateRepoPermsForRobot,
+  IRobotRepoPerms,
+  IRobotTeam,
 } from 'src/resources/RobotsResource';
-import {updateTeamForRobot} from '../resources/TeamResources';
+import {updateTeamForRobot} from 'src/resources/TeamResources';
 
 export function useRobotAccounts({name, onSuccess, onError}) {
   const [page, setPage] = useState(1);
@@ -19,7 +21,7 @@ export function useRobotAccounts({name, onSuccess, onError}) {
     error,
   } = useQuery(
     ['Namespace', namespace, 'robots'],
-    () => fetchRobotsForNamespace(namespace),
+    ({signal}) => fetchRobotsForNamespace(namespace, false, signal),
     {
       placeholderData: [],
       onSuccess: () => {
@@ -39,16 +41,52 @@ export function useRobotAccounts({name, onSuccess, onError}) {
       robotname,
       description,
       isUser,
+      reposToUpdate,
+      selectedTeams,
+      robotDefaultPerm,
     }: createNewRobotForNamespaceParams) => {
       return createNewRobotForNamespace(
         namespace,
         robotname,
         description,
         isUser,
+        reposToUpdate,
+        selectedTeams,
+        robotDefaultPerm,
       );
     },
     {
-      onSuccess: () => {
+      onSuccess: (result) => {
+        if (result.reposToUpdate) {
+          Promise.allSettled(
+            result.reposToUpdate.map((repo) =>
+              updateRepoPermsForRobot(
+                namespace,
+                result.robotname,
+                repo.name,
+                repo.permission,
+                result.isUser,
+              ),
+            ),
+          );
+        }
+
+        if (result.selectedTeams) {
+          Promise.allSettled(
+            result.selectedTeams.map((team) =>
+              updateTeamForRobot(namespace, team.name, result.robotname),
+            ),
+          );
+        }
+
+        if (result.robotDefaultPerm) {
+          addDefaultPermsForRobot(
+            namespace,
+            result.robotname,
+            result.robotDefaultPerm,
+          );
+        }
+
         queryClient.invalidateQueries(['Namespace', namespace, 'robots']);
       },
     },
@@ -129,6 +167,9 @@ interface createNewRobotForNamespaceParams {
   robotname: string;
   description: string;
   isUser?: boolean;
+  reposToUpdate: IRobotRepoPerms[];
+  selectedTeams: IRobotTeam[];
+  robotDefaultPerm: string;
 }
 
 interface updateRobotRepoPermsParams {

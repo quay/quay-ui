@@ -11,6 +11,29 @@ export interface IRobot {
   description: string;
 }
 
+export interface IRobotRepoPerms {
+  name: string;
+  permission: string;
+  last_modified: string;
+}
+
+export interface IRobotTeamAvatar {
+  color: string;
+  hash: string;
+  kind: string;
+  name: string;
+}
+
+export interface IRobotTeam {
+  avatar: IRobotTeamAvatar;
+  can_view: boolean;
+  is_synced: boolean;
+  member_count: number;
+  name: string;
+  repo_count: 0;
+  role: string;
+}
+
 export async function fetchAllRobots(orgnames: string[], signal: AbortSignal) {
   return await Promise.all(
     orgnames.map((org) => fetchRobotsForNamespace(org, false, signal)),
@@ -79,13 +102,22 @@ export async function createNewRobotForNamespace(
   robotname: string,
   description: string,
   isUser = false,
-): Promise<IRobot[]> {
+  reposToUpdate: IRobotRepoPerms[],
+  selectedTeams: IRobotTeam[],
+  robotDefaultPerm: string,
+) {
   const namespacePath = isUser ? 'user' : `organization/${orgname}`;
   const createOrgRobotsUrl = `/api/v1/${namespacePath}/robots/${robotname}`;
   const payload = {description: description};
   const response: AxiosResponse = await axios.put(createOrgRobotsUrl, payload);
   assertHttpCode(response.status, 201);
-  return response.data?.name;
+  return {
+    robotname: robotname,
+    isUser: isUser,
+    reposToUpdate: reposToUpdate,
+    selectedTeams: selectedTeams,
+    robotDefaultPerm: robotDefaultPerm,
+  };
 }
 
 export async function deleteRobotAccount(orgname: string, robotname: string) {

@@ -384,10 +384,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           </Thead>
           {paginatedRobotAccountList.map((robotAccount, rowIndex) => {
             return (
-              <Tbody
-                key={robotAccount.name}
-                isExpanded={isRobotExpanded(robotAccount)}
-              >
+              <Tbody key={rowIndex} isExpanded={isRobotExpanded(robotAccount)}>
                 <Tr>
                   <Td
                     expand={

@@ -51,69 +51,31 @@ export default function CreateRobotAccountModal(
   const [isDrawerExpanded, setDrawerExpanded] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const {
-    createNewRobot,
-    updateRepoPermsForRobot,
-    updateTeamsForRobot,
-    addDefaultPermsForRobot,
-  } = useRobotAccounts({
+  const {createNewRobot} = useRobotAccounts({
     name: props.namespace,
     onSuccess: () => {
       setLoading(false);
     },
     onError: (err) => {
-      setErr(addDisplayError('Unable to fetch robot accounts', err));
-      setLoading(false);
+      setErr(addDisplayError('Unable to create robot', err));
     },
   });
 
   const onSubmit = async () => {
     try {
+      const reposToUpdate = filteredRepos();
       await createNewRobot({
         namespace: props.namespace,
         robotname: robotName,
         description: robotDescription,
         isUser: false,
-      })
-        .then(() => {
-          const reposToUpdate = filteredRepos();
-          if (reposToUpdate) {
-            Promise.allSettled(
-              reposToUpdate.map((repo) =>
-                updateRepoPermsForRobot({
-                  namespace: props.namespace,
-                  robotname: robotName,
-                  reponame: repo.name,
-                  permission: repo.permission,
-                  isUser: false,
-                }),
-              ),
-            );
-          }
-        })
-        .then(() => {
-          if (selectedTeams) {
-            Promise.allSettled(
-              selectedTeams.map((team) =>
-                updateTeamsForRobot({
-                  namespace: props.namespace,
-                  teamname: team.name,
-                  robotname: robotName,
-                }),
-              ),
-            );
-          }
-        })
-        .then(() => {
-          if (robotDefaultPerm) {
-            addDefaultPermsForRobot({
-              namespace: props.namespace,
-              robotname: robotName,
-              permission: robotDefaultPerm,
-            });
-          }
-        });
-      props.handleModalToggle();
+        reposToUpdate: reposToUpdate,
+        selectedTeams: selectedTeams,
+        robotDefaultPerm: robotDefaultPerm,
+      });
+      if (!loading) {
+        props.handleModalToggle();
+      }
     } catch (error) {
       console.error(error);
       setErr(addDisplayError('Unable to create robot', error));
