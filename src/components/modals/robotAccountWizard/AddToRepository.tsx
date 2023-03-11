@@ -1,5 +1,8 @@
-import {useRecoilState} from 'recoil';
-import {searchRepoState} from 'src/atoms/RepositoryState';
+import {useRecoilState, useRecoilCallback} from 'recoil';
+import {
+  searchRepoState,
+  selectedReposPermissionState,
+} from 'src/atoms/RepositoryState';
 import React, {useEffect, useState} from 'react';
 import {
   PageSection,
@@ -26,6 +29,8 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import {DropdownWithDescription} from 'src/components/toolbar/DropdownWithDescription';
+import {IRepository} from 'src/resources/RepositoryResource';
+import {formatDate} from 'src/libs/utils';
 
 const ColumnNames = {
   name: 'Repository',
@@ -41,6 +46,11 @@ export default function AddToRepository(props: AddToRepositoryProps) {
   const [perPage, setPerPage] = useState(10);
   const [tableItems, setTableItems] = useState([]);
   const [search, setSearch] = useRecoilState(searchRepoState);
+  const [robotRepoPermsMapping, setRobotRepoPermsMapping] = useState({});
+  const [isUserEntry, setUserEntry] = useState(false);
+  const [updatedRepoPerms, setUpdatedRepoPerms] = useState({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [err, setErr] = useState<string[]>();
 
   props.repos.sort((r1, r2) => {
     return r1.last_modified > r2.last_modified ? -1 : 1;
@@ -85,7 +95,27 @@ export default function AddToRepository(props: AddToRepositoryProps) {
     if (tableMode == 'All') {
       setTableItems(props.repos);
     }
-  });
+    updateTable();
+  }, [props.robotPermissions, props.repos, props.selectedRepoPerms]);
+
+  const updateTable = () => {
+    if (!props.robotPermissions) {
+      return;
+    }
+    const robotRepoPermsMapping = {};
+    props.robotPermissions?.map(function (perm) {
+      const item = {name: perm.repository.name};
+      const newItems = {
+        ...robotRepoPermsMapping,
+        [perm.repository.name]: perm.role,
+      };
+      setItemSelected(item, true);
+      setRobotRepoPermsMapping(newItems);
+      setUpdatedRepoPerms(newItems);
+      robotRepoPermsMapping[perm.repository.name] = perm.role;
+    });
+    setLoading(false);
+  };
 
   const filteredItems =
     search.query !== ''
@@ -101,24 +131,36 @@ export default function AddToRepository(props: AddToRepositoryProps) {
   );
 
   const updateRepoPerms = (permission, repo) => {
-    // Remove item if already present
-    props.setSelectedRepoPerms(
-      props.selectedRepoPerms.filter((item) => item.name !== repo.name),
-    );
-    if (permission == 'None') {
-      return;
+    if (props.wizardStep) {
+      props.setSelectedRepoPerms(
+        props.selectedRepoPerms.filter((item) => item.name !== repo.name),
+      );
+      if (permission == 'None') {
+        return;
+      }
+
+      props.setSelectedRepoPerms((prevSelected) => {
+        const newPerms = {
+          name: repo.name,
+          permission: permission,
+          last_modified: repo?.last_modified,
+        };
+        return [...prevSelected, newPerms];
+      });
+    } else {
+      setUpdatedRepoPerms((prevSelected) => {
+        const newPerms = {};
+        newPerms[repo.name] = permission;
+        return {...prevSelected, [repo.name]: permission};
+      });
     }
-    props.setSelectedRepoPerms((prevSelected) => {
-      const newPerms = {
-        name: repo.name,
-        permission: permission,
-        last_modified: repo.last_modified,
-      };
-      return [...prevSelected, newPerms];
-    });
   };
 
   const fetchRepoPermission = (repo) => {
+    if (!props.wizardStep && updatedRepoPerms[repo.name] != null) {
+      return updatedRepoPerms[repo.name];
+    }
+
     for (const repoPerm of props.selectedRepoPerms) {
       if (repoPerm.name == repo.name) {
         return repoPerm.permission;
@@ -180,7 +222,7 @@ export default function AddToRepository(props: AddToRepositoryProps) {
           </Thead>
           {paginatedItems.map((repo, rowIndex) => {
             return (
-              <Tbody key={repo.name}>
+              <Tbody key={rowIndex}>
                 <Tr>
                   <Td
                     select={{
@@ -197,10 +239,17 @@ export default function AddToRepository(props: AddToRepositoryProps) {
                       selectedVal={fetchRepoPermission(repo)}
                       onSelect={updateRepoPerms}
                       repo={repo}
+                      isItemSelected={isItemSelected(repo)}
+                      OnRowSelect={onSelectItem}
+                      rowIndex={rowIndex}
+                      setUserEntry={setUserEntry}
+                      isUserEntry={isUserEntry}
                     />
                   </Td>
                   <Td dataLabel={ColumnNames.lastUpdated}>
-                    {repo.last_modified ? repo.last_modified : 'Never'}
+                    {repo.last_modified
+                      ? formatDate(repo.last_modified)
+                      : 'Never'}
                   </Td>
                 </Tr>
               </Tbody>
@@ -227,8 +276,12 @@ interface AddToRepositoryProps {
   namespace: string;
   dropdownItems: any[];
   selectedRepos?: any[];
-  repos: any[];
+  repos: IRepository[];
   setSelectedRepos: (repos) => void;
   selectedRepoPerms: any[];
   setSelectedRepoPerms: (repoPerm) => void;
+  robotPermissions?: any[];
+  wizardStep: boolean;
+  robotName?: string;
+  fetchingRobotPerms?: boolean;
 }

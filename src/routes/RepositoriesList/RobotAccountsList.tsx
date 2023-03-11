@@ -42,11 +42,46 @@ import {ToolbarButton} from 'src/components/toolbar/ToolbarButton';
 import {formatDate} from 'src/libs/utils';
 import TeamView from 'src/components/modals/robotAccountWizard/TeamView';
 import DisplayModal from 'src/components/modals/robotAccountWizard/DisplayModal';
+import RobotRepositoryPermissions from 'src/components/modals/RobotRepositoryPermissions';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {fetchOrg} from 'src/resources/OrganizationResource';
+import {
+  selectedReposPermissionState,
+  selectedReposState,
+} from 'src/atoms/RepositoryState';
+
+const RepoPermissionDropdownItems = [
+  {
+    name: 'None',
+    description: 'No permissions on the repository',
+  },
+  {
+    name: 'Read',
+    description: 'Can view and pull from the repository',
+  },
+  {
+    name: 'Write',
+    description: 'Can view, pull, and push to the repository',
+  },
+  {
+    name: 'Admin',
+    description: 'Full admin access to the organization',
+  },
+];
+
+const EmptyRobotAccount = {
+  name: '',
+  created: '',
+  last_accessed: '',
+  teams: [],
+  repositories: [],
+  description: '',
+};
 
 export default function RobotAccountsList(props: RobotAccountsListProps) {
   const search = useRecoilValue(searchRobotAccountState);
+  const [selectedReposForModalView, setSelectedReposForModalView] =
+    useRecoilState(selectedReposState);
   const [isCreateRobotModalOpen, setCreateRobotModalOpen] = useState(false);
   const [isKebabOpen, setKebabOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -54,9 +89,14 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [isTeamsModalOpen, setTeamsModalOpen] = useState<boolean>(false);
   const [teamsViewItems, setTeamsViewItems] = useState([]);
+  const [isReposModalOpen, setReposModalOpen] = useState<boolean>(false);
+  const [robotRepos, setRobotRepos] = useState([]);
   const [teams, setTeams] = useState([]);
-  const [singleSelectedRobotAccount, setSingleSelectedRobotAccount] = useState(
-    [],
+  const [robotForDeletion, setRobotForDeletion] = useState([]);
+  const [robotForModalView, setRobotForModalView] = useState(EmptyRobotAccount);
+  // For repository modal view
+  const [selectedRepoPerms, setSelectedRepoPerms] = useRecoilState(
+    selectedReposPermissionState,
   );
   const [err, setErr] = useState<string[]>();
 
@@ -184,6 +224,17 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     setRobotAccountsSelected(robotAccount, isSelecting);
   };
 
+  const onReposModalClose = () => {
+    setSelectedReposForModalView([]);
+    setSelectedRepoPerms([]);
+  };
+
+  const fetchReposModal = (robotAccount, repos) => {
+    setRobotForModalView(robotAccount);
+    setRobotRepos(repos);
+    setReposModalOpen(true);
+  };
+
   const fetchTeamsModal = (items) => {
     const filteredItems = teams.filter((team) =>
       items.some((item) => team.name === item.name),
@@ -192,32 +243,31 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     setTeamsViewItems(filteredItems);
   };
 
-  const getLength = (list, teams) => {
+  const getLength = (robotAccount, list, teams) => {
     const len = list.length;
     let placeholder = 'teams';
+    let single_placeholder = 'team';
 
     if (!teams) {
       placeholder = 'repositories';
+      single_placeholder = 'repository';
     }
 
     if (len == 0) {
       return 'No ' + placeholder;
-    } else if (len == 1 && teams) {
+    } else {
       return (
-        <Link to="#" onClick={() => fetchTeamsModal(list)}>
-          1 team
-        </Link>
-      );
-    } else if (len == 1 && !teams) {
-      return <Link to="#">1 repository</Link>;
-    } else if (teams) {
-      return (
-        <Link to="#" onClick={() => fetchTeamsModal(list)}>
-          {len.toString() + ' ' + placeholder}
+        <Link
+          to="#"
+          onClick={() =>
+            teams ? fetchTeamsModal(list) : fetchReposModal(robotAccount, list)
+          }
+        >
+          {len.toString() + ' '}
+          {len == 1 ? single_placeholder : placeholder}
         </Link>
       );
     }
-    return <Link to="#">{len.toString() + ' ' + placeholder}</Link>;
   };
 
   const mapOfColNamesToTableData = {
@@ -232,23 +282,19 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const handleBulkDeleteModalToggle = () => {
     setKebabOpen(!isKebabOpen);
     setDeleteModalOpen(!isDeleteModalOpen);
-    setSingleSelectedRobotAccount([]);
+    setRobotForDeletion([]);
   };
 
   const bulkDeleteRobotAccounts = async () => {
     const items =
-      singleSelectedRobotAccount.length > 0
-        ? singleSelectedRobotAccount
-        : selectedRobotAccounts;
+      robotForDeletion.length > 0 ? robotForDeletion : selectedRobotAccounts;
     await deleteRobotAccounts(items);
-    setSingleSelectedRobotAccount([]);
+    setRobotForDeletion([]);
   };
 
   const bulkDeleteRobotAccountModal = () => {
     const items =
-      singleSelectedRobotAccount.length > 0
-        ? singleSelectedRobotAccount
-        : selectedRobotAccounts;
+      robotForDeletion.length > 0 ? robotForDeletion : selectedRobotAccounts;
     return (
       <BulkDeleteModalTemplate
         mapOfColNamesToTableData={mapOfColNamesToTableData}
@@ -277,6 +323,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       handleModalToggle={() => setCreateRobotModalOpen(!isCreateRobotModalOpen)}
       namespace={props.orgName}
       teams={teams}
+      RepoPermissionDropdownItems={RepoPermissionDropdownItems}
     />
   );
 
@@ -366,7 +413,6 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           expandTable={expandTable}
           collapseTable={collapseTable}
         />
-
         <DisplayModal
           isModalOpen={isTeamsModalOpen}
           setIsModalOpen={setTeamsModalOpen}
@@ -381,7 +427,24 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
             />
           }
         ></DisplayModal>
-
+        <DisplayModal
+          isModalOpen={isReposModalOpen}
+          setIsModalOpen={setReposModalOpen}
+          onClose={onReposModalClose}
+          title="Set repository permissions"
+          Component={
+            <RobotRepositoryPermissions
+              robotAccount={robotForModalView}
+              namespace={props.orgName}
+              RepoPermissionDropdownItems={RepoPermissionDropdownItems}
+              repos={robotRepos}
+              selectedRepos={selectedReposForModalView}
+              setSelectedRepos={setSelectedReposForModalView}
+              selectedRepoPerms={selectedRepoPerms}
+              setSelectedRepoPerms={setSelectedRepoPerms}
+            />
+          }
+        ></DisplayModal>
         <TableComposable aria-label="Expandable table" variant={undefined}>
           <Thead>
             <Tr>
@@ -431,10 +494,10 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                     <Link to="#">{robotAccount.name}</Link>
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.teams}>
-                    {getLength(robotAccount.teams, true)}
+                    {getLength(robotAccount, robotAccount.teams, true)}
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.repositories}>
-                    {getLength(robotAccount.repositories, false)}
+                    {getLength(robotAccount, robotAccount.repositories, false)}
                   </Td>
                   <Td dataLabel={RobotAccountColumnNames.lastAccessed}>
                     {robotAccount.last_accessed
@@ -452,7 +515,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                       deleteModal={bulkDeleteRobotAccountModal}
                       deleteKebabIsOpen={isDeleteModalOpen}
                       setDeleteModalOpen={setDeleteModalOpen}
-                      setSelectedRobotAccount={setSingleSelectedRobotAccount}
+                      setSelectedRobotAccount={setRobotForDeletion}
                     />
                   </Td>
                 </Tr>

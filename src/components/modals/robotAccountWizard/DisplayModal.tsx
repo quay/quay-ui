@@ -4,6 +4,9 @@ import {Modal, ModalVariant, Button} from '@patternfly/react-core';
 export default function DisplayModal(props: DisplayModalProps) {
   const handleModalToggle = () => {
     props.setIsModalOpen(!props.isModalOpen);
+    if (props.onClose) {
+      props.onClose();
+    }
   };
 
   return (
@@ -31,4 +34,5 @@ interface DisplayModalProps {
   setIsModalOpen: (boolean) => void;
   title: string;
   Component: any;
+  onClose?: () => void;
 }

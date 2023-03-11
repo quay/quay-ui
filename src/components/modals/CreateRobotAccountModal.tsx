@@ -87,25 +87,6 @@ export default function CreateRobotAccountModal(
     return /^[a-z][a-z0-9_]{1,254}$/.test(robotName);
   };
 
-  const RepoPermissionDropdownItems = [
-    {
-      name: 'None',
-      description: 'No permissions on the repository',
-    },
-    {
-      name: 'Read',
-      description: 'Can view and pull from the repository',
-    },
-    {
-      name: 'Write',
-      description: 'Can view, pull, and push to the repository',
-    },
-    {
-      name: 'Admin',
-      description: 'Full admin access to the organization',
-    },
-  ];
-
   const filteredRepos = () => {
     return selectedRepoPerms.filter((repo) =>
       selectedRepos.includes(repo.name),
@@ -154,12 +135,13 @@ export default function CreateRobotAccountModal(
       component: (
         <AddToRepository
           namespace={props.namespace}
-          dropdownItems={RepoPermissionDropdownItems}
+          dropdownItems={props.RepoPermissionDropdownItems}
           repos={repos}
           selectedRepos={selectedRepos}
           setSelectedRepos={setSelectedRepos}
           selectedRepoPerms={selectedRepoPerms}
           setSelectedRepoPerms={setSelectedRepoPerms}
+          wizardStep={true}
         />
       ),
     },
@@ -168,7 +150,7 @@ export default function CreateRobotAccountModal(
       component: (
         <DefaultPermissions
           robotName={robotName}
-          repoPermissions={RepoPermissionDropdownItems}
+          repoPermissions={props.RepoPermissionDropdownItems}
           robotDefaultPerm={robotDefaultPerm}
           setRobotdefaultPerm={setRobotdefaultPerm}
         />
@@ -225,4 +207,5 @@ interface CreateRobotAccountModalProps {
   handleModalToggle?: () => void;
   namespace: string;
   teams: any[];
+  RepoPermissionDropdownItems: any[];
 }

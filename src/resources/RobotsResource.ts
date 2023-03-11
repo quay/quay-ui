@@ -97,6 +97,19 @@ export async function updateRepoPermsForRobot(
   return response.data;
 }
 
+export async function deleteRepoPermsForRobot(
+  orgname: string,
+  robotname: string,
+  reponame: string,
+  isUser = false,
+) {
+  const robotNameWithOrg = `${orgname}+${robotname}`;
+  const deletePermsUrl = `/api/v1/repository/${orgname}/${reponame}/permissions/user/${robotNameWithOrg}`;
+  const response: AxiosResponse = await axios.delete(deletePermsUrl);
+  assertHttpCode(response.status, 204);
+  return response.data;
+}
+
 export async function createNewRobotForNamespace(
   orgname: string,
   robotname: string,
@@ -162,4 +175,18 @@ export async function bulkDeleteRobotAccounts(
   }
 
   return responses;
+}
+
+export async function fetchRobotPermissionsForNamespace(
+  orgName: string,
+  robotName: string,
+  isUser = false,
+  signal: AbortSignal,
+) {
+  const robot = robotName.replace(orgName + '+', '');
+  const userOrOrgPath = isUser ? 'user' : `organization/${orgName}`;
+  const getRobotPermsUrl = `/api/v1/${userOrOrgPath}/robots/${robot}/permissions`;
+  const response: AxiosResponse = await axios.get(getRobotPermsUrl, {signal});
+  assertHttpCode(response.status, 200);
+  return response.data?.permissions;
 }
