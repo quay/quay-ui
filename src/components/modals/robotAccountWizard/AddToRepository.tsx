@@ -31,6 +31,7 @@ import {
 import {DropdownWithDescription} from 'src/components/toolbar/DropdownWithDescription';
 import {IRepository} from 'src/resources/RepositoryResource';
 import {formatDate} from 'src/libs/utils';
+import _ from 'lodash';
 
 const ColumnNames = {
   name: 'Repository',
@@ -49,8 +50,6 @@ export default function AddToRepository(props: AddToRepositoryProps) {
   const [robotRepoPermsMapping, setRobotRepoPermsMapping] = useState({});
   const [isUserEntry, setUserEntry] = useState(false);
   const [updatedRepoPerms, setUpdatedRepoPerms] = useState({});
-  const [loading, setLoading] = useState<boolean>(true);
-  const [err, setErr] = useState<string[]>();
 
   props.repos.sort((r1, r2) => {
     return r1.last_modified > r2.last_modified ? -1 : 1;
@@ -84,7 +83,6 @@ export default function AddToRepository(props: AddToRepositoryProps) {
     });
   };
 
-  // Logic for handling row-wise checkbox selection in <Td>
   const isItemSelected = (item) => props.selectedRepos.includes(item.name);
 
   const onSelectItem = (item, rowIndex: number, isSelecting: boolean) => {
@@ -96,25 +94,26 @@ export default function AddToRepository(props: AddToRepositoryProps) {
       setTableItems(props.repos);
     }
     updateTable();
-  }, [props.robotPermissions, props.repos, props.selectedRepoPerms]);
+  }, [props.robotPermissions]);
 
   const updateTable = () => {
     if (!props.robotPermissions) {
       return;
     }
-    const robotRepoPermsMapping = {};
-    props.robotPermissions?.map(function (perm) {
-      const item = {name: perm.repository.name};
+    const temp = {};
+    props.robotPermissions?.map(function (repoPerm) {
+      const repo = repoPerm.repository.name;
+      const permission =
+        repoPerm.role.charAt(0).toUpperCase() + repoPerm.role.slice(1);
       const newItems = {
-        ...robotRepoPermsMapping,
-        [perm.repository.name]: perm.role,
+        ...temp,
+        [repo]: permission,
       };
-      setItemSelected(item, true);
+      setItemSelected({name: repo}, true);
       setRobotRepoPermsMapping(newItems);
-      setUpdatedRepoPerms(newItems);
-      robotRepoPermsMapping[perm.repository.name] = perm.role;
+      setUpdatedRepoPerms(Object.assign({}, newItems));
+      temp[repo] = permission;
     });
-    setLoading(false);
   };
 
   const filteredItems =
@@ -148,11 +147,14 @@ export default function AddToRepository(props: AddToRepositoryProps) {
         return [...prevSelected, newPerms];
       });
     } else {
-      setUpdatedRepoPerms((prevSelected) => {
-        const newPerms = {};
-        newPerms[repo.name] = permission;
-        return {...prevSelected, [repo.name]: permission};
-      });
+      const tempItem = updatedRepoPerms;
+      delete tempItem[repo.name];
+      setUpdatedRepoPerms(tempItem);
+      if (permission == 'None') {
+        return;
+      }
+      tempItem[repo.name] = permission;
+      setUpdatedRepoPerms(tempItem);
     }
   };
 
@@ -168,6 +170,18 @@ export default function AddToRepository(props: AddToRepositoryProps) {
     }
     return 'None';
   };
+  if (
+    !props.wizardStep &&
+    !_.isEqual(updatedRepoPerms, robotRepoPermsMapping)
+  ) {
+    setTimeout(() => props.setShowRepoModalSave(true), 0);
+    setTimeout(() => props.setPrevRepoPerms(robotRepoPermsMapping), 0);
+    setTimeout(() => props.setNewRepoPerms(updatedRepoPerms), 0);
+  }
+
+  if (!props.wizardStep && _.isEqual(updatedRepoPerms, robotRepoPermsMapping)) {
+    setTimeout(() => props.setShowRepoModalSave(false), 0);
+  }
 
   return (
     <>
@@ -284,4 +298,7 @@ interface AddToRepositoryProps {
   wizardStep: boolean;
   robotName?: string;
   fetchingRobotPerms?: boolean;
+  setPrevRepoPerms?: (preVal) => void;
+  setNewRepoPerms?: (newVal) => void;
+  setShowRepoModalSave?: (boolean) => void;
 }

@@ -29,7 +29,7 @@ import {
   selectedRobotAccountsState,
 } from 'src/atoms/RobotAccountState';
 import {useRobotAccounts} from 'src/hooks/useRobotAccounts';
-import {ReactElement, useState} from 'react';
+import {ReactElement, useState, useRef, useEffect} from 'react';
 import {ToolbarPagination} from 'src/components/toolbar/ToolbarPagination';
 import RobotAccountKebab from './RobotAccountKebab';
 import {useDeleteRobotAccounts} from 'src/hooks/UseDeleteRobotAccount';
@@ -49,6 +49,7 @@ import {
   selectedReposPermissionState,
   selectedReposState,
 } from 'src/atoms/RepositoryState';
+import {useRobotRepoPermissions} from 'src/hooks/UseRobotRepoPermissions';
 
 const RepoPermissionDropdownItems = [
   {
@@ -98,7 +99,12 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const [selectedRepoPerms, setSelectedRepoPerms] = useRecoilState(
     selectedReposPermissionState,
   );
+  const [prevRepoPerms, setPrevRepoPerms] = useState({});
+  const [showRepoModalSave, setShowRepoModalSave] = useState(false);
+  const [newRepoPerms, setNewRepoPerms] = useState({});
   const [err, setErr] = useState<string[]>();
+  const [errTitle, setErrTitle] = useState<string>();
+  const robotPermissionsPlaceholder = useRef(null);
 
   const {robotAccountsForOrg, page, perPage, setPage, setPerPage} =
     useRobotAccounts({
@@ -107,6 +113,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
         setLoading(false);
       },
       onError: (err) => {
+        setErrTitle('Failed to fetch Robot Accounts');
         setErr([addDisplayError('Unable to fetch robot accounts', err)]);
         setLoading(false);
       },
@@ -178,6 +185,14 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     selectedRobotAccountsState,
   );
 
+  const fetchBulKUpdateErrorMsg = (err, msg) => {
+    const errMessages = [];
+    err.getErrors().forEach((error, resource) => {
+      errMessages.push(addDisplayError(`${msg} ${resource}`, error.error));
+    });
+    return errMessages;
+  };
+
   const {deleteRobotAccounts} = useDeleteRobotAccounts({
     namespace: props.orgName,
     onSuccess: () => {
@@ -185,22 +200,37 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
       setDeleteModalOpen(!isDeleteModalOpen);
     },
     onError: (err) => {
+      setErrTitle('Robot Account deletion failed');
       if (err instanceof BulkOperationError) {
-        const errMessages = [];
-        err.getErrors().forEach((error, robot) => {
-          errMessages.push(
-            addDisplayError(
-              `Failed to delete robot account ${robot}`,
-              error.error,
-            ),
-          );
-        });
+        const errMessages = fetchBulKUpdateErrorMsg(
+          err,
+          `Failed to delete robot account`,
+        );
         setErr(errMessages);
       } else {
         setErr([addDisplayError('Failed to delete robot account', err)]);
       }
       setSelectedRobotAccounts([]);
       setDeleteModalOpen(!isDeleteModalOpen);
+    },
+  });
+
+  const {updateRepoPerms, deleteRepoPerms} = useRobotRepoPermissions({
+    namespace: props.orgName,
+    onSuccess: () => null,
+    onError: (err) => {
+      setErrTitle('Repository Permission update failed');
+      if (err instanceof BulkOperationError) {
+        const errMessages = fetchBulKUpdateErrorMsg(
+          err,
+          `Failed to update robot repository permission`,
+        );
+        setErr(errMessages);
+      } else {
+        setErr([
+          addDisplayError('Failed to update robot repository permission', err),
+        ]);
+      }
     },
   });
 
@@ -227,6 +257,47 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   const onReposModalClose = () => {
     setSelectedReposForModalView([]);
     setSelectedRepoPerms([]);
+    robotPermissionsPlaceholder.current.resetRobotPermissions();
+  };
+
+  const onRepoModalSave = async () => {
+    try {
+      const robotname = robotForModalView.name.replace(props.orgName + '+', '');
+      const [toUpdate, toDelete] = updateRepoPermissions();
+      if (toUpdate.length > 0) {
+        await updateRepoPerms({robotName: robotname, repoPerms: toUpdate});
+      }
+      if (toDelete.length > 0) {
+        await deleteRepoPerms({robotName: robotname, repoNames: toDelete});
+      }
+    } catch (error) {
+      console.error(error);
+      setErr([
+        addDisplayError('Failed to update robot repository permission', error),
+      ]);
+    }
+  };
+
+  const updateRepoPermissions = () => {
+    const toUpdate = [];
+    Object.keys(newRepoPerms).forEach((repo) => {
+      if (
+        newRepoPerms[repo]?.toLowerCase() != prevRepoPerms[repo]?.toLowerCase()
+      ) {
+        toUpdate.push({
+          reponame: repo,
+          permission: newRepoPerms[repo].toLowerCase(),
+        });
+      }
+    });
+
+    const toDelete = [];
+    Object.keys(prevRepoPerms).forEach((repo) => {
+      if (!(repo in newRepoPerms)) {
+        toDelete.push(repo);
+      }
+    });
+    return [toUpdate, toDelete];
   };
 
   const fetchReposModal = (robotAccount, repos) => {
@@ -384,11 +455,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
   return (
     <>
       <PageSection variant={PageSectionVariants.light}>
-        <ErrorModal
-          title="Robot Account deletion failed"
-          error={err}
-          setError={setErr}
-        />
+        <ErrorModal title={errTitle} error={err} setError={setErr} />
         <RobotAccountsToolBar
           selectedItems={selectedRobotAccounts}
           allItemsList={filteredRobotAccounts}
@@ -417,6 +484,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           isModalOpen={isTeamsModalOpen}
           setIsModalOpen={setTeamsModalOpen}
           title="Teams"
+          showSave={false}
           Component={
             <TeamView
               items={teamsViewItems}
@@ -432,6 +500,8 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
           setIsModalOpen={setReposModalOpen}
           onClose={onReposModalClose}
           title="Set repository permissions"
+          showSave={showRepoModalSave}
+          onSave={onRepoModalSave}
           Component={
             <RobotRepositoryPermissions
               robotAccount={robotForModalView}
@@ -442,6 +512,10 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
               setSelectedRepos={setSelectedReposForModalView}
               selectedRepoPerms={selectedRepoPerms}
               setSelectedRepoPerms={setSelectedRepoPerms}
+              robotPermissionsPlaceholder={robotPermissionsPlaceholder}
+              setPrevRepoPerms={setPrevRepoPerms}
+              setNewRepoPerms={setNewRepoPerms}
+              setShowRepoModalSave={setShowRepoModalSave}
             />
           }
         ></DisplayModal>

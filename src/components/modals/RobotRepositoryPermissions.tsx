@@ -1,5 +1,5 @@
 import {FormGroup, TextInput} from '@patternfly/react-core';
-import React, {useState} from 'react';
+import React, {useState, useImperativeHandle, useEffect} from 'react';
 import AddToRepository from './robotAccountWizard/AddToRepository';
 import {IRepository} from 'src/resources/RepositoryResource';
 import {IRobot} from 'src/resources/RobotsResource';
@@ -11,24 +11,33 @@ export default function RobotRepositoryPermissions(
   props: RobotRepositoryPermissionsProps,
 ) {
   // Fetching repos
-  const {repos: repos, totalResults: repoCount} = useRepositories(
-    props.namespace,
-  );
+  const {repos: repos} = useRepositories(props.namespace);
   const [loading, setLoading] = useState<boolean>(true);
+  const [robotPermissions, setRobotPermissions] = useState([]);
   const [err, setErr] = useState<string[]>();
 
-  const {robotPermissions, page, perPage, setPage, setPerPage} =
-    useRobotPermissions({
-      orgName: props.namespace,
-      robName: props.robotAccount.name,
-      onSuccess: () => {
-        setLoading(false);
-      },
-      onError: (err) => {
-        setErr([addDisplayError('Unable to fetch robot accounts', err)]);
-        setLoading(false);
-      },
-    });
+  const resetRobotPermissions = () => {
+    setRobotPermissions([]);
+  };
+
+  useImperativeHandle(props.robotPermissionsPlaceholder, () => {
+    return {
+      resetRobotPermissions: resetRobotPermissions,
+    };
+  });
+
+  const {result} = useRobotPermissions({
+    orgName: props.namespace,
+    robName: props.robotAccount.name,
+    onSuccess: (result) => {
+      setLoading(false);
+      setRobotPermissions(result);
+    },
+    onError: (err) => {
+      setErr([addDisplayError('Unable to fetch robot accounts', err)]);
+      setLoading(false);
+    },
+  });
 
   return (
     <>
@@ -73,6 +82,9 @@ export default function RobotRepositoryPermissions(
         wizardStep={false}
         robotName={props.robotAccount.name}
         fetchingRobotPerms={loading}
+        setPrevRepoPerms={props.setPrevRepoPerms}
+        setNewRepoPerms={props.setNewRepoPerms}
+        setShowRepoModalSave={props.setShowRepoModalSave}
       />
     </>
   );
@@ -87,4 +99,8 @@ interface RobotRepositoryPermissionsProps {
   setSelectedRepos: (repos) => void;
   selectedRepoPerms: any[];
   setSelectedRepoPerms: (repoPerm) => void;
+  robotPermissionsPlaceholder: any;
+  setPrevRepoPerms: (preVal) => void;
+  setNewRepoPerms: (newVal) => void;
+  setShowRepoModalSave: (boolean) => void;
 }

@@ -1,5 +1,10 @@
-import {fetchRobotPermissionsForNamespace} from 'src/resources/RobotsResource';
-import {useQuery} from '@tanstack/react-query';
+import {
+  bulkDeleteRepoPermsForRobot,
+  bulkUpdateRepoPermsForRobot,
+  fetchRobotPermissionsForNamespace,
+  IRepoPerm,
+} from 'src/resources/RobotsResource';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
 export function useRobotPermissions({orgName, robName, onSuccess, onError}) {
@@ -17,8 +22,32 @@ export function useRobotPermissions({orgName, robName, onSuccess, onError}) {
     ({signal}) =>
       fetchRobotPermissionsForNamespace(namespace, robotName, false, signal),
     {
+      enabled: true,
       placeholderData: [],
+      onSuccess: (result) => {
+        onSuccess(result);
+      },
+      onError: (err) => {
+        onError(err);
+      },
+    },
+  );
+
+  const queryClient = useQueryClient();
+  const deleteRepoPermsMutator = useMutation(
+    async (repoNames: string[]) => {
+      await bulkDeleteRepoPermsForRobot(namespace, robName, repoNames);
+    },
+    {
       onSuccess: () => {
+        queryClient.invalidateQueries(['Namespace', namespace, 'robots']);
+        queryClient.invalidateQueries([
+          'Namespace',
+          namespace,
+          'robot',
+          robotName,
+          'permissions',
+        ]);
         onSuccess();
       },
       onError: (err) => {
@@ -26,8 +55,31 @@ export function useRobotPermissions({orgName, robName, onSuccess, onError}) {
       },
     },
   );
+
+  const updateRepoPermsMutator = useMutation(
+    async (repoPerms: IRepoPerm[]) => {
+      return await bulkUpdateRepoPermsForRobot(namespace, robotName, repoPerms);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['Namespace', namespace, 'robots']);
+        queryClient.invalidateQueries([
+          'Namespace',
+          namespace,
+          'robot',
+          robotName,
+          'permissions',
+        ]);
+        onSuccess();
+      },
+      onError: (err) => {
+        onError(err);
+      },
+    },
+  );
+
   return {
-    robotPermissions: robotPermissions,
+    result: robotPermissions,
     loading: loading,
     error,
     setPage,
@@ -37,5 +89,21 @@ export function useRobotPermissions({orgName, robName, onSuccess, onError}) {
     setNamespace,
     namespace,
     setRobotName,
+
+    // Mutations
+    updateRepoPerms: async (repoPerms: IRepoPerm[]) =>
+      updateRepoPermsMutator.mutate(repoPerms),
+    deleteRepoPerms: async (repoNames: string[]) =>
+      deleteRepoPermsMutator.mutate(repoNames),
   };
+}
+
+interface bulkUpdateRepoPermsParams {
+  robotName: string;
+  repoPerms: IRepoPerm[];
+}
+
+interface bulkDeleteRepoPermsParams {
+  robotName: string;
+  repoNames: string[];
 }

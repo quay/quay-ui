@@ -34,6 +34,11 @@ export interface IRobotTeam {
   role: string;
 }
 
+export interface IRepoPerm {
+  reponame: string;
+  permission: string;
+}
+
 export async function fetchAllRobots(orgnames: string[], signal: AbortSignal) {
   return await Promise.all(
     orgnames.map((org) => fetchRobotsForNamespace(org, false, signal)),
@@ -97,6 +102,42 @@ export async function updateRepoPermsForRobot(
   return response.data;
 }
 
+export async function bulkUpdateRepoPermsForRobot(
+  orgname: string,
+  robotname: string,
+  repoPerms: IRepoPerm[],
+) {
+  const responses = await Promise.allSettled(
+    repoPerms.map((repoPerm) =>
+      updateRepoPermsForRobot(
+        orgname,
+        robotname,
+        repoPerm.reponame,
+        repoPerm.permission,
+      ),
+    ),
+  );
+
+  // Aggregate failed responses
+  const errResponses = responses.filter(
+    (r) => r.status == 'rejected',
+  ) as PromiseRejectedResult[];
+
+  // If errors, collect and throw
+  if (errResponses.length > 0) {
+    const bulkDeleteError = new BulkOperationError(
+      'error deleting repository permissions',
+    );
+    for (const response of errResponses) {
+      const reason = response.reason;
+      bulkDeleteError.addError(reason.repository_name, reason);
+    }
+    throw bulkDeleteError;
+  }
+
+  return {response: responses, robotname: robotname};
+}
+
 export async function deleteRepoPermsForRobot(
   orgname: string,
   robotname: string,
@@ -108,6 +149,37 @@ export async function deleteRepoPermsForRobot(
   const response: AxiosResponse = await axios.delete(deletePermsUrl);
   assertHttpCode(response.status, 204);
   return response.data;
+}
+
+export async function bulkDeleteRepoPermsForRobot(
+  orgname: string,
+  robotname: string,
+  repoNames: string[],
+) {
+  const responses = await Promise.allSettled(
+    repoNames.map((repoName) =>
+      deleteRepoPermsForRobot(orgname, robotname, repoName),
+    ),
+  );
+
+  // Aggregate failed responses
+  const errResponses = responses.filter(
+    (r) => r.status == 'rejected',
+  ) as PromiseRejectedResult[];
+
+  // If errors, collect and throw
+  if (errResponses.length > 0) {
+    const bulkDeleteError = new BulkOperationError(
+      'error deleting repository permissions',
+    );
+    for (const response of errResponses) {
+      const reason = response.reason;
+      bulkDeleteError.addError(reason.repository_name, reason);
+    }
+    throw bulkDeleteError;
+  }
+
+  return {response: responses, robotname: robotname};
 }
 
 export async function createNewRobotForNamespace(
