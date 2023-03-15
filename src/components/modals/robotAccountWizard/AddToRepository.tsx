@@ -155,6 +155,7 @@ export default function AddToRepository(props: AddToRepositoryProps) {
       }
       tempItem[repo.name] = permission;
       setUpdatedRepoPerms(tempItem);
+      updateRobotAccountsList();
     }
   };
 
@@ -170,18 +171,26 @@ export default function AddToRepository(props: AddToRepositoryProps) {
     }
     return 'None';
   };
-  if (
-    !props.wizardStep &&
-    !_.isEqual(updatedRepoPerms, robotRepoPermsMapping)
-  ) {
-    setTimeout(() => props.setShowRepoModalSave(true), 0);
-    setTimeout(() => props.setPrevRepoPerms(robotRepoPermsMapping), 0);
-    setTimeout(() => props.setNewRepoPerms(updatedRepoPerms), 0);
-  }
 
-  if (!props.wizardStep && _.isEqual(updatedRepoPerms, robotRepoPermsMapping)) {
-    setTimeout(() => props.setShowRepoModalSave(false), 0);
-  }
+  const updateRobotAccountsList = () => {
+    if (
+      !props.wizardStep &&
+      !_.isEqual(updatedRepoPerms, robotRepoPermsMapping)
+    ) {
+      setTimeout(() => props.setShowRepoModalSave(true), 0);
+      setTimeout(() => props.setPrevRepoPerms(robotRepoPermsMapping), 0);
+      setTimeout(() => props.setNewRepoPerms(updatedRepoPerms), 0);
+    }
+
+    if (
+      !props.wizardStep &&
+      _.isEqual(updatedRepoPerms, robotRepoPermsMapping)
+    ) {
+      setTimeout(() => props.setShowRepoModalSave(false), 0);
+    }
+  };
+
+  updateRobotAccountsList();
 
   return (
     <>
