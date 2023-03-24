@@ -39,6 +39,15 @@ export interface IRepoPerm {
   permission: string;
 }
 
+export interface IRobotToken {
+  name: string;
+  created: string;
+  last_accessed: string;
+  description: string;
+  token: string;
+  unstructured_metadata: object;
+}
+
 export async function fetchAllRobots(orgnames: string[], signal: AbortSignal) {
   return await Promise.all(
     orgnames.map((org) => fetchRobotsForNamespace(org, false, signal)),
@@ -261,4 +270,30 @@ export async function fetchRobotPermissionsForNamespace(
   const response: AxiosResponse = await axios.get(getRobotPermsUrl, {signal});
   assertHttpCode(response.status, 200);
   return response.data?.permissions;
+}
+
+export async function fetchRobotAccountToken(
+  orgName: string,
+  robotName: string,
+  isUser = false,
+  signal: AbortSignal,
+) {
+  const robot = robotName.replace(orgName + '+', '');
+  const userOrOrgPath = isUser ? 'user' : `organization/${orgName}`;
+  const getRobotTokenUrl = `/api/v1/${userOrOrgPath}/robots/${robot}`;
+  const response: AxiosResponse = await axios.get(getRobotTokenUrl, {signal});
+  assertHttpCode(response.status, 200);
+  return response.data;
+}
+
+export async function regenerateRobotToken(
+  orgName: string,
+  robotName: string,
+  isUser = false,
+): Promise<IRobot[]> {
+  const robot = robotName.replace(orgName + '+', '');
+  const updatePermsUrl = `/api/v1/organization/${orgName}/robots/${robot}/regenerate`;
+  const response: AxiosResponse = await axios.post(updatePermsUrl, {});
+  assertHttpCode(response.status, 200);
+  return response.data;
 }

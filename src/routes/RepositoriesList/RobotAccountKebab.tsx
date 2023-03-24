@@ -13,9 +13,13 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
     element.focus();
   };
 
-  const onClick = () => {
+  const onDelete = () => {
     props.setSelectedRobotAccount([props.robotAccount.name]);
     props.setDeleteModalOpen(true);
+  };
+
+  const onSetRepoPerms = () => {
+    props.onSetRepoPermsClick(props.robotAccount, props.robotAccountRepos);
   };
 
   return (
@@ -34,12 +38,20 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
         dropdownItems={[
           <DropdownItem
             key="delete"
-            onClick={() => onClick()}
+            onClick={() => onDelete()}
             className="red-color"
-            id={`${props.robotAccount.name}-btn`}
+            id={`${props.robotAccount.name}-del-btn`}
           >
             {props.deleteKebabIsOpen ? props.deleteModal() : null}
             Delete
+          </DropdownItem>,
+          <DropdownItem
+            key="set-repo-perms"
+            onClick={() => onSetRepoPerms()}
+            id={`${props.robotAccount.name}-set-repo-perms-btn`}
+          >
+            {props.deleteKebabIsOpen ? props.deleteModal() : null}
+            Set repository permissions
           </DropdownItem>,
         ]}
         isPlain
@@ -56,4 +68,6 @@ interface RobotAccountKebabProps {
   deleteKebabIsOpen: boolean;
   setDeleteModalOpen: (open) => void;
   setSelectedRobotAccount: (robotAccount) => void;
+  onSetRepoPermsClick: (robotAccount, repos) => void;
+  robotAccountRepos: any[];
 }
