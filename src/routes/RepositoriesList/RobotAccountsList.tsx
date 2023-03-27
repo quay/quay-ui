@@ -443,7 +443,7 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
     );
   }
 
-  if (paginatedRobotAccountList.length == 0) {
+  if (loading && paginatedRobotAccountList.length == 0) {
     return (
       <TableComposable aria-label="Empty state table" borders={false}>
         <Tbody>

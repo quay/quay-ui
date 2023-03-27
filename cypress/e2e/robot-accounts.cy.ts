@@ -58,7 +58,12 @@ describe('Robot Accounts Page', () => {
     cy.get('#robot-account-search').type('testrobot2');
     cy.contains('1 - 1 of 1');
     cy.get('button[id="testorg+testrobot2-toggle-kebab"]').click();
-    cy.get('li[id="testorg+testrobot2-btn"]').contains('Delete').click();
+    cy.get('li[id="testorg+testrobot2-del-btn"]').contains('Delete').click();
+
+    cy.get('#delete-confirmation-input').type('confirm');
+    cy.get('[id="bulk-delete-modal"]').within(() =>
+      cy.get('button:contains("Delete")').click(),
+    );
 
     // Validate org was deleted
     cy.wait(9000);
