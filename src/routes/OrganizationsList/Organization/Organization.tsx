@@ -44,12 +44,6 @@ export default function Organization() {
       name: 'Settings',
       component: <Settings />,
     },
-    // Commenting till needed.
-    // {
-    //   href: NavigationPath.orgDetailUsageLogsTab,
-    //   name: 'Usage Logs',
-    //   component: <UsageLogsTab />,
-    // },
   ];
 
   return (

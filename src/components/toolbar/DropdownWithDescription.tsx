@@ -10,30 +10,35 @@ export function DropdownWithDescription(props: DropdownWithDescriptionProps) {
   const [dropdownToggle, setDropdownToggle] = useState('');
 
   const dropdownOnSelect = (name, userEntry) => {
-    props.setUserEntry(userEntry);
-    if (name == defaultUnSelectedVal) {
-      props.OnRowSelect(props.repo, props.rowIndex, false);
-    } else if (name != defaultUnSelectedVal && !props.isItemSelected) {
-      props.OnRowSelect(props.repo, props.rowIndex, true);
+    if (!props.wizarStep) {
+      props.setUserEntry(userEntry);
+      if (name == defaultUnSelectedVal) {
+        props.OnRowSelect(props.repo, props?.rowIndex, false);
+      } else if (name != defaultUnSelectedVal && !props?.isItemSelected) {
+        props.OnRowSelect(props.repo, props?.rowIndex, true);
+      }
     }
     setDropdownToggle(name);
-    props.onSelect(name, props.repo);
+    props.onSelect(name, props?.repo);
     setIsOpen(false);
   };
 
   useEffect(() => {
+    if (props.wizarStep) {
+      return;
+    }
     if (
-      props.isItemSelected &&
+      props?.isItemSelected &&
       (!props.selectedVal || props.selectedVal == 'None')
     ) {
-      dropdownOnSelect(defaultSelectedVal, props.isUserEntry || false);
-    } else if (!props.isItemSelected) {
-      dropdownOnSelect(defaultUnSelectedVal, props.isUserEntry || false);
+      dropdownOnSelect(defaultSelectedVal, props?.isUserEntry || false);
+    } else if (!props?.isItemSelected) {
+      dropdownOnSelect(defaultUnSelectedVal, props?.isUserEntry || false);
     }
     if (props.selectedVal && props.selectedVal != dropdownToggle) {
-      dropdownOnSelect(props.selectedVal, props.isUserEntry || false);
+      dropdownOnSelect(props.selectedVal, props?.isUserEntry || false);
     }
-  }, [props.isItemSelected, props.selectedVal]);
+  }, [props?.isItemSelected, props.selectedVal]);
 
   return (
     <Dropdown
@@ -62,12 +67,13 @@ export function DropdownWithDescription(props: DropdownWithDescriptionProps) {
 
 interface DropdownWithDescriptionProps {
   dropdownItems: any[];
+  onSelect: (item, repo) => void;
   selectedVal: string;
-  onSelect?: (item, repo) => void;
-  repo: Record<string, unknown>;
-  isItemSelected: boolean;
-  OnRowSelect: (item, rowIndex, isSelecting) => void;
-  rowIndex: number;
-  isUserEntry: boolean;
-  setUserEntry: (userEntry) => void;
+  wizarStep: boolean;
+  isItemSelected?: boolean;
+  OnRowSelect?: (item, rowIndex, isSelecting) => void;
+  repo?: Record<string, unknown>;
+  rowIndex?: number;
+  isUserEntry?: boolean;
+  setUserEntry?: (userEntry) => void;
 }

@@ -53,6 +53,7 @@ export default function DefaultPermissions(props: DefaultPermissionsProps) {
         dropdownItems={props.repoPermissions}
         onSelect={updateDefaultPermission}
         selectedVal={props.robotDefaultPerm}
+        wizarStep={true}
       />
     </>
   );
