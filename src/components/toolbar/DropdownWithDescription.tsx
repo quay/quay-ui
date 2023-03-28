@@ -25,6 +25,9 @@ export function DropdownWithDescription(props: DropdownWithDescriptionProps) {
 
   useEffect(() => {
     if (props.wizarStep) {
+      if (props.selectedVal) {
+        dropdownOnSelect(props.selectedVal, true);
+      }
       return;
     }
     if (

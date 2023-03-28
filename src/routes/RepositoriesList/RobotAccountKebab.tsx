@@ -1,4 +1,9 @@
-import {Dropdown, DropdownItem, KebabToggle} from '@patternfly/react-core';
+import {
+  Dropdown,
+  DropdownItem,
+  KebabToggle,
+  DropdownPosition,
+} from '@patternfly/react-core';
 import {IRobot} from 'src/resources/RobotsResource';
 import {useState} from 'react';
 
@@ -55,6 +60,7 @@ export default function RobotAccountKebab(props: RobotAccountKebabProps) {
           </DropdownItem>,
         ]}
         isPlain
+        position={DropdownPosition.right}
       />
     </>
   );

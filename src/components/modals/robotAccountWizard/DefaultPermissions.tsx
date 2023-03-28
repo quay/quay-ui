@@ -5,7 +5,6 @@ import {
   TextInput,
   FormGroup,
   Form,
-  DropdownItem,
 } from '@patternfly/react-core';
 import React from 'react';
 import {DropdownWithDescription} from 'src/components/toolbar/DropdownWithDescription';
@@ -52,7 +51,7 @@ export default function DefaultPermissions(props: DefaultPermissionsProps) {
       <DropdownWithDescription
         dropdownItems={props.repoPermissions}
         onSelect={updateDefaultPermission}
-        selectedVal={props.robotDefaultPerm}
+        selectedVal={props.robotDefaultPerm || 'None'}
         wizarStep={true}
       />
     </>

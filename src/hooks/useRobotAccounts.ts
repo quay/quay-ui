@@ -79,7 +79,7 @@ export function useRobotAccounts({name, onSuccess, onError}) {
           );
         }
 
-        if (result.robotDefaultPerm) {
+        if (result.robotDefaultPerm && result.robotDefaultPerm != 'None') {
           addDefaultPermsForRobot(
             namespace,
             result.robotname,

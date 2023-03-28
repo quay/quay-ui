@@ -114,6 +114,9 @@ export default function ReviewAndFinish(props: ReviewAndFinishProps) {
   };
 
   const fetchDefaultPerms = () => {
+    if (props.robotdefaultPerm == 'None') {
+      return;
+    }
     return (
       <>
         <Form>
