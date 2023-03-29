@@ -288,12 +288,6 @@ export default function RobotTokensModal(props: RobotTokensModalProps) {
             >
               {getKubernetesConfiguration()}
             </ClipboardCopy>
-            <Alert
-              title="Note that once you regenerate token, all existing logins of this robot account will become invalid."
-              variant="warning"
-              isPlain
-              isInline
-            />
           </TextContent>
         </Tab>
         <Tab
