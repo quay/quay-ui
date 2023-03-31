@@ -573,7 +573,6 @@ export default function RobotAccountsList(props: RobotAccountsListProps) {
                                 robotAccount,
                                 !isRobotExpanded(robotAccount),
                               ),
-                            // expandId: 'expandable-robot-account',
                           }
                         : undefined
                     }
