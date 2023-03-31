@@ -63,7 +63,7 @@ jobs:
       - name: Create report
         run: |
           mkdir -p .logs/
-          docker-compose logs quay-quay >.logs/quay.log 2>&1 || true
+          docker logs quay-quay >.logs/quay.log 2>&1 || true
         if: always()
 
       - name: Upload Quay logs
