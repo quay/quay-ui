@@ -17,12 +17,12 @@ import {addDisplayError} from 'src/resources/ErrorHandling';
 import DefaultPermissions from './robotAccountWizard/DefaultPermissions';
 import ReviewAndFinish from './robotAccountWizard/ReviewAndFinish';
 import {useRecoilState} from 'recoil';
-import {
-  selectedReposState,
-  selectedReposPermissionState,
-} from 'src/atoms/RepositoryState';
 import {selectedTeamsState} from 'src/atoms/TeamState';
-import {selectedRobotDefaultPermission} from 'src/atoms/RobotAccountState';
+import {
+  selectedRobotDefaultPermission,
+  selectedRobotReposState,
+  selectedRobotReposPermissionState,
+} from 'src/atoms/RobotAccountState';
 import {useRepositories} from 'src/hooks/UseRepositories';
 
 export default function CreateRobotAccountModal(
@@ -41,10 +41,12 @@ export default function CreateRobotAccountModal(
   const [robotDescription, setrobotDescription] = useState('');
   const [err, setErr] = useState<string>();
   const [selectedRepoPerms, setSelectedRepoPerms] = useRecoilState(
-    selectedReposPermissionState,
+    selectedRobotReposPermissionState,
   );
   const [selectedTeams, setSelectedTeams] = useRecoilState(selectedTeamsState);
-  const [selectedRepos, setSelectedRepos] = useRecoilState(selectedReposState);
+  const [selectedRepos, setSelectedRepos] = useRecoilState(
+    selectedRobotReposState,
+  );
   const [robotDefaultPerm, setRobotdefaultPerm] = useRecoilState(
     selectedRobotDefaultPermission,
   );

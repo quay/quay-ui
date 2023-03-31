@@ -21,9 +21,11 @@ export default function Footer(props: FooterProps) {
         }) => {
           return (
             <>
-              <Button variant="primary" type="submit" onClick={onNext}>
-                Next
-              </Button>
+              {activeStep.name != 'Review and Finish' ? (
+                <Button variant="primary" type="submit" onClick={onNext}>
+                  Next
+                </Button>
+              ) : null}
               {activeStep.name != 'Robot name and description' ? (
                 <Button variant="secondary" type="submit" onClick={onBack}>
                   Back

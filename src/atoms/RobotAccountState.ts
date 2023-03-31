@@ -19,3 +19,13 @@ export const selectedRobotDefaultPermission = atom({
   key: 'selectedRobotDefaultPermission',
   default: '',
 });
+
+export const selectedRobotReposState = atom({
+  key: 'selectedRobotReposState',
+  default: [],
+});
+
+export const selectedRobotReposPermissionState = atom({
+  key: 'selectedRobotReposPermissionState',
+  default: [],
+});
