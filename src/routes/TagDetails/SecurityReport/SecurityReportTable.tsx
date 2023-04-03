@@ -90,8 +90,6 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       return prevVulnList.sort((a, b) => {
         const aValue = VulnSeverityOrder[getSortableRowValues(a)[sortIndex]];
         const bValue = VulnSeverityOrder[getSortableRowValues(b)[sortIndex]];
-        console.log('aValue', aValue);
-        console.log('bValue', bValue);
         if (direction === 'asc') {
           return (aValue as number) - (bValue as number);
         }
