@@ -106,7 +106,6 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       direction: activeSortDirection,
     },
     onSort: (_event, index, direction) => {
-      console.log('index', index, 'direction', direction);
       setActiveSortIndex(index);
       setActiveSortDirection(direction);
       sortVulnerabilities(index, direction);
