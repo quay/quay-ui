@@ -70,11 +70,11 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
 
   // Sorting states
   const [activeSortIndex, setActiveSortIndex] = React.useState<number | null>(
-    null,
+    1,
   );
   const [activeSortDirection, setActiveSortDirection] = React.useState<
     'asc' | 'desc' | null
-  >(null);
+  >('desc');
 
   // Pagination state
   const [page, setPage] = useState<number>(1);
@@ -90,7 +90,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       return prevVulnList.sort((a, b) => {
         const aValue = VulnSeverityOrder[getSortableRowValues(a)[sortIndex]];
         const bValue = VulnSeverityOrder[getSortableRowValues(b)[sortIndex]];
-        if (direction === 'asc') {
+        if (direction === 'desc') {
           return (aValue as number) - (bValue as number);
         }
         return (bValue as number) - (aValue as number);
@@ -106,6 +106,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       direction: activeSortDirection,
     },
     onSort: (_event, index, direction) => {
+      console.log('index', index, 'direction', direction);
       setActiveSortIndex(index);
       setActiveSortDirection(direction);
       sortVulnerabilities(index, direction);
@@ -127,7 +128,9 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
         <Tr>
           <Th />
           <Th>{columnNames.advisory}</Th>
-          <Th sort={sortBySeverity(1)}>{columnNames.severity}</Th>
+          <Th sort={sortBySeverity(1)} id="severity-sort">
+            {columnNames.severity}
+          </Th>
           <Th>{columnNames.package}</Th>
           <Th>{columnNames.currentVersion}</Th>
           <Th>{columnNames.fixedInVersion}</Th>
@@ -178,6 +181,7 @@ export default function SecurityReportTable({features}: SecurityDetailsProps) {
       });
       setVulnList(vulnList);
       setFilteredVulnList(vulnList);
+      sortVulnerabilities(activeSortIndex, activeSortDirection);
     } else {
       setVulnList([]);
       setFilteredVulnList([]);
