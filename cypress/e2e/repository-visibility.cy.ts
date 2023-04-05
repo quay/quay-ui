@@ -173,7 +173,7 @@ describe('Repository Settings - Visibility', () => {
       "In order to make this repository private under testorg, you will need to upgrade the namespace's plan to at least a Micro plan",
     ).should('exist');
     cy.contains('Upgrade testorg').click();
-    cy.wait('@stripeBootstrap', {timeout: 25000});
+    cy.wait('@stripeBootstrap', {timeout: 27000});
     cy.getIframeBody('iframe[name="stripe_checkout_app"]').within(() => {
       cy.contains('Quay Micro Subscription').should('exist');
       cy.contains('Up to 10 private repositories').should('exist');
