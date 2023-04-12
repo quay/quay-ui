@@ -94,10 +94,10 @@ describe('Repositories List Page', () => {
   });
 
   it('create repository under organization', () => {
-    cy.visit('/organization/user1');
+    cy.visit('/organization/testorg');
     cy.contains('Create Repository').click();
     cy.contains('Create repository').should('exist');
-    cy.get('button:contains("user1")').should('exist');
+    cy.get('button:contains("testorg")').should('exist');
     cy.get('input[id="repository-name-input"]').type('new-repo');
     cy.get('input[id="repository-description-input"]').type(
       'This is a new private repository',
