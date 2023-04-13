@@ -2,6 +2,8 @@ import {useState} from 'react';
 import {
   fetchAllRepos,
   fetchRepositoriesForNamespace,
+  IOrgRepos,
+  IRepository,
 } from 'src/resources/RepositoryResource';
 import {useQuery} from '@tanstack/react-query';
 import {useCurrentUser} from './UseCurrentUser';
@@ -16,27 +18,18 @@ export function useRepositories(organization?: string) {
   const [nextPageToken, setNextPageToken] = useState('');
   const [perPage, setPerPage] = useState(10);
   const [repos, setRepos] = useState([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<SearchState>({
     field: ColumnNames.name,
     query: '',
   });
   const [currentOrganization, setCurrentOrganization] = useState(organization);
 
-  const setNextPageParams = (nextPageToken) => {
-    setNextPageToken(nextPageToken || '');
-    setPage(page + 1);
-  };
-
   const listOfOrgNames: string[] = currentOrganization
     ? [currentOrganization]
     : user?.organizations.map((org) => org.name).concat(user.username);
 
-  const {
-    data,
-    isLoading: loading,
-    isPlaceholderData,
-    error,
-  } = useQuery({
+  const {data, error} = useQuery({
     queryKey: ['organization', organization || 'all', 'repositories', page],
     keepPreviousData: true,
     placeholderData: [],
@@ -49,23 +42,27 @@ export function useRepositories(organization?: string) {
           )
         : fetchAllRepos(listOfOrgNames, true, signal, nextPageToken);
     },
-    onSuccess: async (result) => {
-      const newList = result;
-      if (!Array.isArray(result)) {
-        const newList = repos.concat(result?.result);
-        if (result?.next_page) {
-          setNextPageParams(result?.next_page);
-        }
+    onSuccess: async (response: IOrgRepos | IRepository[]) => {
+      const newList = response;
+      // fetchAllRepos returns an array of IOrgRepos
+      if (!Array.isArray(response)) {
+        const newList = repos.concat(response?.result);
         setRepos(newList);
         return newList;
-      } else {
-        const newList = result.reduce(
+      }
+      // fetchRepositoriesForNamespace returns an object of IOrgRepos
+      else {
+        const newList = response.reduce(
           (allRepos, result) => allRepos.concat(result.result),
           [],
         );
       }
       setRepos(newList);
+      setLoading(false);
       return newList;
+    },
+    onError: () => {
+      setLoading(false);
     },
   });
 
@@ -74,7 +71,7 @@ export function useRepositories(organization?: string) {
     repos: repos,
 
     // Fetching State
-    loading: loading || isPlaceholderData || !listOfOrgNames,
+    loading: loading,
     error,
 
     // Search Query State

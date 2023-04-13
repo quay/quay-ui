@@ -33,12 +33,16 @@ export interface IQuotaReport {
   configured_quota: number;
 }
 
+export interface IOrgRepos {
+  result: IRepository[];
+}
+
 export async function fetchAllRepos(
   namespaces: string[],
   flatten = false,
   signal: AbortSignal,
   next_page_token = null,
-): Promise<IRepository[] | IRepository[][]> {
+): Promise<IRepository[] | IOrgRepos[]> {
   const namespacedRepos = await Promise.all(
     namespaces.map((ns) => {
       return fetchRepositoriesForNamespace(ns, signal, next_page_token);
@@ -60,8 +64,7 @@ export async function fetchRepositoriesForNamespace(
   ns: string,
   signal: AbortSignal,
   next_page_token: string = null,
-) {
-  // TODO: Add return type to AxiosResponse
+): Promise<IOrgRepos> {
   const url = next_page_token
     ? `/api/v1/repository?next_page=${next_page_token}&last_modified=true&namespace=${ns}&public=true`
     : `/api/v1/repository?last_modified=true&namespace=${ns}&public=true`;
