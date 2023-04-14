@@ -2,8 +2,6 @@ import {useState} from 'react';
 import {
   fetchAllRepos,
   fetchRepositoriesForNamespace,
-  IOrgRepos,
-  IRepository,
 } from 'src/resources/RepositoryResource';
 import {useQuery} from '@tanstack/react-query';
 import {useCurrentUser} from './UseCurrentUser';
@@ -17,7 +15,6 @@ export function useRepositories(organization?: string) {
   const [page, setPage] = useState(1);
   const [nextPageToken, setNextPageToken] = useState('');
   const [perPage, setPerPage] = useState(10);
-  const [repos, setRepos] = useState([]);
   const [search, setSearch] = useState<SearchState>({
     field: ColumnNames.name,
     query: '',
@@ -29,7 +26,7 @@ export function useRepositories(organization?: string) {
     : user?.organizations.map((org) => org.name).concat(user.username);
 
   const {
-    data,
+    data: repos,
     error,
     isLoading: loading,
     isPlaceholderData,
@@ -45,24 +42,6 @@ export function useRepositories(organization?: string) {
             nextPageToken,
           )
         : fetchAllRepos(listOfOrgNames, true, signal, nextPageToken);
-    },
-    onSuccess: async (response: IOrgRepos | IRepository[]) => {
-      const newList = response;
-      // fetchAllRepos returns an array of IOrgRepos
-      if (!Array.isArray(response)) {
-        const newList = repos.concat(response?.result);
-        setRepos(newList);
-        return newList;
-      }
-      // fetchRepositoriesForNamespace returns an object of IOrgRepos
-      else {
-        const newList = response.reduce(
-          (allRepos, result) => allRepos.concat(result.result),
-          [],
-        );
-      }
-      setRepos(newList);
-      return newList;
     },
   });
 
