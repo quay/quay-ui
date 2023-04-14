@@ -89,11 +89,11 @@ export default function RepositoriesList() {
     totalResults,
   } = useRepositories(currentOrg);
 
-  repos.sort((r1, r2) => {
+  repos?.sort((r1, r2) => {
     return r1.last_modified > r2.last_modified ? -1 : 1;
   });
 
-  const repositoryList: RepoListTableItem[] = repos.map((repo) => {
+  const repositoryList: RepoListTableItem[] = repos?.map((repo) => {
     return {
       namespace: repo.namespace,
       name: repo.name,
@@ -113,7 +113,7 @@ export default function RepositoriesList() {
         })
       : repositoryList;
 
-  const paginatedRepositoryList = filteredRepos.slice(
+  const paginatedRepositoryList = filteredRepos?.slice(
     page * perPage - perPage,
     page * perPage - perPage + perPage,
   );

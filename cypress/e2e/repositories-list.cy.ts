@@ -112,28 +112,27 @@ describe('Repositories List Page', () => {
     );
   });
 
-  // TODO: @sunanda - Fix this
-  // it('deletes multiple repositories', () => {
-  //   cy.visit('/repository');
-  //   cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-  //   cy.contains('Select all (103)').click();
-  //   cy.contains('Actions').click();
-  //   cy.contains('Delete').click();
-  //   cy.contains('Permanently delete repositories?');
-  //   cy.contains(
-  //     'This action deletes all repositories and cannot be recovered.',
-  //   );
-  //   cy.contains('Confirm deletion by typing "confirm" below:');
-  //   cy.get('input[id="delete-confirmation-input"]').type('confirm');
-  //   cy.get('[id="bulk-delete-modal"]').within(() =>
-  //     cy.get('button:contains("Delete")').click(),
-  //   );
-  //   cy.contains('There are no viewable repositories').should('exist');
-  //   cy.contains(
-  //     'Either no repositories exist yet or you may not have permission to view any. If you have permission, try creating a new repository.',
-  //   ).should('exist');
-  //   cy.contains('Create Repository');
-  // });
+  it('deletes multiple repositories', () => {
+    cy.visit('/repository');
+    cy.get('button[id="toolbar-dropdown-checkbox"]').click();
+    cy.contains('Select all (153)').click();
+    cy.contains('Actions').click();
+    cy.contains('Delete').click();
+    cy.contains('Permanently delete repositories?');
+    cy.contains(
+      'This action deletes all repositories and cannot be recovered.',
+    );
+    cy.contains('Confirm deletion by typing "confirm" below:');
+    cy.get('input[id="delete-confirmation-input"]').type('confirm');
+    cy.get('[id="bulk-delete-modal"]').within(() =>
+      cy.get('button:contains("Delete")').click(),
+    );
+    cy.contains('There are no viewable repositories').should('exist');
+    cy.contains(
+      'Either no repositories exist yet or you may not have permission to view any. If you have permission, try creating a new repository.',
+    ).should('exist');
+    cy.contains('Create Repository');
+  });
 
   // TODO: per page currently does not work
   // https://issues.redhat.com/browse/PROJQUAY-4663
@@ -147,13 +146,14 @@ describe('Repositories List Page', () => {
 
   it('makes multiple repositories public', () => {
     cy.visit('/repository');
+    cy.get('input[placeholder="Search by Name..."]').type('user1');
     cy.get('button[id="toolbar-dropdown-checkbox"]').click();
-    cy.contains('Select page (10)').click();
+    cy.contains('Select page (2)').click();
     cy.contains('Actions').click();
     cy.contains('Make Public').click();
     cy.contains('Make repositories public');
     cy.contains(
-      'Update 10 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
+      'Update 2 repositories visibility to be public so they are visible to all user, and may be pulled by all users.',
     );
     cy.contains('Make public').click();
     cy.contains('private').should('not.exist');

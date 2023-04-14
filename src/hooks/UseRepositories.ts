@@ -25,23 +25,24 @@ export function useRepositories(organization?: string) {
     : user?.organizations.map((org) => org.name).concat(user.username);
 
   const {
-    data: repositories,
+    data: repos,
+    error,
     isLoading: loading,
     isPlaceholderData,
-    error,
-  } = useQuery(
-    ['organization', organization, 'repositories'],
-    currentOrganization
-      ? ({signal}) => fetchRepositoriesForNamespace(currentOrganization, signal)
-      : ({signal}) => fetchAllRepos(listOfOrgNames, true, signal),
-    {
-      placeholderData: [],
+  } = useQuery({
+    queryKey: ['organization', organization || 'all', 'repositories', page],
+    keepPreviousData: true,
+    placeholderData: [],
+    queryFn: ({signal}) => {
+      return currentOrganization
+        ? fetchRepositoriesForNamespace(currentOrganization, signal)
+        : fetchAllRepos(listOfOrgNames, true, signal);
     },
-  );
+  });
 
   return {
     // Data
-    repos: repositories,
+    repos: repos,
 
     // Fetching State
     loading: loading || isPlaceholderData || !listOfOrgNames,
@@ -58,6 +59,6 @@ export function useRepositories(organization?: string) {
     setCurrentOrganization,
 
     // Useful Metadata
-    totalResults: repositories.length,
+    totalResults: repos.length,
   };
 }
