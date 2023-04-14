@@ -57,7 +57,6 @@ export default function RepositoryDetails() {
   const [drawerContent, setDrawerContent] = useState<DrawerContentType>(
     DrawerContentType.None,
   );
-  const [repoDetails, setRepoDetails] = useState<IRepositoryDetails>();
   const [err, setErr] = useState<string>();
 
   const drawerRef = useRef<HTMLDivElement>();

@@ -13,7 +13,6 @@ export function useRepositories(organization?: string) {
 
   // Keep state of current search in this hook
   const [page, setPage] = useState(1);
-  const [nextPageToken, setNextPageToken] = useState('');
   const [perPage, setPerPage] = useState(10);
   const [search, setSearch] = useState<SearchState>({
     field: ColumnNames.name,
@@ -36,12 +35,8 @@ export function useRepositories(organization?: string) {
     placeholderData: [],
     queryFn: ({signal}) => {
       return currentOrganization
-        ? fetchRepositoriesForNamespace(
-            currentOrganization,
-            signal,
-            nextPageToken,
-          )
-        : fetchAllRepos(listOfOrgNames, true, signal, nextPageToken);
+        ? fetchRepositoriesForNamespace(currentOrganization, signal)
+        : fetchAllRepos(listOfOrgNames, true, signal);
     },
   });
 
