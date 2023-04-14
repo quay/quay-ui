@@ -18,7 +18,6 @@ export function useRepositories(organization?: string) {
   const [nextPageToken, setNextPageToken] = useState('');
   const [perPage, setPerPage] = useState(10);
   const [repos, setRepos] = useState([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState<SearchState>({
     field: ColumnNames.name,
     query: '',
@@ -29,7 +28,12 @@ export function useRepositories(organization?: string) {
     ? [currentOrganization]
     : user?.organizations.map((org) => org.name).concat(user.username);
 
-  const {data, error} = useQuery({
+  const {
+    data,
+    error,
+    isLoading: loading,
+    isPlaceholderData,
+  } = useQuery({
     queryKey: ['organization', organization || 'all', 'repositories', page],
     keepPreviousData: true,
     placeholderData: [],
@@ -58,11 +62,7 @@ export function useRepositories(organization?: string) {
         );
       }
       setRepos(newList);
-      setLoading(false);
       return newList;
-    },
-    onError: () => {
-      setLoading(false);
     },
   });
 
@@ -71,7 +71,7 @@ export function useRepositories(organization?: string) {
     repos: repos,
 
     // Fetching State
-    loading: loading,
+    loading: loading || isPlaceholderData || !listOfOrgNames,
     error,
 
     // Search Query State
