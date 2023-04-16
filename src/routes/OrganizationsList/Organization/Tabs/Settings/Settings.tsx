@@ -16,6 +16,8 @@ import {
 import {useLocation} from 'react-router-dom';
 import {useCurrentUser} from 'src/hooks/UseCurrentUser';
 import {useOrganization} from 'src/hooks/UseOrganization';
+import {BillingInformation} from './BillingInformation';
+import {CliConfiguration} from './CLIConfiguration';
 
 const GeneralSettings = () => {
   const location = useLocation();
@@ -120,11 +122,11 @@ export default function Settings() {
       id: 'generalsettings',
       content: <GeneralSettings />,
     },
-    // {
-    //   name: 'Billing Information',
-    //   id: 'billinginformation',
-    //   content: <BillingInformation />,
-    // },
+    {
+      name: 'Billing Information',
+      id: 'billinginformation',
+      content: <BillingInformation />,
+    },
   ];
 
   return (
@@ -141,14 +143,16 @@ export default function Settings() {
             <Tab
               key={tab.id}
               eventKey={tabIndex}
-              title={<TabTitleText>{tab.name}</TabTitleText>}
+              title={<TabTitleText wrap="nowrap">{tab.name}</TabTitleText>}
             />
           ))}
         </Tabs>
       </FlexItem>
 
       <FlexItem
-        alignSelf={{default: 'alignSelfCenter'}}
+        alignSelf={{
+          default: activeTabIndex != 2 ? 'alignSelfCenter' : 'alignSelfStretch',
+        }}
         style={{padding: '20px'}}
       >
         {tabs.at(activeTabIndex).content}
