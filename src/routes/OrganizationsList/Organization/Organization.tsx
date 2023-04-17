@@ -43,6 +43,7 @@ export default function Organization() {
     {
       name: 'Robot accounts',
       component: <RobotAccountsList orgName={orgName} />,
+      visible: organization.is_org_admin || organization.is_admin,
     },
     {
       name: 'Settings',
