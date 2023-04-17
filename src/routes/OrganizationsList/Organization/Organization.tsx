@@ -13,10 +13,11 @@ import RepositoriesList from 'src/routes/RepositoriesList/RepositoriesList';
 import Settings from './Tabs/Settings/Settings';
 import {QuayBreadcrumb} from 'src/components/breadcrumb/Breadcrumb';
 import {useOrganization} from 'src/hooks/UseOrganization';
+import RobotAccountsList from 'src/routes/RepositoriesList/RobotAccountsList';
 
 export default function Organization() {
   const location = useLocation();
-  const repositoryName = location.pathname.split('/')[2];
+  const orgName = location.pathname.split('/')[2];
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {organization} = useOrganization(repositoryName);
@@ -40,6 +41,10 @@ export default function Organization() {
       visible: true,
     },
     {
+      name: 'Robot accounts',
+      component: <RobotAccountsList orgName={orgName} />,
+    },
+    {
       name: 'Settings',
       component: <Settings />,
       visible: organization.is_org_admin || organization.is_admin,
@@ -54,7 +59,7 @@ export default function Organization() {
         className="no-padding-bottom"
       >
         <Title data-testid="repo-title" headingLevel="h1">
-          {repositoryName}
+          {orgName}
         </Title>
       </PageSection>
       <PageSection
